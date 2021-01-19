@@ -1,0 +1,11 @@
+project='lua-resty-aws'
+title='AWS SDK for OpenResty'
+description='AWS SDK to interact with AWS services'
+format='discount'
+file='./src/'
+dir='docs'
+readme='README.md'
+sort=true
+sort_modules=true
+all=false
+style='./docs/'

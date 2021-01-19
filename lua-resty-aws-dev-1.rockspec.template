@@ -1,0 +1,47 @@
+package = "lua-resty-aws"
+version = "dev-1"
+
+source = {
+  url = "git+https://github.com/kong/lua-resty-aws.git",
+  branch = "master"
+}
+
+description = {
+  summary = "AWS SDK for OpenResty",
+  detailed = [[
+    AWS SDK generated from the same data as the AWS JavaScript SDK.
+  ]],
+  license = "Apache 2.0",
+  homepage = "https://github.com/Kong/lua-resty-aws"
+}
+
+dependencies = {
+}
+
+build = {
+  type = "builtin",
+  modules = {
+    ["resty.aws.init"]                                      = "src/resty/aws/init.lua",
+    ["resty.aws.request.validate"]                          = "src/resty/aws/request/validate.lua",
+    ["resty.aws.request.build"]                             = "src/resty/aws/request/build.lua",
+    ["resty.aws.request.sign"]                              = "src/resty/aws/request/sign.lua",
+    ["resty.aws.request.execute"]                           = "src/resty/aws/request/execute.lua",
+    ["resty.aws.request.signatures.v4"]                     = "src/resty/aws/request/signatures/v4.lua",
+    ["resty.aws.credentials.Credentials"]                   = "src/resty/aws/credentials/Credentials.lua",
+    ["resty.aws.credentials.ChainableTemporaryCredentials"] = "src/resty/aws/credentials/ChainableTemporaryCredentials.lua",
+    ["resty.aws.credentials.CredentialProviderChain"]       = "src/resty/aws/credentials/CredentialProviderChain.lua",
+    ["resty.aws.credentials.EC2MetadataCredentials"]        = "src/resty/aws/credentials/EC2MetadataCredentials.lua",
+    ["resty.aws.credentials.EnvironmentCredentials"]        = "src/resty/aws/credentials/EnvironmentCredentials.lua",
+    ["resty.aws.credentials.RemoteCredentials"]             = "src/resty/aws/credentials/RemoteCredentials.lua",
+
+-- AWS SDK files
+-- Do not modify anything between the start and end markers, that part is generated
+    ["resty.aws.raw-api.region_config_data"] = "src/resty/aws/raw-api/region_config_data.lua",
+    ["resty.aws.raw-api.table_of_contents"] = "src/resty/aws/raw-api/table_of_contents.lua",
+--START-MARKER--
+
+This will be replaced by the actual file list imported from the AWS SDK
+
+--END-MARKER--
+  }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AWS SDK for OpenResty</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>lua-resty-aws</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Overview">Overview </a></li>
+<li><a href="#Status">Status </a></li>
+<li><a href="#Installation">Installation </a></li>
+<li><a href="#Development">Development </a></li>
+<li><a href="#Testing">Testing </a></li>
+<li><a href="#To_do">To do </a></li>
+<li><a href="#Copyright_and_license">Copyright and license </a></li>
+<li><a href="#History">History </a></li>
+</ul>
+
+
+<h2>Topics</h2>
+<ul class="">
+  <li><strong>README</strong></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AWS.html">AWS</a></li>
+  <li><a href="../classes/ChainedTemporaryCredentials.html">ChainedTemporaryCredentials</a></li>
+  <li><a href="../classes/CredentialProviderChain.html">CredentialProviderChain</a></li>
+  <li><a href="../classes/Credentials.html">Credentials</a></li>
+  <li><a href="../classes/EC2MetadataCredentials.html">EC2MetadataCredentials</a></li>
+  <li><a href="../classes/EnvironmentCredentials.html">EnvironmentCredentials</a></li>
+  <li><a href="../classes/RemoteCredentials.html">RemoteCredentials</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+
+<h1>lua-resty-aws</h1>
+
+
+<p><a name="Overview"></a></p>
+<h2>Overview</h2>
+
+<p>AWS SDK for OpenResty. The SDK is generated from the <a href="https://github.com/aws/aws-sdk-js/tree/master/apis">original AWS JavaScript
+repository details</a>.</p>
+
+<p><a href="https://kong.github.io/lua-resty-aws/topics/README.md.html">The documentation</a>
+will mostly cover the specifics for this library, the actual
+<a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/">services invoked are documented by AWS</a>.</p>
+
+<p>For a quick start on how to use this library checkout
+<a href="https://kong.github.io/lua-resty-aws/classes/AWS.html">the examples of the AWS class</a>.</p>
+
+<hr/>
+
+<p><a name="Status"></a></p>
+<h2>Status</h2>
+
+<p>This library is under early development. Not everything has been implemented,
+and testing is hard since it requires access to AWS resources and not just
+regular CI.</p>
+
+<hr/>
+
+<p><a name="Installation"></a></p>
+<h2>Installation</h2>
+
+<p>Installation will be done using LuaRocks, but is currently not yet available
+until a first release is made.</p>
+
+<p>For now run <code>make install</code>.</p>
+
+<hr/>
+
+<p><a name="Development"></a></p>
+<h2>Development</h2>
+
+<p>To update the SDK version being used edit the version tag in <a href="https://github.com/Kong/lua-resty-aws/blob/main/update_api_files.sh"><code>update_api_files.sh</code></a>
+and then run <code>make dev</code>.</p>
+
+<p>Make sure to run <code>make dev</code> to pull in the generated files. Documentation can be
+generated using <a href="https://github.com/lunarmodules/LDoc">ldoc</a> by running <code>make docs</code>.</p>
+
+<hr/>
+
+<p><a name="Testing"></a></p>
+<h2>Testing</h2>
+
+<p>Tests are executed using <code>busted</code>, but because they run inside the <code>resty</code> cli tool,
+you must use the <code>rbusted</code> script or run <code>make test</code>.</p>
+
+<hr/>
+
+<p><a name="To_do"></a></p>
+<h2>To do</h2>
+
+<ul>
+    <li>Implement the request/response objects (more AWS like, currently Lua modules)</li>
+    <li>Implement additional signatures (only V4 currently)</li>
+    <li>Implement retries from the global config</li>
+    <li>Additional tests for other services</li>
+</ul>
+
+<hr/>
+
+<p><a name="Copyright_and_license"></a></p>
+<h2>Copyright and license</h2>
+
+<p>Copyright: (c) 2020-2021 Kong, Inc.</p>
+
+<p>Author: Thijs Schreijer</p>
+
+<p>License: <a href="https://github.com/Kong/lua-resty-aws/blob/main/LICENSE">Apache 2.0</a></p>
+
+<hr/>
+
+<p><a name="History"></a></p>
+<h2>History</h2>
+
+<p>Versioning is strictly based on <a href="https://semver.org/">Semantic Versioning</a> (please
+note that in the pre-1.0 stage the API is not considered stable and can change at
+any time, and in any release, major, minor, and patch)</p>
+
+<p>Release process:</p>
+
+<ol>
+    <li>update the changelog below</li>
+    <li>update the rockspec file</li>
+    <li>generate the docs using <code>ldoc .</code></li>
+    <li>commit and tag the release</li>
+    <li>upload rock to LuaRocks</li>
+</ol>
+
+
+<h3>0.1 (xx-xxx-2021) Initial released version</h3>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-01-20 21:32:40 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
