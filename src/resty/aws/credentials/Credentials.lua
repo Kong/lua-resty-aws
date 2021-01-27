@@ -6,6 +6,19 @@ local parse_date = require("luatz").parse.rfc_3339
 local semaphore = require "ngx.semaphore"
 
 
+-- Executes a xpcall but returns hard-errors as Lua 'nil+err' result.
+-- Handles max of 10 return values.
+-- @param f function to execute
+-- @param ... parameters to pass to the function
+local function safe_call(f, ...)
+  local ok, result, err, r3, r4, r5, r6, r7, r8, r9, r10 = xpcall(f, debug.traceback, ...)
+  if ok then
+    return result, err, r3, r4, r5, r6, r7, r8, r9, r10
+  end
+  return nil, result
+end
+
+
 local Credentials = {}
 Credentials.__index = Credentials
 
@@ -80,9 +93,7 @@ function Credentials:get()
         return nil, "create semaphore failed: " .. tostring(err)
       end
 
-      local ok, result, err = pcall(self.refresh, self)
-      err = ok and err or result
-      ok = ok and result
+      local ok, err = safe_call(self.refresh, self)
 
       -- release all waiting threads
       self.semaphore = nil
