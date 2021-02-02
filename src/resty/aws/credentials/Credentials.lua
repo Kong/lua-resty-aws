@@ -6,6 +6,8 @@ local parse_date = require("luatz").parse.rfc_3339
 local semaphore = require "ngx.semaphore"
 
 
+local SEMAPHORE_TIMEOUT = 30 -- semaphore timeout in seconds
+
 -- Executes a xpcall but returns hard-errors as Lua 'nil+err' result.
 -- Handles max of 10 return values.
 -- @param f function to execute
@@ -84,7 +86,11 @@ function Credentials:get()
   while self:needsRefresh() do
     if self.semaphore then
       -- an update is in progress
-      self.semaphore:wait()
+      local ok, err = self.semaphore:wait(SEMAPHORE_TIMEOUT)
+      if not ok then
+        ngx.log(ngx.ERR, "[Credentials ", self.type, "] waiting for semaphore failed: ", err)
+        return nil, "waiting for semaphore failed: " .. tostring(err)
+      end
     else
       -- no update in progress
       local sema, err = semaphore.new()
