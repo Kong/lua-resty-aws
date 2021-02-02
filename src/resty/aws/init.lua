@@ -257,7 +257,10 @@ local function generate_service_methods(service)
       local request = build_request(operation, self.config, params)
 
       -- sign the request according to the signature version required
-      local signed_request = sign_request(self.config, request)
+      local signed_request, err = sign_request(self.config, request)
+      if not signed_request then
+        return nil, "failed to sign request: " .. tostring(err)
+      end
 
       --print(require("pl.pretty").write(signed_request))
 
