@@ -10,7 +10,7 @@ dev:
 	bash ./update_api_files.sh
 
 test:
-	./rbusted
+	busted
 
 docs:
 	mv docs/ldoc.css ./

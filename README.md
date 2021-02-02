@@ -44,8 +44,7 @@ generated using [ldoc](https://github.com/lunarmodules/LDoc) by running `make do
 
 ## Testing
 
-Tests are executed using `busted`, but because they run inside the `resty` cli tool,
-you must use the `rbusted` script or run `make test`.
+Tests are executed using `busted`, or run `make test`.
 
 ---
 
