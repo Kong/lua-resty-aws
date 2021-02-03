@@ -3,7 +3,7 @@ version = "dev-1"
 
 source = {
   url = "git+https://github.com/kong/lua-resty-aws.git",
-  branch = "master"
+  branch = "main"
 }
 
 description = {
