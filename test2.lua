@@ -18,8 +18,9 @@ local AWS = require("resty.aws")
 local aws = AWS()
 local secretsmanager = aws:SecretsManager { region = "us-east-2" }
 
-dump(secretsmanager:GetSecretValue {
+dump(secretsmanager:getSecretValue {
   SecretId = "arn:aws:secretsmanager:us-east-2:238406704566:secret:test2-HN1F1k",
+  VersionStage = "AWSCURRENT",
 })
 
 

@@ -15,7 +15,7 @@ local json_decode = require("cjson.safe").new().decode
 local function execute_request(signed_request)
 
   local httpc = http.new()
-  httpc:set_timeout(60)
+  httpc:set_timeout(60000)
   local ok, err = httpc:connect(signed_request.host, signed_request.port)
   if not ok then
     return nil, ("failed to connect to '%s:%s': %s"):format(
