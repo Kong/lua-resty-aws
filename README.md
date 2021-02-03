@@ -25,26 +25,42 @@ regular CI.
 
 ## Installation
 
-Installation will be done using LuaRocks, but is currently not yet available
-until a first release is made.
+Installation is easiest using LuaRocks:
 
-For now run `make install`.
+    luarocks install lua-resty-aws
+
+To install from the git repo:
+
+    git clone https://github.com/Kong/lua-resty-aws.git
+    cd lua-resty-aws
+    make install
 
 ---
 
 ## Development
 
 To update the SDK version being used edit the version tag in [`update_api_files.sh`](https://github.com/Kong/lua-resty-aws/blob/main/update_api_files.sh)
-and then run `make dev`.
+and then run:
+
+    make dev
 
 Make sure to run `make dev` to pull in the generated files. Documentation can be
-generated using [ldoc](https://github.com/lunarmodules/LDoc) by running `make docs`.
+generated using [ldoc](https://github.com/lunarmodules/LDoc) by running:
+
+    make docs
 
 ---
 
 ## Testing
 
-Tests are executed using `busted`, or run `make test`.
+Tests are executed using Busted and LuaCheck:
+
+    busted
+    luacheck .
+
+or run
+
+    make test
 
 ---
 
@@ -76,10 +92,10 @@ any time, and in any release, major, minor, and patch)
 Release process:
 
 1. update the changelog below
-2. update the rockspec file
+2. create a new rockspec file in `/rockspecs`
 3. generate the docs using `ldoc .`
 4. commit and tag the release
 5. upload rock to LuaRocks
 
 
-### 0.1 (xx-xxx-2021) Initial released version
+### 0.1 (03-Feb-2021) Initial released version
