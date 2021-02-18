@@ -12,7 +12,7 @@ local WARN = ngx.WARN
 local DEFAULT_SERVICE_REQUEST_TIMEOUT = 5000
 
 local url = require "socket.url"
-local http = require "resty.http"
+local http = require "resty.aws.request.http.http"
 local json = require "cjson"
 local getenv = os.getenv
 
@@ -67,7 +67,7 @@ local FullUri do
   local err
   FullUri, err = getFullUri()
   if not FullUri then
-    log(WARN, "Failed to construct RemoteCredentials url: ", err)
+    log(DEBUG, "Failed to construct RemoteCredentials url: ", err)
 
   else
     -- parse it and set a default port if omitted

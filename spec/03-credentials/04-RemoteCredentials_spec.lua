@@ -40,13 +40,13 @@ describe("RemoteCredentials", function()
     os.getenv = function(name)  -- luacheck: ignore
       return mockvars[name] or old_getenv(name) or nil
     end
-    package.loaded["resty.http"] = http
+    package.loaded["resty.aws.request.http.http"] = http
     package.loaded["resty.aws.credentials.RemoteCredentials"] = nil
     RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
   end)
 
   after_each(function()
-    package.loaded["resty.http"] = nil
+    package.loaded["resty.aws.request.http.http"] = nil
     package.loaded["resty.aws.credentials.RemoteCredentials"] = nil
     os.getenv = old_getenv  -- luacheck: ignore
   end)
