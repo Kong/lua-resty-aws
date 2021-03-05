@@ -1,7 +1,7 @@
 --- EC2MetadataCredentials class.
 -- @classmod EC2MetadataCredentials
 
-local http = require "resty.http"
+local http = require "resty.aws.request.http.http"
 local json = require("cjson.safe").new()
 local log = ngx.log
 local DEBUG = ngx.DEBUG
@@ -37,7 +37,6 @@ function EC2MetadataCredentials:refresh()
   client:set_timeout(METADATA_SERVICE_REQUEST_TIMEOUT)
 
   local ok, err = client:connect(METADATA_SERVICE_HOST, METADATA_SERVICE_PORT)
-
   if not ok then
     return nil, "Could not connect to EC2 metadata service: " .. tostring(err)
   end
@@ -57,11 +56,11 @@ function EC2MetadataCredentials:refresh()
   end
 
   local iam_role_name = role_name_request_res:read_body()
-
   log(DEBUG, "Found EC2 IAM role on instance with name: ", iam_role_name)
 
-  local ok, err = client:connect(METADATA_SERVICE_HOST, METADATA_SERVICE_PORT)
 
+
+  local ok, err = client:connect(METADATA_SERVICE_HOST, METADATA_SERVICE_PORT)
   if not ok then
     return nil, "Could not connect to EC2 metadata service: " .. tostring(err)
   end

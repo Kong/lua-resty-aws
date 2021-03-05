@@ -1,4 +1,4 @@
-local http = require "resty.http"
+local http = require "resty.aws.request.http.http"
 local json_decode = require("cjson.safe").new().decode
 
 -- TODO: retries and back-off: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
