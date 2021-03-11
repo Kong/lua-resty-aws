@@ -36,6 +36,10 @@
 </ul>
 
 
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>resty.aws.request.http.socket</strong></li>
+</ul>
 <h2>Classes</h2>
 <ul class="nowrap">
   <li><a href="../classes/AWS.html">AWS</a></li>
@@ -44,11 +48,7 @@
   <li><a href="../classes/Credentials.html">Credentials</a></li>
   <li><a href="../classes/EC2MetadataCredentials.html">EC2MetadataCredentials</a></li>
   <li><a href="../classes/EnvironmentCredentials.html">EnvironmentCredentials</a></li>
-  <li><strong>RemoteCredentials</strong></li>
-</ul>
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/resty.aws.request.http.socket.html">resty.aws.request.http.socket</a></li>
+  <li><a href="../classes/RemoteCredentials.html">RemoteCredentials</a></li>
 </ul>
 <h2>Topics</h2>
 <ul class="">
@@ -59,18 +59,19 @@
 
 <div id="content">
 
-<h1>Class <code>RemoteCredentials</code></h1>
-<p>RemoteCredentials class.</p>
-<p>
+<h1>Module <code>resty.aws.request.http.socket</code></h1>
+<p>Socket compatibility module to enable the init-phase.</p>
+<p> File copied from lua-resty-socket
+ specifically: https://github.com/thibaultcha/lua-resty-socket/pull/18</p>
 
-</p>
+<p> There should be no need to invoke anything in this module from user code.</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#aws:RemoteCredentials">aws:RemoteCredentials (opt)</a></td>
-	<td class="summary">Constructor, inherits from <a href="../classes/Credentials.html#">Credentials</a>.</td>
+	<td class="name" nowrap><a href="#set_luasec_defaults">set_luasec_defaults (defaults)</a></td>
+	<td class="summary">Setting LuaSec defaults</td>
 	</tr>
 </table>
 
@@ -82,17 +83,19 @@
 
     <dl class="function">
     <dt>
-    <a name = "aws:RemoteCredentials"></a>
-    <strong>aws:RemoteCredentials (opt)</strong>
+    <a name = "set_luasec_defaults"></a>
+    <strong>set_luasec_defaults (defaults)</strong>
     </dt>
     <dd>
-    Constructor, inherits from <a href="../classes/Credentials.html#">Credentials</a>.
+    Setting LuaSec defaults
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">opt</span>
-         options table, no additional fields to the <a href="../classes/Credentials.html#">Credentials</a> class.
+        <li><span class="parameter">defaults</span>
+
+
+
         </li>
     </ul>
 

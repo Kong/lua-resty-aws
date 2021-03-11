@@ -49,6 +49,17 @@ generated using [ldoc](https://github.com/lunarmodules/LDoc) by running:
 
     make docs
 
+Note that distribution is a little more complex than desired. This is because the
+repo does not contain all the json files pulled in from the JS sdk. This in turn
+means that `luarocks upload` cannot build a rock from the repo (because it is
+incomplete after just being pulled).
+
+To work around this the `make pack` command actually builds a .rock file that
+is compatible with LuaRocks. The `make upload` target will upload the generated
+rock.
+
+See the detailed release instructions at [History](#history).
+
 ---
 
 ## Testing
@@ -92,10 +103,13 @@ any time, and in any release, major, minor, and patch)
 Release process:
 
 1. update the changelog below
-2. create a new rockspec file in `/rockspecs`
-3. generate the docs using `ldoc .`
-4. commit and tag the release
-5. upload rock to LuaRocks
-
+1. generate the docs using `ldoc .`
+1. run `make clean`
+1. commit, and tag the commit with the version `x.y.z`
+1. push the commit and tag
+1. run `VERSION=x.y.z make pack`
+1. test the create `.rock` file
+1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
+1. test installing the rock from LuaRocks
 
 ### 0.1 (03-Feb-2021) Initial released version

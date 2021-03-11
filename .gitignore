@@ -2,7 +2,7 @@
 luac.out
 
 # luarocks build files
-*.src.rock
+*.rock
 *.zip
 *.tar.gz
 
@@ -43,5 +43,5 @@ luac.out
 delete-me
 
 # generated files
-lua-resty-aws-dev-1.rockspec
+*.rockspec
 src/resty/aws/raw-api
