@@ -115,5 +115,6 @@ Release process:
 ### unreleased
 
  - fix: add proper json Content-Type header from meta-data
+ - fix: use proper signingName for the signature
 
 ### 0.1 (03-Feb-2021) Initial released version

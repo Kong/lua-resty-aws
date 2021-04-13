@@ -76,7 +76,7 @@ local function build_request(operation, config, params)
     method = (operation.http or {}).method,
     query = {},
     headers = {
-      ["X-Amz-Target"] = (config.endpointPrefix or config.targetPrefix) .. "." .. operation.name,
+      ["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name,
     },
     body = {},
   }
