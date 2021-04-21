@@ -112,4 +112,8 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### unreleased
+
+ - fix: add proper json Content-Type header from meta-data
+
 ### 0.1 (03-Feb-2021) Initial released version

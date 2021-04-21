@@ -139,7 +139,8 @@ local function build_request(operation, config, params)
 
     else
       -- assuming remaining protocols "rest-json", "json", "query" to be safe to json encode
-      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-1.1"
+      local version = config.jsonVersion or '1.0'
+      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-" .. version
       request.body = json_encode(request.body)
     end
     request.headers["Content-Length"] = #request.body
