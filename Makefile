@@ -12,6 +12,7 @@ dev:
 	bash ./update_api_files.sh
 
 test:
+	luacheck .
 	busted
 
 docs:

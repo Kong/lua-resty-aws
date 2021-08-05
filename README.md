@@ -103,17 +103,19 @@ any time, and in any release, major, minor, and patch)
 Release process:
 
 1. update the changelog below
-1. generate the docs using `ldoc .`
 1. run `make clean`
+1. run `make test`
+1. run `make docs`
 1. commit, and tag the commit with the version `x.y.z`
 1. push the commit and tag
 1. run `VERSION=x.y.z make pack`
-1. test the create `.rock` file
+1. test the created `.rock` file
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### unreleased
+### 0.2 (-5-Aug-2021)
 
+ - fix: rockspec, add Penlight dependency
  - fix: add proper json Content-Type header from meta-data
  - fix: use proper signingName for the signature
 
