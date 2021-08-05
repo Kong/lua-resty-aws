@@ -6,7 +6,6 @@ local build_request = require("resty.aws.request.build")
 local sign_request = require("resty.aws.request.sign")
 local execute_request = require("resty.aws.request.execute")
 local split = require("pl.utils").split
-local cjson = require "cjson.safe"
 
 
 

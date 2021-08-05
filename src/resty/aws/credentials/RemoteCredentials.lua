@@ -7,7 +7,6 @@
 
 local log = ngx.log
 local DEBUG = ngx.DEBUG
-local WARN = ngx.WARN
 
 local DEFAULT_SERVICE_REQUEST_TIMEOUT = 5000
 
