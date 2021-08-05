@@ -36,7 +36,7 @@ $(target_rock):
 	cd /tmp/random_dir_2cs4f0tghRT/lua-resty-aws; git checkout ${VERSION}
 	cd /tmp/random_dir_2cs4f0tghRT/lua-resty-aws; make dev
 	cd /tmp/random_dir_2cs4f0tghRT; zip -r lua-resty-aws-${VERSION}-1.src.rock lua-resty-aws
-	cd /tmp/random_dir_2cs4f0tghRT; cat lua-resty-aws/lua-resty-aws-dev-1.rockspec | sed "s/\"dev-1\"/\"${VERSION}-1\"/" > lua-resty-aws-${VERSION}-1.rockspec
+	cd /tmp/random_dir_2cs4f0tghRT; cat lua-resty-aws/lua-resty-aws-dev-1.rockspec | sed "s/package_version = \"dev\"/package_version = \"${VERSION}\"/" > lua-resty-aws-${VERSION}-1.rockspec
 	cd /tmp/random_dir_2cs4f0tghRT; zip -r lua-resty-aws-${VERSION}-1.src.rock lua-resty-aws-${VERSION}-1.rockspec
 	mv /tmp/random_dir_2cs4f0tghRT/lua-resty-aws-${VERSION}-1.src.rock ./
 	-@rm lua-resty-aws-${VERSION}-1.rockspec

@@ -113,7 +113,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### 0.2 (-5-Aug-2021)
+### 0.2 (05-Aug-2021)
 
  - fix: rockspec, add Penlight dependency
  - fix: add proper json Content-Type header from meta-data
