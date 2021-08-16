@@ -283,7 +283,9 @@ end
 -- create, so you might want to reuse them.
 -- @param config (optional) the config table to be copied into the instance as the global `aws_instance.config`
 -- @usage
--- local AWS = require("AWS")
+-- local AWS = require("resty.aws")
+-- local utils = require("resty.aws.utils")
+-- local config = { region = utils.getCurrentRegion() }
 --
 -- local aws = AWS(config)
 -- -- or similarly

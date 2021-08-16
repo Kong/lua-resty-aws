@@ -113,6 +113,12 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### unreleased
+
+ - feat: capability to fetch metadata for ECS tasks (EC2 & Fargate), versions 2, 3, and 4
+ - feat: capability to fetch IMDS metadata (EC2 & EKS), versions 1, and 2
+ - feat: automatic region detection, check the docs for details (utils module)
+
 ### 0.2 (05-Aug-2021)
 
  - fix: rockspec, add Penlight dependency
