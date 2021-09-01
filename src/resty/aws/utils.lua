@@ -39,7 +39,7 @@ local function make_request(url, method, headers)
 
   if res.status ~= 200 then
     return nil, "failed to get metadata from " .. url .. ": " ..
-                tostring(res.status) .. " " .. tostring(res.reason)
+                tostring(res.status) .. " " .. tostring(res.reason), res.status
   end
 
   if res.headers["Content-Type"]:find("json") then
@@ -53,9 +53,6 @@ end
 
 do -- getIMDSMetadata
   local IDMSToken
-  local IDMSToken_expires = 0
-  local token_ttl = 21600   -- 6 hours
-  local refresh_after = token_ttl - 600  -- 10 minutes before
 
   --- Fetches IDMS Metadata (EC2 and EKS).
   -- Will make a call to the IP address and hence might timeout if ran on anything
@@ -79,15 +76,14 @@ do -- getIMDSMetadata
     httpc:set_timeouts(METADATA_TIMEOUTS, METADATA_TIMEOUTS, METADATA_TIMEOUTS)
 
     -- check token, refresh if necessary
-    if version ~= "V1" and IDMSToken_expires <= ngx.now() then
+    if version ~= "V1" and not IDMSToken then
       local headers = { ["X-aws-ec2-metadata-token-ttl-seconds"] = "21600" }
       local token, err = make_request(IDMS_URI.."/latest/api/token", "PUT", headers)
       if not token then
-        return nil, err
+        return nil, "failed getting IDMSToken: " .. tostring(err)
       end
 
       IDMSToken = token
-      IDMSToken_expires = ngx.now() + refresh_after
     end
 
     -- fetch the metadata
@@ -95,7 +91,15 @@ do -- getIMDSMetadata
     if version ~= "V1" then
       headers = { ["X-aws-ec2-metadata-token"] = IDMSToken }
     end
-    return make_request(IDMS_URI .. subpath, nil, headers)
+
+    local resp, ct, status = make_request(IDMS_URI .. subpath, nil, headers)
+    if version ~= "V1" and status == 401 and not retry then
+      -- unauthorized, must refresh token, so clear and recurse as retry
+      ngx.log(ngx.DEBUG, "IDMS metadata request returned '401 unauthorized', updating token and retrying")
+      IDMSToken = nil
+      return Utils.getIDMSMetadata(subpath, version, true)
+    end
+    return resp, ct
   end
 end
 
@@ -166,7 +170,7 @@ do  -- getCurrentRegion
     -- to stay the same, but ECS metadata has no 'region' field, so best we can do.
     local region = availablity_zone:match("^(.+%-%d+)%w+$")
     if not region then
-      return region, region and nil or "couldn't parse region from '"..availablity_zone.."'"
+      return nil, "couldn't parse region from '"..availablity_zone.."'"
     end
     return region
   end
