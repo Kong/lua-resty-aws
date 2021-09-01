@@ -248,7 +248,7 @@ do  -- getCurrentRegion
       ngx.log(ngx.DEBUG, "detect AWS region; wait for other thread result")
       local ok, err = sema:wait(SEMAPHORE_TIMEOUT)
       if not ok then
-        return "waiting for semaphore failed: " .. tostring(err)
+        return nil, "waiting for semaphore failed: " .. tostring(err)
       end
       return true
     end
