@@ -1,6 +1,10 @@
 -- load a version of resty-http using luasocket as a fallback
 -- this enables using the SDK in the "init" phase where cosockets
 -- are unavailable.
+--
+-- NOTE: the socket compatibilty is not sturdy enough to have the http-client
+-- make multiple requests over the same connection. So after each request create
+-- a new http client and do not re-use it.
 
 local http do
   -- store old values

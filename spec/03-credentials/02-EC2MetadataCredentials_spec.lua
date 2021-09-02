@@ -6,6 +6,7 @@ local http = {
   new = function()
     return {
       connect = function() return true end,
+      close = function() return true end,
       set_timeout = function() return true end,
       request = function(self, opts)
         if opts.path == "/latest/meta-data/iam/security-credentials/" then
@@ -55,8 +56,8 @@ describe("EC2MetadataCredentials", function()
   it("fetches credentials", function()
     local cred = EC2MetadataCredentials:new()
     local success, key, secret, token = cred:get()
-    assert.equal(true, success)
     assert.equal("access", key)
+    assert.equal(true, success)
     assert.equal("secret", secret)
     assert.equal("token", token)
   end)

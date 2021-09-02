@@ -1,8 +1,10 @@
---- Socket compatibility module to enable the init-phase.
+-- Socket compatibility module to enable the init-phase.
 -- File copied from lua-resty-socket
 -- specifically: https://github.com/thibaultcha/lua-resty-socket/pull/18
 --
 -- There should be no need to invoke anything in this module from user code.
+--
+-- NOTE: see comments in the http module regarding compatibility!!
 
 local type = type
 local luasec_defaults = {}

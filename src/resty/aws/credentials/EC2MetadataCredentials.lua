@@ -59,6 +59,12 @@ function EC2MetadataCredentials:refresh()
   log(DEBUG, "Found EC2 IAM role on instance with name: ", iam_role_name)
 
 
+  -- recycle the client, because the luasocket/ngx.socket compatibility is not
+  -- solid enough to reuse the httrp client
+  client:close()
+  client = http.new()
+  client:set_timeout(METADATA_SERVICE_REQUEST_TIMEOUT)
+
 
   local ok, err = client:connect(METADATA_SERVICE_HOST, METADATA_SERVICE_PORT)
   if not ok then
