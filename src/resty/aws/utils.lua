@@ -72,9 +72,6 @@ do -- getIMDSMetadata
       subpath = "/latest/meta-data/"
     end
 
-    local httpc = http:new()
-    httpc:set_timeouts(METADATA_TIMEOUTS, METADATA_TIMEOUTS, METADATA_TIMEOUTS)
-
     -- check token, refresh if necessary
     if version ~= "V1" and not IDMSToken then
       local headers = { ["X-aws-ec2-metadata-token-ttl-seconds"] = "21600" }
