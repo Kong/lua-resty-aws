@@ -9,9 +9,9 @@
 local type = type
 local luasec_defaults = {}
 
-----------------------------
+--==========================
 -- LuaSocket proxy metatable
-----------------------------
+--==========================
 
 local proxy_mt
 

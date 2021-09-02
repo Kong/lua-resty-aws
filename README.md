@@ -104,6 +104,7 @@ Release process:
 
 1. update the changelog below
 1. run `make clean`
+1. run `make dev`
 1. run `make test`
 1. run `make docs`
 1. commit, and tag the commit with the version `x.y.z`

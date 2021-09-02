@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AWS SDK for OpenResty</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>lua-resty-aws</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/resty.aws.request.http.socket.html">resty.aws.request.http.socket</a></li>
+  <li><strong>resty.aws.utils</strong></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AWS.html">AWS</a></li>
+  <li><a href="../classes/ChainedTemporaryCredentials.html">ChainedTemporaryCredentials</a></li>
+  <li><a href="../classes/CredentialProviderChain.html">CredentialProviderChain</a></li>
+  <li><a href="../classes/Credentials.html">Credentials</a></li>
+  <li><a href="../classes/EC2MetadataCredentials.html">EC2MetadataCredentials</a></li>
+  <li><a href="../classes/EnvironmentCredentials.html">EnvironmentCredentials</a></li>
+  <li><a href="../classes/RemoteCredentials.html">RemoteCredentials</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>resty.aws.utils</code></h1>
+<p>AWS utility module.</p>
+<p> Provides methods for detecting the AWS Region, as well as fetching metadata.
+ Since the module requires access to the environment variables with metadata
+ URLs, it should preferably be loaded in the <code>init</code> phases to make sure it can
+ access the variables required.</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Utils.getCurrentRegion">Utils.getCurrentRegion ()</a></td>
+	<td class="summary">Auto detects the current AWS region.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Utils.getECSTaskMetadata">Utils.getECSTaskMetadata (subpath, version)</a></td>
+	<td class="summary">Fetches ECS Task Metadata.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Utils.getIDMSMetadata">Utils.getIDMSMetadata (path, version)</a></td>
+	<td class="summary">Fetches IDMS Metadata (EC2 and EKS).</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Utils.getCurrentRegion"></a>
+    <strong>Utils.getCurrentRegion ()</strong>
+    </dt>
+    <dd>
+    Auto detects the current AWS region.
+ It will try the following options (in order);</p>
+
+<ol>
+    <li>environment variable <code>AWS_REGION</code></li>
+    <li>environment variable <code>AWS_DEFAULT_REGION</code></li>
+    <li>ECS metadata V4 (parse region from "AvailabilityZone") if the environment
+    variable <code>ECS_CONTAINERMETADATA_URI_V4</code> is available</li>
+    <li>ECS metadata V3 (parse region from "AvailabilityZone") if the environment
+    variable <code>ECS_CONTAINERMETADATA_URI</code> is available</li>
+    <li>IDMSv2 metadata</li>
+</ol>
+
+<p> The IDMSv2 call makes a call to an IP endpoint, and hence could timeout
+ (timeout is 5 seconds) if called on anything not being an EC2 or EKS instance.</p>
+
+<p> Note: the result is cached so any consequtive calls will not perform any IO.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        region, or nil+err
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Utils.getECSTaskMetadata"></a>
+    <strong>Utils.getECSTaskMetadata (subpath, version)</strong>
+    </dt>
+    <dd>
+    Fetches ECS Task Metadata.  Both for Fargate as well as EC2 based ECS.
+ Support version 2, 3, and 4 (version 2 is NOT available on Fargate).
+ V3 and V4 will return an error if no url is found in the related environment variable, V2 will make a request to
+ the IP address and hence might timeout if ran on anything else than a EC2-based ECS container.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">subpath</span>
+         (optional) path to return data from (default "/metadata" for V2, nothing for V3+)
+        </li>
+        <li><span class="parameter">version</span>
+         (optional) metadata version to get "V3" or V4" (case insensitive, default "V4")
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        body &amp; content-type (if json, the body will be decoded to a Lua table), or nil+err
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Utils.getIDMSMetadata"></a>
+    <strong>Utils.getIDMSMetadata (path, version)</strong>
+    </dt>
+    <dd>
+    Fetches IDMS Metadata (EC2 and EKS).
+ Will make a call to the IP address and hence might timeout if ran on anything
+ else than an EC2-instance.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+         (optional) path to return data from, default <code>/latest/meta-data/</code>
+        </li>
+        <li><span class="parameter">version</span>
+         (optional) version of IDMS to use, either "V1" or "V2" (case insensitive, default "V2")
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        body &amp; content-type (if json, the body will be decoded to a Lua table), or nil+err
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-09-02 19:11:14 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
