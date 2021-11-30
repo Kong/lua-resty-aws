@@ -114,6 +114,10 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### unreleased
+
+ - fix: do not validate patterns as regexes are incompatible
+
 ### 0.3 (02-Sep-2021)
 
  - feat: capability to fetch metadata for ECS tasks (EC2 & Fargate), versions 2, 3, and 4
