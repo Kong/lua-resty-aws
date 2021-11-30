@@ -398,8 +398,9 @@ local validators do
       return nil, (id and id .. ": " or "") .. "maximum length of " .. max
     end,
     pattern = function(value, pattern, id)
-      if ngx.re.match(value, pattern, "jo") then return true end
-      return nil, (id and id .. ": " or "") .. "value should match pattern: "..pattern
+      return true  -- disabled since the JavaScript Regex patterns are incompatible
+      -- if ngx.re.match(value, pattern, "jo") then return true end
+      -- return nil, (id and id .. ": " or "") .. "value should match pattern: "..pattern
     end,
     enum = function(value, enums, id)
       for _, enum in ipairs(enums) do
