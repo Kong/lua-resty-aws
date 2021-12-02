@@ -81,6 +81,10 @@ local function build_request(operation, config, params)
   if config.signingName or config.targetPrefix then
     request.headers["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name
   end
+  if config.protocol == "query" then
+    request.query["Action"] = operation.name
+    request.query["Version"] = config.apiVersion
+  end
 
 
   -- inject parameters in the right places; path/query/header/body
