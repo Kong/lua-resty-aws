@@ -231,6 +231,17 @@ end
 
 
 
+-- a few AWS services make unsigned calls, this is not part of the metadata, but
+-- of override files. See this one: https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js
+local unsigned = {
+  STS = {
+    AssumeRoleWithWebIdentity = true,
+    AssumeRoleWithSAML = true,
+  }
+}
+
+
+
 -- Generate a function for each operation in the service api "operations" table
 local function generate_service_methods(service)
   for _, operation in pairs(service.api.operations) do
@@ -255,8 +266,19 @@ local function generate_service_methods(service)
       -- generate request data and format it according to the protocol
       local request = build_request(operation, self.config, params)
 
+      local old_sig
+      if (unsigned[service.api.metadata.serviceId] or {})[operation.name] then
+        -- were not signing this one, patch signature version
+        old_sig = self.config.signatureVersion
+        self.config.signatureVersion = "none"
+      end
+
       -- sign the request according to the signature version required
       local signed_request, err = sign_request(self.config, request)
+      if old_sig then
+        -- revert the patched signatureVersion
+        self.config.signatureVersion = old_sig
+      end
       if not signed_request then
         return nil, "failed to sign request: " .. tostring(err)
       end
