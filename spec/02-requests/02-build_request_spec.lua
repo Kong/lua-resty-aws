@@ -130,7 +130,7 @@ describe("operations protocol", function()
   end)
 
 
-  it("query: params go into query table", function()
+  it("query: params go into query table, target action+version added", function()
 
     config.protocol = "query"
     params.subList = nil
@@ -148,6 +148,8 @@ describe("operations protocol", function()
         RoleArn = 'hello',
         RoleSessionName = 'world',
         UserId = "Arthur Dent",
+        Action = "AssumeRole",
+        Version = "2011-06-15",
       }
     }, request)
   end)
