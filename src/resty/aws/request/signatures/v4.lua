@@ -157,6 +157,19 @@ local function prepare_awsv4_request(config, request_data)
   end
 
   local tls = config.tls
+  local host = config.endpoint
+  do
+    local s, e = host:find("://")
+    if s then
+      -- the "globalSSL" one from the region_config_data file
+      local scheme = host:sub(1, s-1):lower()
+      host = host:sub(e+1, -1)
+      if config.tls == nil then
+        config.tls = scheme == "https"
+      end
+    end
+  end
+
   if tls == nil then
     tls = true
   end
@@ -165,7 +178,6 @@ local function prepare_awsv4_request(config, request_data)
   local req_date = os.date("!%Y%m%dT%H%M%SZ", timestamp)
   local date = os.date("!%Y%m%d", timestamp)
 
-  local host = config.endpoint
   local host_header do -- If the "standard" port is not in use, the port should be added to the Host header
     local with_port
     if tls then

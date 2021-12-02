@@ -75,11 +75,13 @@ local function build_request(operation, config, params)
     path =  (operation.http or {}).requestUri or "",
     method = (operation.http or {}).method,
     query = {},
-    headers = {
-      ["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name,
-    },
+    headers = {},
     body = {},
   }
+  if config.signingName or config.targetPrefix then
+    request.headers["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name
+  end
+
 
   -- inject parameters in the right places; path/query/header/body
   -- this assumes they all live on the top-level of the structure, is this correct??
