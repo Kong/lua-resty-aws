@@ -9,6 +9,7 @@ CredentialProviderChain
 EC2MetadataCredentials
 EnvironmentCredentials
 RemoteCredentials
+TokenFileWebIdentityCredentials
 ChainableTemporaryCredentials  --> to be tested
 
 ## Classes not yet implemented
@@ -18,6 +19,5 @@ FileSystemCredentials
 ProcessCredentials
 SAMLCredentials
 SharedIniFileCredentials
-TemporaryCredentials
-TokenFileWebIdentityCredentials
+TemporaryCredentials (superseeded by ChainableTemporaryCredentials)
 WebIdentityCredentials
