@@ -18,7 +18,12 @@ CredentialProviderChain.defaultProviders = {} do
       return
     end
     -- instantiate and add
-    CredentialProviderChain.defaultProviders[#CredentialProviderChain.defaultProviders+1] = class:new(opts)
+    local ok, instance = pcall(class.new, class, opts)
+    if not ok then
+      ngx.log(ngx.DEBUG, "AWS credential class '", name, "' failed to instantiate: ", instance)
+      return
+    end
+    CredentialProviderChain.defaultProviders[#CredentialProviderChain.defaultProviders+1] = instance
   end
 
   -- add the defaults
