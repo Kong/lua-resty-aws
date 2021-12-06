@@ -114,7 +114,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### unreleased
+### 0.4.0 (06-dec-2021)
 
  - feat: added TokenFileWebIdentityCredentials. This adds default IAM credentials
    to be picked up on EKS. The default AWS instance creates a CredentialProviderChain
