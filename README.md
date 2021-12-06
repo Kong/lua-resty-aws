@@ -116,6 +116,13 @@ Release process:
 
 ### unreleased
 
+ - feat: added TokenFileWebIdentityCredentials. This adds default IAM credentials
+   to be picked up on EKS. The default AWS instance creates a CredentialProviderChain
+   which includes TokenFileWebIdentity. So on EKS it will now pick up container
+   based credentials instead of falling back to the underlying (more coarse) EC2
+   credentials.
+ - fix: for 'query' type calls, add target action and version, which are required
+ - fix: allow for unsigned requests for services requiring that (STS)
  - fix: do not validate patterns as regexes are incompatible
 
 ### 0.3 (02-Sep-2021)
