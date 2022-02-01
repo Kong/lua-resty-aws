@@ -114,6 +114,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### (unreleased)
+
+ - deps: bumped the [lua-resty-http](https://github.com/ledgetech/lua-resty-http)
+   dependency to 0.16 to disable the warnings and use the better connection building logic.
+
 ### 0.4.0 (06-dec-2021)
 
  - feat: added TokenFileWebIdentityCredentials. This adds default IAM credentials

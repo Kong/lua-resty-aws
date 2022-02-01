@@ -16,24 +16,19 @@ local function execute_request(signed_request)
 
   local httpc = http.new()
   httpc:set_timeout(60000)
-  local ok, err = httpc:connect(signed_request.host, signed_request.port)
+
+  local ok, err = httpc:connect {
+    host = signed_request.host,
+    port = signed_request.port,
+    scheme = signed_request.tls and "https" or "http",
+    ssl_server_name = signed_request.host,
+  }
   if not ok then
-    return nil, ("failed to connect to '%s:%s': %s"):format(
+    return nil, ("failed to connect to '%s://%s:%s': %s"):format(
+                  signed_request.tls and "https" or "http",
                   tostring(signed_request.host),
                   tostring(signed_request.port),
                   tostring(err))
-  end
-
-  if signed_request.tls then
-    -- FIXME: TODO: enable verification again
-    --local ok, err = httpc:ssl_handshake(nil, signed_request.host, true)
-    local ok, err = httpc:ssl_handshake(nil, signed_request.host, false)
-    if not ok then
-      return nil, ("failed tls handshake for '%s:%s': %s"):format(
-                    tostring(signed_request.host),
-                    tostring(signed_request.port),
-                    tostring(err))
-    end
   end
 
   local response, err = httpc:request({

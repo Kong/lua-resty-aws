@@ -24,6 +24,7 @@ description = {
 
 dependencies = {
   "penlight ~> 1",
+  "lua-resty-http >= 0.16",
 }
 
 build = {

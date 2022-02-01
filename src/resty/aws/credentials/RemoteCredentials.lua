@@ -104,8 +104,11 @@ function RemoteCredentials:refresh()
   local client = http.new()
   client:set_timeout(DEFAULT_SERVICE_REQUEST_TIMEOUT)
 
-  local ok, err = client:connect(FullUri.host, FullUri.port)
-
+  local ok, err = client:connect {
+    scheme = FullUri.scheme,
+    host = FullUri.host,
+    port = FullUri.port,
+  }
   if not ok then
     return nil, "Could not connect to RemoteCredentials metadata service: " .. tostring(err)
   end
