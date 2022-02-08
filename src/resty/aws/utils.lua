@@ -206,7 +206,7 @@ do  -- getCurrentRegion
       ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINERMETADATA_URI env variable")
       local metadata, err = Utils.getECSTaskMetadata("/task", "V3")
       if not metadata then
-        ngx.log(ngx.DEBUG, "failed getting ECS metdata V4: ", err)
+        ngx.log(ngx.DEBUG, "failed getting ECS metadata V3: ", err)
       else
         set_region(parse_region_from_availability_zone(metadata.AvailabilityZone))
         return true
