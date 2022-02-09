@@ -64,7 +64,7 @@ describe("config loader", function()
 
     os.remove(config_filename) -- delete the file so we revert to defaults
     config = require "resty.aws.config"
-    local conf = assert(config())
+    local conf = assert(config.get_config())
 
     -- just calling out as separate test; picking default region
     assert.equal("eu-west-1", conf.region)
@@ -92,7 +92,7 @@ describe("config loader", function()
       unsetenv("AWS_CONFIG_FILE")
     end)
     config = require "resty.aws.config"
-    local conf = assert(config())
+    local conf = assert(config.get_config())
 
     -- from the config file; default profile
     assert.equal("eu-central-1", conf.region)
@@ -121,7 +121,7 @@ describe("config loader", function()
       unsetenv("AWS_PROFILE")
     end)
     config = require "resty.aws.config"
-    local conf = assert(config())
+    local conf = assert(config.get_config())
 
     -- from the config file; profile 'tieske'
     assert.equal("us-west-1", conf.region)
@@ -139,6 +139,34 @@ describe("config loader", function()
       retry_mode = 'standard',
       sts_regional_endpoints = 'regional'
     }, conf)
+  end)
+
+  it("global field returns the global configuration (5 sec timeout due to IDMS 2 endpoint)", function()
+    config = require "resty.aws.config"
+    local t = ngx.now()
+    -- getting this config will hit the IDMS 2 endpoint, which will timeout (5 secs)
+    -- running this test multiple times, will fail, since the local system will cache the route
+    -- and the 2nd run will fail immediately with "No route to host"
+    -- hence the assertion if further down
+    local conf = config.global
+    t = ngx.now() - t
+
+    assert.same({
+      region = nil, -- detection should fail
+      AWS_CONFIG_FILE = "~/.aws/config",
+      AWS_EC2_METADATA_DISABLED = false,
+      AWS_PROFILE = 'default',
+      AWS_SHARED_CREDENTIALS_FILE = '~/.aws/credentials',
+      cli_timestamp_format = 'iso8601',
+      duration_seconds = 3600,
+      max_attempts = 5,
+      parameter_validation = true,
+      retry_mode = 'standard',
+      sts_regional_endpoints = 'regional'
+    }, conf)
+
+    -- see comments above
+    assert.near(5, t, 0.5)
   end)
 
 end)

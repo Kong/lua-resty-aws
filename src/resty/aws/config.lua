@@ -195,6 +195,9 @@ end
 --- returns the current configuration.
 -- Reads the configuration files (config + credentials) and overrides them with
 -- any environment variables specified, or defaults.
+--
+-- NOTE: this will not auto-detect the region. Use the `utils` module for that, or
+-- get the `global` table.
 -- @return table with configuration options, table can be empty.
 function config.get_config()
   local cfg = config.load_config() or {}   -- ignore error, already logged
@@ -240,11 +243,24 @@ function config.get_credentials()
   return config.load_credentials()
 end
 
+-- @field global
+config.global = {}  -- trick LuaDoc
+config.global = nil
 
 return setmetatable(config, {
-  __call = function(self, ...)
-    return self.get_config(...)
-  end,
+  __index = function(self, key)
+    if key ~= "global" then
+      return nil
+    end
+    -- Build the global config on demand since there is a recursive relation
+    -- between this module and the utils module.
+    self.global = assert(self.get_config())
+    if not self.global.region then
+      local utils = require "resty.aws.utils"
+      self.global.region = utils.getCurrentRegion()
+      return self.global
+    end
+  end
 })
 
 
