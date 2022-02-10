@@ -1,5 +1,7 @@
 local json = require("cjson.safe").new()
 
+require "resty.aws.config" -- load before mocking the http lib
+
 -- Mock for HTTP client
 local response = {} -- override in tests
 local http = {

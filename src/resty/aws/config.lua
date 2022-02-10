@@ -81,6 +81,9 @@ local env_vars = {
   AMAZON_ACCESS_KEY_ID = { name = "AMAZON_ACCESS_KEY_ID", default = nil },
   AMAZON_SECRET_ACCESS_KEY = { name = "AMAZON_SECRET_ACCESS_KEY", default = nil },
   AMAZON_SESSION_TOKEN = { name = "AMAZON_SESSION_TOKEN", default = nil },
+  -- Variables used in RemoteCredentials (and in the CredentialProviderChain)
+  AWS_CONTAINER_CREDENTIALS_RELATIVE_URI = { name = "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", default = nil },
+  AWS_CONTAINER_CREDENTIALS_FULL_URI = { name = "AWS_CONTAINER_CREDENTIALS_FULL_URI", default = nil },
 }
 
 -- populate the env vars with their values, or defaults
@@ -92,6 +95,7 @@ end
 env_vars.AWS_MAX_ATTEMPTS.value = tonumber(env_vars.AWS_MAX_ATTEMPTS.value) or env_vars.AWS_MAX_ATTEMPTS.default
 env_vars.AWS_DURATION_SECONDS.value = tonumber(env_vars.AWS_DURATION_SECONDS.value) or env_vars.AWS_DURATION_SECONDS.value
 env_vars.AWS_PARAMETER_VALIDATION.value = (env_vars.AWS_PARAMETER_VALIDATION.value ~= "false")  -- to boolean
+env_vars.AWS_EC2_METADATA_DISABLED.value = (env_vars.AWS_EC2_METADATA_DISABLED.value ~= "false")  -- to boolean
 if not env_vars.AWS_REGION.value then
   env_vars.AWS_REGION.value = env_vars.AWS_DEFAULT_REGION.value -- switch to region default if not given
 end

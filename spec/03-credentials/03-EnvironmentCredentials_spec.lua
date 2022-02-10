@@ -1,21 +1,21 @@
+local restore = require "spec.helpers"
+
 describe("EnvironmentCredentials", function()
 
-  local EnvironmentCredentials = require "resty.aws.credentials.EnvironmentCredentials"
-  local old_getenv = os.getenv
+  local EnvironmentCredentials
 
-  setup(function()
-    local mockvars = {
-      ABC_ACCESS_KEY_ID = "access",
-      ABC_SECRET_ACCESS_KEY = "secret",
-      ABC_SESSION_TOKEN = "token",
-    }
-    os.getenv = function(name)  -- luacheck: ignore
-      return mockvars[name] or old_getenv(name) or nil
-    end
+  before_each(function()
+    restore()
+    restore.setenv("ABC_ACCESS_KEY_ID", "access")
+    restore.setenv("ABC_SECRET_ACCESS_KEY", "secret")
+    restore.setenv("ABC_SESSION_TOKEN", "token")
+    local _ = require("resty.aws.config").global -- load config before anything else
+
+    EnvironmentCredentials = require "resty.aws.credentials.EnvironmentCredentials"
   end)
 
-  teardown(function()
-    os.getenv = old_getenv  -- luacheck: ignore
+  after_each(function()
+    restore()
   end)
 
 

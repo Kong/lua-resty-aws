@@ -1,4 +1,6 @@
 local json = require("cjson.safe").new()
+local restore = require "spec.helpers"
+
 
 -- Mock for HTTP client
 local response = {} -- override in tests
@@ -32,24 +34,19 @@ local http = {
 describe("RemoteCredentials", function()
 
   local RemoteCredentials
-  local old_getenv = os.getenv
-  local mockvars = {
-    AWS_CONTAINER_CREDENTIALS_FULL_URI = "https://localhost/test/path",
-  }
 
   before_each(function()
-    os.getenv = function(name)  -- luacheck: ignore
-      return mockvars[name] or old_getenv(name) or nil
-    end
+    restore()
+    restore.setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI", "https://localhost/test/path")
+
+    local _ = require("resty.aws.config").global -- load config before mocking http client
     package.loaded["resty.aws.request.http.http"] = http
-    package.loaded["resty.aws.credentials.RemoteCredentials"] = nil
+
     RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
   end)
 
   after_each(function()
-    package.loaded["resty.aws.request.http.http"] = nil
-    package.loaded["resty.aws.credentials.RemoteCredentials"] = nil
-    os.getenv = old_getenv  -- luacheck: ignore
+    restore()
   end)
 
 

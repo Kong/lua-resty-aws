@@ -1,33 +1,33 @@
+local restore = require "spec.helpers"
+
 describe("Credentials base-class", function()
 
   local AWS, Credentials
 
-  setup(function()
+  before_each(function()
+    restore()
+    local _ = require("resty.aws.config").global -- load config before anything else
     AWS = require "resty.aws"
     Credentials = require "resty.aws.credentials.Credentials"
+  end)
+
+  after_each(function()
+    restore()
   end)
 
 
 
   describe("Class inheritance", function()
     local EnvironmentCredentials
-    local old_getenv = os.getenv
 
-    setup(function()
+    before_each(function()
+      restore()
+      restore.setenv("ABC_ACCESS_KEY_ID", "access")
+      restore.setenv("ABC_SECRET_ACCESS_KEY", "secret")
+      restore.setenv("ABC_SESSION_TOKEN", "token")
+      local _ = require("resty.aws.config").global -- load config before anything else
+
       EnvironmentCredentials = require "resty.aws.credentials.EnvironmentCredentials"
-
-      local mockvars = {
-        ABC_ACCESS_KEY_ID = "access",
-        ABC_SECRET_ACCESS_KEY = "secret",
-        ABC_SESSION_TOKEN = "token",
-      }
-      os.getenv = function(name)  -- luacheck: ignore
-        return mockvars[name] or old_getenv(name) or nil
-      end
-    end)
-
-    teardown(function()
-      os.getenv = old_getenv  -- luacheck: ignore
     end)
 
 
