@@ -39,7 +39,7 @@ local env_vars = {
   AWS_SHARED_CREDENTIALS_FILE = { name = "AWS_SHARED_CREDENTIALS_FILE", default = "~/.aws/credentials" },
 
   -- Misc
-  AWS_EC2_METADATA_DISABLED = { name = "AWS_EC2_METADATA_DISABLED", default = false }, -- TODO: implement in 'utils' module, and in credentials chaining
+  AWS_EC2_METADATA_DISABLED = { name = "AWS_EC2_METADATA_DISABLED", default = false },
   AWS_CA_BUNDLE = { name = "ca_bundle", default = nil }, -- not used
   AWS_CLI_AUTO_PROMPT = { name = "cli_auto_prompt", default = nil }, -- not used
   AWS_CLI_FILE_ENCODING = { name = "AWS_CLI_FILE_ENCODING", default = nil }, -- not used

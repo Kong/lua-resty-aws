@@ -8,6 +8,9 @@ local CredentialProviderChain = setmetatable({}, Super)
 CredentialProviderChain.__index = CredentialProviderChain
 
 
+local AWS_EC2_METADATA_DISABLED = require("resty.aws.config").global.AWS_EC2_METADATA_DISABLED
+
+
 CredentialProviderChain.defaultProviders = {} do
   -- while not everything is implemented this will load what we do have without
   -- failing on what is missing. Will auto pick up newly added classes afterwards.
@@ -33,7 +36,11 @@ CredentialProviderChain.defaultProviders = {} do
   add_if_exists("RemoteCredentials") -- since "ECSCredentials" doesn't exist? and for ECS RemoteCredentials is used???
   add_if_exists("ProcessCredentials")
   add_if_exists("TokenFileWebIdentityCredentials")
-  add_if_exists("EC2MetadataCredentials")
+  if AWS_EC2_METADATA_DISABLED then
+    ngx.log(ngx.DEBUG, "AWS_EC2_METADATA_DISABLED is set, skipping EC2MetadataCredentials provider")
+  else
+    add_if_exists("EC2MetadataCredentials")
+  end
 end
 
 --- Constructor, inherits from `Credentials`.
@@ -52,7 +59,7 @@ end
 --
 -- 6. `TokenFileWebIdentityCredentials`
 --
--- 7. `EC2MetadataCredentials`
+-- 7. `EC2MetadataCredentials` (only if `AWS_EC2_METADATA_DISABLED` hasn't been set to `true`)
 --
 -- @function aws:CredentialProviderChain
 -- @param opt options table, additional fields to the `Credentials` class:
