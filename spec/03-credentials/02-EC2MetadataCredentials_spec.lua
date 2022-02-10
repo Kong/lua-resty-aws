@@ -8,6 +8,7 @@ local http = {
       connect = function() return true end,
       close = function() return true end,
       set_timeout = function() return true end,
+      set_timeouts = function() return true end,
       request = function(self, opts)
         if opts.path == "/latest/meta-data/iam/security-credentials/" then
           return { -- the response for requesting the role name

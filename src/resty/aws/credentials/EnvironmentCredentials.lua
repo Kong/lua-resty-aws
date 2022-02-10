@@ -31,13 +31,17 @@ end
 -- updates credentials.
 -- @return success, or nil+err
 function EnvironmentCredentials:refresh()
-  local access = os.getenv(self.envPrefix .. "_ACCESS_KEY_ID")
+  local global_config = require("resty.aws.config").global
+
+  local access = os.getenv(self.envPrefix .. "_ACCESS_KEY_ID") or global_config[self.envPrefix .. "_ACCESS_KEY_ID"]
   if not access then
-    -- Note: nginx workers do not have access to env vars. initialize in init phase or enable access.
+    -- Note: nginx workers do not have access to env vars. initialize in init phase
+    -- or enable access for any prefix other than "AWS" and "AMAZON" which are covered
+    -- by the 'config' module.
     return nil, "Couldn't find " .. self.envPrefix .. "_ACCESS_KEY_ID env variable"
   end
-  local secret = os.getenv(self.envPrefix .. "_SECRET_ACCESS_KEY")
-  local token = os.getenv(self.envPrefix .. "_SESSION_TOKEN")
+  local secret = os.getenv(self.envPrefix .. "_SECRET_ACCESS_KEY") or global_config[self.envPrefix .. "_SECRET_ACCESS_KEY"]
+  local token = os.getenv(self.envPrefix .. "_SESSION_TOKEN") or global_config[self.envPrefix .. "_SESSION_TOKEN"]
   local expire = ngx.now() + 10 * 365 * 24 * 60 * 60 -- static, so assume 10 year validity
   self:set(access, secret, token, expire)
   return true

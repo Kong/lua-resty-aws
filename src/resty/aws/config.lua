@@ -72,8 +72,15 @@ local env_vars = {
   -- Additional environment variables that are NOT part of the CLI configuration.
   -- Adding them here so we get their values in one place (since we need to load in
   -- 'init' phase because envs are not available in later stages)
+
+  -- ECS metadata urls
   ECS_CONTAINERMETADATA_URI_V4 = { name = "ECS_CONTAINERMETADATA_URI_V4", default = nil },
   ECS_CONTAINERMETADATA_URI = { name = "ECS_CONTAINERMETADATA_URI", default = nil },
+
+  -- Variables used in the CredentialProviderChain; EnvironmentCredentials with 'AMAZON' prefix
+  AMAZON_ACCESS_KEY_ID = { name = "AMAZON_ACCESS_KEY_ID", default = nil },
+  AMAZON_SECRET_ACCESS_KEY = { name = "AMAZON_SECRET_ACCESS_KEY", default = nil },
+  AMAZON_SESSION_TOKEN = { name = "AMAZON_SESSION_TOKEN", default = nil },
 }
 
 -- populate the env vars with their values, or defaults

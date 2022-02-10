@@ -7,6 +7,7 @@ local http = {
     return {
       connect = function() return true end,
       set_timeout = function() return true end,
+      set_timeouts = function() return true end,
       request = function(self, opts)
         if opts.path == "/test/path" then
           return { -- the response for the credentials
