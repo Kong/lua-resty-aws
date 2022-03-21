@@ -146,6 +146,7 @@ Release process:
 
 ### (unreleased)
 
+ - feat: enable use of regional STS endpoints
  - deps: bumped the [lua-resty-http](https://github.com/ledgetech/lua-resty-http)
    dependency to 0.16 to disable the warnings and use the better connection building logic.
  - fix: added `sock:settimeouts` to the socket compatibility layer.
