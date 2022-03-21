@@ -118,6 +118,8 @@ end
 
 
 do
+  -- returns the region with the last element replaced by "*"
+  -- "us-east-1" --> "us-east-*"
   local function generateRegionPrefix(region)
     if not region then
       return nil, "no region given"
@@ -132,10 +134,26 @@ do
   end
 
 
+  -- returns array of patterns;
+  -- 'sts' has endpointPrefix = "sts" in its metadata
+  -- 'sts' configured without region;
+  -- {
+  --   "*/sts"
+  --   "*/*"
+  -- }
+  -- 'sts' configured for region 'us-west-2';
+  -- {
+  --   "us-west-2/sts",
+  --   "us-west-*/sts",
+  --   "us-west-2/*",
+  --   "us-west-*/*",
+  --   "*/sts",
+  --   "*/*",
+  -- }
   local function derivedKeys(service)
-    local region = service.config.region  -- look s like a configuration for and instance of a service???
-    local regionPrefix = generateRegionPrefix(region) -- this can return nil !
-    local endpointPrefix = service.api.metadata.endpointPrefix   -- looks like it comes from the services table
+    local region = service.config.region  -- configuration for an instance of a service
+    local regionPrefix = generateRegionPrefix(region) -- this can return nil, or eg. "us-east-*"
+    local endpointPrefix = service.api.metadata.endpointPrefix   -- this comes from the service metadata
 
     local result = {}
     if region       and endpointPrefix then result[#result+1] = region.."/"..endpointPrefix end
@@ -159,9 +177,10 @@ do
   end
 
 
+  -- @param service service-instance being created; field `aws` is the aws instance,
+  -- `config` is the service instance config, `api` the service api.
   function AWS.configureEndpoint(service)
-    local keys = derivedKeys(service)  -- there should be a 'service.config.region' field...
-    for i, key in ipairs(keys) do
+    for i, key in ipairs(derivedKeys(service)) do
 
       local region_rule_config = aws_config.region.rules[key]  --> contains regions templates
       if type(region_rule_config) == 'string' then
@@ -192,7 +211,7 @@ do
           region_rule_config.signatureVersion = 'v4'
         end
 
-        -- merge config
+        -- merge region_rule_config into service.config
         applyConfig(service.config, region_rule_config)
         return
       end
@@ -265,6 +284,18 @@ local function generate_service_methods(service)
 
       -- generate request data and format it according to the protocol
       local request = build_request(operation, self.config, params)
+
+      -- implement stsRegionalEndpoints config setting,
+      if service.api.metadata.serviceId == "STS"
+        and service.config.stsRegionalEndpoints == "regional"
+        and service.isGlobalEndpoint then
+        -- we use regional endpoints, see
+        -- https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js#L78-L82
+        assert(service.config.region, "region is required when using STS regional endpoints")
+        local pre, post = service.config.endpoint:match("^(.+)(%.amazonaws%.com)$")
+        service.config.endpoint = pre .. "." .. service.config.region .. post
+        service.config.signingRegion = service.config.region
+      end
 
       local old_sig
       if (unsigned[service.api.metadata.serviceId] or {})[operation.name] then

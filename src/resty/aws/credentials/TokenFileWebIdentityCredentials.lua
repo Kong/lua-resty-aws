@@ -49,7 +49,10 @@ function TokenFileWebIdentityCredentials:refresh()
     -- constructor is called when instantiating an AWS instance (creating a loop).
     -- That's because this credentials class is part of the "CredentialProviderChain"
     local AWS = require "resty.aws"
-    local aws = AWS()
+    local aws = AWS {
+      region = global_config.region,
+      stsRegionalEndpoints = global_config.sts_regional_endpoints,
+    }
     local sts, err = aws:STS()
     if not sts then
       error("failed to construct AWS.STS instance: " .. tostring(err))
