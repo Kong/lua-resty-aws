@@ -48,11 +48,17 @@ describe("config loader", function()
       AWS_PROFILE = 'default',
       AWS_SHARED_CREDENTIALS_FILE = '~/.aws/credentials',
       cli_timestamp_format = 'iso8601',
+      AWS_CLI_TIMESTAMP_FORMAT = 'iso8601',
       duration_seconds = 3600,
+      AWS_DURATION_SECONDS = 3600,
       max_attempts = 5,
+      AWS_MAX_ATTEMPTS = 5,
       parameter_validation = true,
+      AWS_PARAMETER_VALIDATION = true,
       retry_mode = 'standard',
-      sts_regional_endpoints = 'regional'
+      AWS_RETRY_MODE = 'standard',
+      sts_regional_endpoints = 'regional',
+      AWS_STS_REGIONAL_ENDPOINTS = 'regional',
     }, conf)
   end)
 
@@ -71,12 +77,18 @@ describe("config loader", function()
       AWS_PROFILE = 'default',
       AWS_SHARED_CREDENTIALS_FILE = '~/.aws/credentials',
       cli_timestamp_format = 'iso8601',
+      AWS_CLI_TIMESTAMP_FORMAT = 'iso8601',
       duration_seconds = 3600,
+      AWS_DURATION_SECONDS = 3600,
       max_attempts = 99,
+      AWS_MAX_ATTEMPTS = 5,
       region = "eu-central-1",
       parameter_validation = true,
+      AWS_PARAMETER_VALIDATION = true,
       retry_mode = 'standard',
-      sts_regional_endpoints = 'regional'
+      AWS_RETRY_MODE = 'standard',
+      sts_regional_endpoints = 'regional',
+      AWS_STS_REGIONAL_ENDPOINTS = 'regional',
     }, conf)
   end)
 
@@ -95,12 +107,18 @@ describe("config loader", function()
       AWS_PROFILE = 'tieske',
       AWS_SHARED_CREDENTIALS_FILE = '~/.aws/credentials',
       cli_timestamp_format = 'iso8601',
+      AWS_CLI_TIMESTAMP_FORMAT = 'iso8601',
       duration_seconds = 3600,
+      AWS_DURATION_SECONDS = 3600,
       max_attempts = 5,
+      AWS_MAX_ATTEMPTS = 5,
       region = "us-west-1",
       parameter_validation = true,
+      AWS_PARAMETER_VALIDATION = true,
       retry_mode = 'standard',
-      sts_regional_endpoints = 'regional'
+      AWS_RETRY_MODE = 'standard',
+      sts_regional_endpoints = 'regional',
+      AWS_STS_REGIONAL_ENDPOINTS = 'regional',
     }, conf)
   end)
 
@@ -115,11 +133,17 @@ describe("config loader", function()
       AWS_PROFILE = 'default',
       AWS_SHARED_CREDENTIALS_FILE = '~/.aws/credentials',
       cli_timestamp_format = 'iso8601',
+      AWS_CLI_TIMESTAMP_FORMAT = 'iso8601',
       duration_seconds = 3600,
+      AWS_DURATION_SECONDS = 3600,
       max_attempts = 5,
+      AWS_MAX_ATTEMPTS = 5,
       parameter_validation = true,
+      AWS_PARAMETER_VALIDATION = true,
       retry_mode = 'standard',
-      sts_regional_endpoints = 'regional'
+      AWS_RETRY_MODE = 'standard',
+      sts_regional_endpoints = 'regional',
+      AWS_STS_REGIONAL_ENDPOINTS = 'regional',
     }, conf)
 
   end)

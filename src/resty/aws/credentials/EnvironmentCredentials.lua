@@ -12,7 +12,9 @@ EnvironmentCredentials.__index = EnvironmentCredentials
 --
 -- _Note_: this class will fetch the credentials upon instantiation. So it can be
 -- instantiated in the `init` phase where there is still access to the environment
--- variables.
+-- variables. The standard prefixes `AWS` and `AMAZON` are covered by the `config`
+-- module, so in case those are used, only the `config` module needs to be loaded
+-- in the `init` phase.
 -- @function aws:EnvironmentCredentials
 -- @param opt options table, additional fields to the `Credentials` class:
 -- @param opt.envPrefix prefix to use when looking for environment variables, defaults to "AWS".

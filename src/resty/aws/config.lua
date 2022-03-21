@@ -2,6 +2,58 @@
 --
 -- This is based of [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 -- and [Environment variables to configure the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
+--
+-- <h3>Usage</h3>
+--
+-- Simply collect the global config table:
+--     local config = require("resty.aws.config").config
+--     print("AWS region: ", (config.region or "failed to detect"))
+--
+-- <h3>Additional environment variables</h3>
+--
+-- The following config file entries do not have an environment variable override
+-- in the AWS CLI, but this Lua module adds them as follows:
+--
+-- * `AWS_CLI_TIMESTAMP_FORMAT` will override `cli_timestamp_format`
+-- * `AWS_DURATION_SECONDS` will override `duration_seconds`
+-- * `AWS_PARAMETER_VALIDATION` will override `parameter_validation`
+--
+-- <h3>Options processing and naming</h3>
+--
+-- Some options are available in the config/credential files, some as environment
+-- variables, and some in both. The options are processed as follows:
+--
+-- * profiles will be honored (see environment variable `AWS_PROFILE`)
+--
+-- * Numeric and boolean values will be converted to their equivalkent Lua types
+--
+-- * properties will have the name as used in the config file, for any property
+--   that is a valid config file entry but also has an environment variable override.
+--   For example:
+--       export AWS_REGION="us-east-1"
+--   will be available as `config.global.region` and `config.global.AWS_REGION`,
+--   since in the config file the property
+--   is named `region`, whilst the environment variable is called `AWS_REGION`.
+--
+-- * properties that only have environment variable settings (eg. `AWS_SHARED_CREDENTIALS_FILE`)
+--   will be added to the config table by their all-caps name.
+--   For example:
+--       export AWS_SHARED_CREDENTIALS_FILE="~/my_aws_config"
+--   will be available as `config.global.AWS_SHARED_CREDENTIALS_FILE`, since in
+--   there is no config file property in this case.
+--
+-- <h3>Other system variables</h3>
+--
+-- The following environment variables are also read (so only loading this config
+-- module in the `init` phase will suffice for most use cases):
+--
+-- * `ECS_CONTAINERMETADATA_URI_V4`
+-- * `ECS_CONTAINERMETADATA_URI`
+-- * `AMAZON_ACCESS_KEY_ID`
+-- * `AMAZON_SECRET_ACCESS_KEY`
+-- * `AMAZON_SESSION_TOKEN`
+-- * `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`
+-- * `AWS_CONTAINER_CREDENTIALS_FULL_URI`
 
 
 local pl_path = require "pl.path"
@@ -81,6 +133,7 @@ local env_vars = {
   AMAZON_ACCESS_KEY_ID = { name = "AMAZON_ACCESS_KEY_ID", default = nil },
   AMAZON_SECRET_ACCESS_KEY = { name = "AMAZON_SECRET_ACCESS_KEY", default = nil },
   AMAZON_SESSION_TOKEN = { name = "AMAZON_SESSION_TOKEN", default = nil },
+
   -- Variables used in RemoteCredentials (and in the CredentialProviderChain)
   AWS_CONTAINER_CREDENTIALS_RELATIVE_URI = { name = "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", default = nil },
   AWS_CONTAINER_CREDENTIALS_FULL_URI = { name = "AWS_CONTAINER_CREDENTIALS_FULL_URI", default = nil },
@@ -96,9 +149,6 @@ env_vars.AWS_MAX_ATTEMPTS.value = tonumber(env_vars.AWS_MAX_ATTEMPTS.value) or e
 env_vars.AWS_DURATION_SECONDS.value = tonumber(env_vars.AWS_DURATION_SECONDS.value) or env_vars.AWS_DURATION_SECONDS.value
 env_vars.AWS_PARAMETER_VALIDATION.value = (env_vars.AWS_PARAMETER_VALIDATION.value ~= "false")  -- to boolean
 env_vars.AWS_EC2_METADATA_DISABLED.value = (env_vars.AWS_EC2_METADATA_DISABLED.value ~= "false")  -- to boolean
-if not env_vars.AWS_REGION.value then
-  env_vars.AWS_REGION.value = env_vars.AWS_DEFAULT_REGION.value -- switch to region default if not given
-end
 
 
 
@@ -153,8 +203,8 @@ do
   -- then they will be sub-tables, with key "profile [profile-name]".
   -- @tparam string filename the filename of the configuration file to load
   -- @tparam[opt] string profile the profile to retrieve from the configuration file. If
-  -- the profile doesn't exist, then it returns an empty table. Use `default` to get the default profile.
-  -- @return table with the contents of the file, or only the profile if a profile was specified or
+  -- the profile doesn't exist, then it returns an empty table. Use `"default"` to get the default profile.
+  -- @return table with the contents of the file, or only the profile if a profile was specified, or
   -- nil+err if there was a problem loading the file
   function config.load_configfile(filename, profile)
     if profile and profile ~= "default" then
@@ -207,9 +257,17 @@ end
 -- Reads the configuration files (config + credentials) and overrides them with
 -- any environment variables specified, or defaults.
 --
--- NOTE: this will not auto-detect the region. Use the `utils` module for that, or
--- get the `global` table.
+-- NOTE: this will not auto-detect the region. Use `resty.aws.utils.getCurrentRegion`
+-- for that, or get the `config.global` table which will auto-detect.
 -- @return table with configuration options, table can be empty.
+-- @usage
+-- local config = require("resty.aws.config").config       -- does auto-detect region
+--
+-- -- is equivalent to:
+-- local config = require("resty.aws.config").get_config()
+-- if not config.region then
+--     config.region = utils.getCurrentRegion()
+-- end
 function config.get_config()
   local cfg = config.load_config() or {}   -- ignore error, already logged
 
@@ -226,9 +284,15 @@ function config.get_config()
 
   -- add environment variables
   for var_name, var in pairs(env_vars) do
-    if cfg[var.name] == nil then
+    if cfg[var_name] == nil then  -- add the environment variable name with value
+      cfg[var_name] = var.value
+    end
+    if cfg[var.name] == nil then  -- add the config file name with value
       cfg[var.name] = var.value
     end
+  end
+  if cfg.region == nil then
+    cfg.region = cfg.AWS_DEFAULT_REGION
   end
 
   return cfg
@@ -238,7 +302,7 @@ end
 --- returns the credentials from config file, credential file, or environment variables.
 -- Reads the configuration files (config + credentials) and overrides them with
 -- any environment variables specified.
--- @return table with credentials (aws_access_key_id, aws_secret_access_key, and aws_session_token)
+-- @return table with credentials (`aws_access_key_id`, `aws_secret_access_key`, and `aws_session_token`)
 function config.get_credentials()
   local creds = {
     aws_access_key_id = env_vars.AWS_ACCESS_KEY_ID.value,
@@ -254,7 +318,8 @@ function config.get_credentials()
   return config.load_credentials()
 end
 
--- @field global
+-- @field global configuration
+-- @table somename
 config.global = {}  -- trick LuaDoc
 config.global = nil
 
