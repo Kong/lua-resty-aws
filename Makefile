@@ -1,5 +1,6 @@
 .PHONY: docs install dev clean test pack
 
+# specify VERSION as 'x.y.z' or 'dev'
 target_rock := lua-resty-aws-${VERSION}-1.src.rock
 
 install:
@@ -33,7 +34,7 @@ $(target_rock):
 	-@rm -rf /tmp/random_dir_2cs4f0tghRT
 	mkdir /tmp/random_dir_2cs4f0tghRT
 	cd /tmp/random_dir_2cs4f0tghRT; git clone https://github.com/kong/lua-resty-aws.git
-	cd /tmp/random_dir_2cs4f0tghRT/lua-resty-aws; git checkout ${VERSION}
+	cd /tmp/random_dir_2cs4f0tghRT/lua-resty-aws; if [ ! "${VERSION}" = "dev" ]; then git checkout ${VERSION}; fi
 	cd /tmp/random_dir_2cs4f0tghRT/lua-resty-aws; make dev
 	cd /tmp/random_dir_2cs4f0tghRT; zip -r lua-resty-aws-${VERSION}-1.src.rock lua-resty-aws
 	cd /tmp/random_dir_2cs4f0tghRT; cat lua-resty-aws/lua-resty-aws-dev-1.rockspec | sed "s/package_version = \"dev\"/package_version = \"${VERSION}\"/" > lua-resty-aws-${VERSION}-1.rockspec
