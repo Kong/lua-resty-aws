@@ -1,5 +1,7 @@
 local json = require("cjson.safe").new()
 
+require "resty.aws.config" -- load before mocking the http lib
+
 -- Mock for HTTP client
 local response = {} -- override in tests
 local http = {
@@ -8,6 +10,7 @@ local http = {
       connect = function() return true end,
       close = function() return true end,
       set_timeout = function() return true end,
+      set_timeouts = function() return true end,
       request = function(self, opts)
         if opts.path == "/latest/meta-data/iam/security-credentials/" then
           return { -- the response for requesting the role name

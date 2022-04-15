@@ -163,7 +163,7 @@ do
     local keys = derivedKeys(service)  -- there should be a 'service.config.region' field...
     for i, key in ipairs(keys) do
 
-      local region_rule_config = aws_config.region.rules[key]
+      local region_rule_config = aws_config.region.rules[key]  --> contains regions templates
       if type(region_rule_config) == 'string' then
         -- it's a reference, resolve it
         region_rule_config = aws_config.region.patterns[region_rule_config]

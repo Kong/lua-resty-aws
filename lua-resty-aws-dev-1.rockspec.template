@@ -32,6 +32,7 @@ build = {
   modules = {
     ["resty.aws.init"]                                        = "src/resty/aws/init.lua",
     ["resty.aws.utils"]                                       = "src/resty/aws/utils.lua",
+    ["resty.aws.config"]                                      = "src/resty/aws/config.lua",
     ["resty.aws.request.validate"]                            = "src/resty/aws/request/validate.lua",
     ["resty.aws.request.build"]                               = "src/resty/aws/request/build.lua",
     ["resty.aws.request.sign"]                                = "src/resty/aws/request/sign.lua",

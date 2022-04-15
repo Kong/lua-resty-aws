@@ -1,20 +1,18 @@
 --- AWS utility module.
 --
 -- Provides methods for detecting the AWS Region, as well as fetching metadata.
--- Since the module requires access to the environment variables with metadata
--- URLs, it should preferably be loaded in the `init` phases to make sure it can
--- access the variables required.
 
 local semaphore = require "ngx.semaphore"
 local http = require "resty.aws.request.http.http"
 local json = require "cjson"
+local global_config = require("resty.aws.config").global
 
--- get the Env vars here once, load this in the "init" phase to make sure
--- we still have access to those variables
-local AWS_REGION = os.getenv "AWS_REGION"
-local AWS_DEFAULT_REGION = os.getenv "AWS_DEFAULT_REGION"
-local ECS_CONTAINERMETADATA_URI_V4 = os.getenv "ECS_CONTAINERMETADATA_URI_V4"
-local ECS_CONTAINERMETADATA_URI_V3 = os.getenv "ECS_CONTAINERMETADATA_URI"
+-- get the Env vars here, they have been stored in the config module
+local AWS_REGION = global_config.AWS_REGION
+local AWS_DEFAULT_REGION = global_config.AWS_DEFAULT_REGION
+local AWS_EC2_METADATA_DISABLED = global_config.AWS_EC2_METADATA_DISABLED
+local ECS_CONTAINERMETADATA_URI_V4 = global_config.ECS_CONTAINERMETADATA_URI_V4
+local ECS_CONTAINERMETADATA_URI_V3 = global_config.ECS_CONTAINERMETADATA_URI
 local ECS_CONTAINERMETADATA_URI_V2 = "http://169.254.170.2/v2/"
 local IDMS_URI = "http://169.254.169.254"
 local METADATA_TIMEOUTS = 5000  -- in milliseconds
@@ -57,6 +55,7 @@ do -- getIMDSMetadata
   --- Fetches IDMS Metadata (EC2 and EKS).
   -- Will make a call to the IP address and hence might timeout if ran on anything
   -- else than an EC2-instance.
+  -- Calling this function will make the calls, it will not honor the `AWS_EC2_METADATA_DISABLED` setting.
   -- @param path (optional) path to return data from, default `/latest/meta-data/`
   -- @param version (optional) version of IDMS to use, either "V1" or "V2" (case insensitive, default "V2")
   -- @return body & content-type (if json, the body will be decoded to a Lua table), or nil+err
@@ -105,9 +104,9 @@ end
 --- Fetches ECS Task Metadata. Both for Fargate as well as EC2 based ECS.
 -- Support version 2, 3, and 4 (version 2 is NOT available on Fargate).
 -- V3 and V4 will return an error if no url is found in the related environment variable, V2 will make a request to
--- the IP address and hence might timeout if ran on anything else than a EC2-based ECS container.
+-- the IP address and hence might timeout if ran on anything else than an EC2-based ECS container.
 -- @param subpath (optional) path to return data from (default "/metadata" for V2, nothing for V3+)
--- @param version (optional) metadata version to get "V3" or V4" (case insensitive, default "V4")
+-- @param version (optional) metadata version to get "V2", "V3", or "V4" (case insensitive, default "V4")
 -- @return body & content-type (if json, the body will be decoded to a Lua table), or nil+err
 function Utils.getECSTaskMetadata(subpath, version)
   local url
@@ -206,7 +205,7 @@ do  -- getCurrentRegion
       ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINERMETADATA_URI env variable")
       local metadata, err = Utils.getECSTaskMetadata("/task", "V3")
       if not metadata then
-        ngx.log(ngx.DEBUG, "failed getting ECS metdata V4: ", err)
+        ngx.log(ngx.DEBUG, "failed getting ECS metadata V3: ", err)
       else
         set_region(parse_region_from_availability_zone(metadata.AvailabilityZone))
         return true
@@ -215,13 +214,17 @@ do  -- getCurrentRegion
       ngx.log(ngx.DEBUG, "no ECS_CONTAINERMETADATA_URI env variable")
     end
 
-    ngx.log(ngx.DEBUG, "detecting AWS region from IDMSv2 metadata")
-    local region, err = Utils.getIDMSMetadata("/latest/meta-data/placement/region", "V2")
-    if not region then
-      ngx.log(ngx.DEBUG, "failed getting IDMS metadata V2: ", err)
+    if AWS_EC2_METADATA_DISABLED then
+      ngx.log(ngx.DEBUG, "AWS_EC2_METADATA_DISABLED is set, skipping region detection from IDMSv2 metadata")
     else
-      set_region(region)
-      return true
+      ngx.log(ngx.DEBUG, "detecting AWS region from IDMSv2 metadata")
+      local region, err = Utils.getIDMSMetadata("/latest/meta-data/placement/region", "V2")
+      if not region then
+        ngx.log(ngx.DEBUG, "failed getting IDMS metadata V2: ", err)
+      else
+        set_region(region)
+        return true
+      end
     end
 
     set_region(nil, "unable to detect AWS region, all options failed")
@@ -280,12 +283,12 @@ do  -- getCurrentRegion
   --    variable `ECS_CONTAINERMETADATA_URI_V4` is available
   -- 4. ECS metadata V3 (parse region from "AvailabilityZone") if the environment
   --    variable `ECS_CONTAINERMETADATA_URI` is available
-  -- 5. IDMSv2 metadata
+  -- 5. IDMSv2 metadata (only if `AWS_EC2_METADATA_DISABLED` hasn't been set to `true`)
   --
   -- The IDMSv2 call makes a call to an IP endpoint, and hence could timeout
   -- (timeout is 5 seconds) if called on anything not being an EC2 or EKS instance.
   --
-  -- Note: the result is cached so any consequtive calls will not perform any IO.
+  -- Note: the result is cached so any consecutive calls will not perform any IO.
   -- @return region, or nil+err
   function Utils.getCurrentRegion()
     if not detected then

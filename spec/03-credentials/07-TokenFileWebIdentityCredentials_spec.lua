@@ -1,22 +1,20 @@
+local restore = require "spec.helpers"
+
 describe("TokenFileWebIdentityCredentials", function()
 
   local TokenFileWebIdentityCredentials
-  local old_getenv = os.getenv
-  local mockvars
 
   before_each(function()
-    mockvars = {
-      AWS_ROLE_ARN = "arn:abc123",
-      AWS_WEB_IDENTITY_TOKEN_FILE = "/some/file",
-    }
-    os.getenv = function(name)  -- luacheck: ignore
-      return mockvars[name] or old_getenv(name) or nil
-    end
+    restore()
+    restore.setenv("AWS_ROLE_ARN", "arn:abc123")
+    restore.setenv("AWS_WEB_IDENTITY_TOKEN_FILE", "/some/file")
+    local _ = require("resty.aws.config").global -- load config before anything else
+
     TokenFileWebIdentityCredentials = require "resty.aws.credentials.TokenFileWebIdentityCredentials"
   end)
 
   after_each(function()
-    os.getenv = old_getenv  -- luacheck: ignore
+    restore()
   end)
 
 
@@ -25,8 +23,8 @@ describe("TokenFileWebIdentityCredentials", function()
     local cred = TokenFileWebIdentityCredentials:new()
     assert.is_true(cred:needsRefresh()) -- true; because we only get env vars
 
-    assert.same(mockvars.AWS_ROLE_ARN, cred.role_arn)
-    assert.same(mockvars.AWS_WEB_IDENTITY_TOKEN_FILE, cred.token_file)
+    assert.same("arn:abc123", cred.role_arn)
+    assert.same("/some/file", cred.token_file)
     assert.same("session@lua-resty-aws", cred.session_name)
   end)
 

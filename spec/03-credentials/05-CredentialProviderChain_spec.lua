@@ -1,25 +1,21 @@
+local restore = require "spec.helpers"
+
 describe("CredentialProviderChain", function()
 
-  local CredentialProviderChain = require "resty.aws.credentials.CredentialProviderChain"
-  local old_getenv = os.getenv
-  local mockvars
-
-  setup(function()
-    os.getenv = function(name)  -- luacheck: ignore
-      return mockvars[name] or old_getenv(name) or nil
-    end
-  end)
+  local CredentialProviderChain
 
   before_each(function()
-    mockvars = {
-      ABC_ACCESS_KEY_ID = "access-1",
-      ABC_SECRET_ACCESS_KEY = "secret-1",
-      ABC_SESSION_TOKEN = "token-1",
-    }
+    restore()
+    restore.setenv("ABC_ACCESS_KEY_ID", "access-1")
+    restore.setenv("ABC_SECRET_ACCESS_KEY", "secret-1")
+    restore.setenv("ABC_SESSION_TOKEN", "token-1")
+    local _ = require("resty.aws.config").global -- load config before anything else
+
+    CredentialProviderChain = require "resty.aws.credentials.CredentialProviderChain"
   end)
 
-  teardown(function()
-    os.getenv = old_getenv  -- luacheck: ignore
+  after_each(function()
+    restore()
   end)
 
 
@@ -46,7 +42,11 @@ describe("CredentialProviderChain", function()
 
 
   it("gets plain credentials which are last", function()
-    mockvars = {} -- clear env vars such that the first 2 providers both fail
+    -- clear env vars such that the first 2 providers both fail
+    restore.setenv("ABC_ACCESS_KEY_ID", nil)
+    restore.setenv("ABC_SECRET_ACCESS_KEY", nil)
+    restore.setenv("ABC_SESSION_TOKEN", nil)
+
     local cred = CredentialProviderChain:new {
       providers = {
         require("resty.aws.credentials.EnvironmentCredentials"):new { envPrefix = "ABC" },

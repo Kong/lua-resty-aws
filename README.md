@@ -118,6 +118,15 @@ Release process:
 
  - deps: bumped the [lua-resty-http](https://github.com/ledgetech/lua-resty-http)
    dependency to 0.16 to disable the warnings and use the better connection building logic.
+ - feat: implement a config object based on AWS CLI configuration.
+   - for most use cases it will now suffice to load the `config` in the `init` phase
+     since it caches al predefined environment variables.
+   - BREAKING: getting EC2 credentials will now honor AWS_EC2_METADATA_DISABLED.
+     Behaviour might change, but is expected to be very rare.
+   - BREAKING: The TokenFileWebIdentityCredentials
+     will honor the `role_session_name` setting (file or env) as default name.
+     Behaviour might change, but is expected to be very rare.
+
 
 ### 0.4.0 (06-dec-2021)
 

@@ -13,7 +13,6 @@ local DEFAULT_SERVICE_REQUEST_TIMEOUT = 5000
 local url = require "socket.url"
 local http = require "resty.aws.request.http.http"
 local json = require "cjson"
-local getenv = os.getenv
 
 
 local FullUri do
@@ -26,8 +25,10 @@ local FullUri do
     return t
   end
 
-  local ENV_RELATIVE_URI = getenv 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI'
-  local ENV_FULL_URI = getenv 'AWS_CONTAINER_CREDENTIALS_FULL_URI'
+  local global_config = require("resty.aws.config").global
+
+  local ENV_RELATIVE_URI = global_config.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
+  local ENV_FULL_URI = global_config.AWS_CONTAINER_CREDENTIALS_FULL_URI
   local FULL_URI_UNRESTRICTED_PROTOCOLS = makeset { "https" }
   local FULL_URI_ALLOWED_PROTOCOLS = makeset { "http", "https" }
   local FULL_URI_ALLOWED_HOSTNAMES = makeset { "localhost", "127.0.0.1" }
