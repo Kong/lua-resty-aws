@@ -104,9 +104,9 @@ end
 --- Fetches ECS Task Metadata. Both for Fargate as well as EC2 based ECS.
 -- Support version 2, 3, and 4 (version 2 is NOT available on Fargate).
 -- V3 and V4 will return an error if no url is found in the related environment variable, V2 will make a request to
--- the IP address and hence might timeout if ran on anything else than a EC2-based ECS container.
+-- the IP address and hence might timeout if ran on anything else than an EC2-based ECS container.
 -- @param subpath (optional) path to return data from (default "/metadata" for V2, nothing for V3+)
--- @param version (optional) metadata version to get "V3" or V4" (case insensitive, default "V4")
+-- @param version (optional) metadata version to get "V2", "V3", or "V4" (case insensitive, default "V4")
 -- @return body & content-type (if json, the body will be decoded to a Lua table), or nil+err
 function Utils.getECSTaskMetadata(subpath, version)
   local url
@@ -288,7 +288,7 @@ do  -- getCurrentRegion
   -- The IDMSv2 call makes a call to an IP endpoint, and hence could timeout
   -- (timeout is 5 seconds) if called on anything not being an EC2 or EKS instance.
   --
-  -- Note: the result is cached so any consequtive calls will not perform any IO.
+  -- Note: the result is cached so any consecutive calls will not perform any IO.
   -- @return region, or nil+err
   function Utils.getCurrentRegion()
     if not detected then

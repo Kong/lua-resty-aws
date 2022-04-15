@@ -25,7 +25,7 @@
 --
 -- * profiles will be honored (see environment variable `AWS_PROFILE`)
 --
--- * Numeric and boolean values will be converted to their equivalkent Lua types
+-- * Numeric and boolean values will be converted to their equivalent Lua types
 --
 -- * properties will have the name as used in the config file, for any property
 --   that is a valid config file entry but also has an environment variable override.
@@ -39,7 +39,7 @@
 --   will be added to the config table by their all-caps name.
 --   For example:
 --       export AWS_SHARED_CREDENTIALS_FILE="~/my_aws_config"
---   will be available as `config.global.AWS_SHARED_CREDENTIALS_FILE`, since in
+--   will be available as `config.global.AWS_SHARED_CREDENTIALS_FILE`, since
 --   there is no config file property in this case.
 --
 -- <h3>Other system variables</h3>
@@ -216,7 +216,7 @@ end
 
 
 --- returns the configuration loaded from the config file.
--- Options are based on `AWS_CONFIG_FILE` and `AWS_PROFILE`. Returns an empty
+-- The result is based on `AWS_CONFIG_FILE` and `AWS_PROFILE`. Returns an empty
 -- table if the config file does not exist.
 -- @return options table as gotten from the configuration file, or nil+err.
 function config.load_config()
