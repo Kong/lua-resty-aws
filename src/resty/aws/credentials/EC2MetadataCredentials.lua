@@ -8,6 +8,7 @@ local DEBUG = ngx.DEBUG
 
 
 
+local METADATA_SERVICE_SCHEME = "http"
 local METADATA_SERVICE_PORT = 80
 local METADATA_SERVICE_REQUEST_TIMEOUT = 5000  -- milliseconds
 local METADATA_SERVICE_HOST = "169.254.169.254"
@@ -37,6 +38,7 @@ function EC2MetadataCredentials:refresh()
   client:set_timeout(METADATA_SERVICE_REQUEST_TIMEOUT)
 
   local ok, err = client:connect {
+    scheme = METADATA_SERVICE_SCHEME,
     host = METADATA_SERVICE_HOST,
     port = METADATA_SERVICE_PORT,
   }
@@ -70,6 +72,7 @@ function EC2MetadataCredentials:refresh()
 
 
   local ok, err = client:connect {
+    scheme = METADATA_SERVICE_SCHEME,
     host = METADATA_SERVICE_HOST,
     port = METADATA_SERVICE_PORT,
   }
