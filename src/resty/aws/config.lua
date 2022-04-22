@@ -334,8 +334,8 @@ return setmetatable(config, {
     if not self.global.region then
       local utils = require "resty.aws.utils"
       self.global.region = utils.getCurrentRegion()
-      return self.global
     end
+    return self.global
   end
 })
 
