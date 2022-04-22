@@ -22,6 +22,7 @@ local function execute_request(signed_request)
     port = signed_request.port,
     scheme = signed_request.tls and "https" or "http",
     ssl_server_name = signed_request.host,
+    ssl_verify = false, -- TODO: added after updating lua-resty-http which now defaults to "true" and breaks stuff, needs to be fixed!!
   }
   if not ok then
     return nil, ("failed to connect to '%s://%s:%s': %s"):format(
