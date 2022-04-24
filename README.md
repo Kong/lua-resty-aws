@@ -23,6 +23,36 @@ regular CI.
 
 ---
 
+## Usage IMPORTANT!!
+
+### Global settings
+
+This library depends on global settings. Escpecially the core services for authentication
+and metadata. Many of those can (also) be specified as environment variables.
+
+Hence it is recommended to populate the global confguration object at application start
+in the OpenResty `init` phase. Simply add the following line;
+
+```
+        local _ = require("resty.aws.config").global
+```
+
+This ensures the environment variables can still be read (in the `init` phase). And
+the auto-detection of the AWS region will execute.
+
+### EC2 metadata
+
+The endpoint for EC2 metadata can block (until timeout) if the SDK is used on a non-EC2
+machine. In that case you might want to set the `AWS_EC2_METADATA_DISABLED` to a value
+different from `false` (which is the default).
+
+```
+        export AWS_EC2_METADATA_DISABLED=true
+```
+
+
+---
+
 ## Installation
 
 Installation is easiest using LuaRocks:
