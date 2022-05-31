@@ -61,6 +61,14 @@ do
       end
       self.sock:settimeout(t)
     end,
+    settimeouts = function(self, connect_timeout, send_timeout, read_timeout)
+      -- luasocket doesn't have individual timeouts, picking connect_timeout for all of them
+      local t = connect_timeout
+      if t then
+        t = t/1000
+      end
+      self.sock:settimeout(t)
+    end,
     setkeepalive = function(self)
       self.sock:close()
       return true
