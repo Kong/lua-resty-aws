@@ -56,7 +56,7 @@ do -- getIMDSMetadata
   -- Will make a call to the IP address and hence might timeout if ran on anything
   -- else than an EC2-instance.
   -- Calling this function will make the calls, it will not honor the `AWS_EC2_METADATA_DISABLED` setting.
-  -- @param path (optional) path to return data from, default `/latest/meta-data/`
+  -- @param subpath (optional) subpath to return data from, default `/latest/meta-data/`
   -- @param version (optional) version of IDMS to use, either "V1" or "V2" (case insensitive, default "V2")
   -- @return body & content-type (if json, the body will be decoded to a Lua table), or nil+err
   function Utils.getIDMSMetadata(subpath, version, retry)
