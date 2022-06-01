@@ -144,7 +144,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### (unreleased)
+### 0.5.0 (01-jun-2022)
 
  - feat: enable use of regional STS endpoints
  - deps: bumped the [lua-resty-http](https://github.com/ledgetech/lua-resty-http)

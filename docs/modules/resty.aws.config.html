@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AWS SDK for OpenResty</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>lua-resty-aws</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>resty.aws.config</strong></li>
+  <li><a href="../modules/resty.aws.request.http.socket.html">resty.aws.request.http.socket</a></li>
+  <li><a href="../modules/resty.aws.utils.html">resty.aws.utils</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AWS.html">AWS</a></li>
+  <li><a href="../classes/ChainedTemporaryCredentials.html">ChainedTemporaryCredentials</a></li>
+  <li><a href="../classes/CredentialProviderChain.html">CredentialProviderChain</a></li>
+  <li><a href="../classes/Credentials.html">Credentials</a></li>
+  <li><a href="../classes/EC2MetadataCredentials.html">EC2MetadataCredentials</a></li>
+  <li><a href="../classes/EnvironmentCredentials.html">EnvironmentCredentials</a></li>
+  <li><a href="../classes/RemoteCredentials.html">RemoteCredentials</a></li>
+  <li><a href="../classes/TokenFileWebIdentityCredentials.html">TokenFileWebIdentityCredentials</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>resty.aws.config</code></h1>
+<p>Load AWS configuration.</p>
+<p>
+
+
+<p> This is based of <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">Configuration and credential file settings</a>
+ and <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html">Environment variables to configure the AWS CLI</a>.</p>
+
+<p> <h3>Usage</h3></p>
+
+<p> Simply collect the global config table:</p>
+
+<pre>
+<span class="keyword">local</span> config = <span class="global">require</span>(<span class="string">"resty.aws.config"</span>).config
+<span class="global">print</span>(<span class="string">"AWS region: "</span>, (config.region <span class="keyword">or</span> <span class="string">"failed to detect"</span>))
+</pre>
+
+<p> <h3>Additional environment variables</h3></p>
+
+<p> The following config file entries do not have an environment variable override
+ in the AWS CLI, but this Lua module adds them as follows:</p>
+
+<ul>
+    <li><code>AWS_CLI_TIMESTAMP_FORMAT</code> will override <code>cli_timestamp_format</code></li>
+    <li><code>AWS_DURATION_SECONDS</code> will override <code>duration_seconds</code></li>
+    <li><code>AWS_PARAMETER_VALIDATION</code> will override <code>parameter_validation</code></li>
+</ul>
+
+<p> <h3>Options processing and naming</h3></p>
+
+<p> Some options are available in the config/credential files, some as environment
+ variables, and some in both. The options are processed as follows:</p>
+
+<ul>
+    <li><p>profiles will be honored (see environment variable <code>AWS_PROFILE</code>)</p></li>
+    <li><p>Numeric and boolean values will be converted to their equivalent Lua types</p></li>
+    <li><p>properties will have the name as used in the config file, for any property
+that is a valid config file entry but also has an environment variable override.
+For example:</p>
+
+<pre>
+export AWS_REGION=<span class="string">"us-east-1"</span>
+</pre>
+
+<p>will be available as <code>config.global.region</code> and <code>config.global.AWS_REGION</code>,
+since in the config file the property
+is named <code>region</code>, whilst the environment variable is called <code>AWS_REGION</code>.</p></li>
+    <li><p>properties that only have environment variable settings (eg. <code>AWS_SHARED_CREDENTIALS_FILE</code>)
+will be added to the config table by their all-caps name.
+For example:</p>
+
+<pre>
+export AWS_SHARED_CREDENTIALS_FILE=<span class="string">"~/my_aws_config"</span>
+</pre>
+
+<p>will be available as <code>config.global.AWS_SHARED_CREDENTIALS_FILE</code>, since
+there is no config file property in this case.</p></li>
+</ul>
+
+<p> <h3>Other system variables</h3></p>
+
+<p> The following environment variables are also read (so only loading this config
+ module in the <code>init</code> phase will suffice for most use cases):</p>
+
+<ul>
+    <li><code>ECS_CONTAINERMETADATA_URI_V4</code></li>
+    <li><code>ECS_CONTAINERMETADATA_URI</code></li>
+    <li><code>AMAZON_ACCESS_KEY_ID</code></li>
+    <li><code>AMAZON_SECRET_ACCESS_KEY</code></li>
+    <li><code>AMAZON_SESSION_TOKEN</code></li>
+    <li><code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code></li>
+    <li><code>AWS_CONTAINER_CREDENTIALS_FULL_URI</code></li>
+</ul>
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#get_config">get_config ()</a></td>
+	<td class="summary">returns the current configuration.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_credentials">get_credentials ()</a></td>
+	<td class="summary">returns the credentials from config file, credential file, or environment variables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load_config">load_config ()</a></td>
+	<td class="summary">returns the configuration loaded from the config file.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load_configfile">load_configfile (filename[, profile])</a></td>
+	<td class="summary">loads a configuration file.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load_credentials">load_credentials ()</a></td>
+	<td class="summary">returns the credentials loaded from the config files.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load_credentials_file">load_credentials_file (filename[, profile])</a></td>
+	<td class="summary">loads a credential file.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "get_config"></a>
+    <strong>get_config ()</strong>
+    </dt>
+    <dd>
+    returns the current configuration.
+ Reads the configuration files (config + credentials) and overrides them with
+ any environment variables specified, or defaults.</p>
+
+<p> NOTE: this will not auto-detect the region. Use <a href="../modules/resty.aws.utils.html#Utils.getCurrentRegion">resty.aws.utils.getCurrentRegion</a>
+ for that, or get the <code>config.global</code> table which will auto-detect.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with configuration options, table can be empty.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> config = <span class="global">require</span>(<span class="string">"resty.aws.config"</span>).config       <span class="comment">-- does auto-detect region
+</span>
+<span class="comment">-- is equivalent to:
+</span><span class="keyword">local</span> config = <span class="global">require</span>(<span class="string">"resty.aws.config"</span>).get_config()
+<span class="keyword">if</span> <span class="keyword">not</span> config.region <span class="keyword">then</span>
+    config.region = utils.getCurrentRegion()
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "get_credentials"></a>
+    <strong>get_credentials ()</strong>
+    </dt>
+    <dd>
+    returns the credentials from config file, credential file, or environment variables.
+ Reads the configuration files (config + credentials) and overrides them with
+ any environment variables specified.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with credentials (<code>aws_access_key_id</code>, <code>aws_secret_access_key</code>, and <code>aws_session_token</code>)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "load_config"></a>
+    <strong>load_config ()</strong>
+    </dt>
+    <dd>
+    returns the configuration loaded from the config file.
+ The result is based on <code>AWS_CONFIG_FILE</code> and <code>AWS_PROFILE</code>. Returns an empty
+ table if the config file does not exist.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        options table as gotten from the configuration file, or nil+err.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "load_configfile"></a>
+    <strong>load_configfile (filename[, profile])</strong>
+    </dt>
+    <dd>
+    loads a configuration file.
+ The returned table is a hash table with options. If profiles are returned
+ then they will be sub-tables, with key "profile [profile-name]".
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">filename</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the filename of the configuration file to load
+        </li>
+        <li><span class="parameter">profile</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the profile to retrieve from the configuration file. If
+ the profile doesn't exist, then it returns an empty table. Use <code>&quot;default&quot;</code> to get the default profile.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with the contents of the file, or only the profile if a profile was specified, or
+ nil+err if there was a problem loading the file
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "load_credentials"></a>
+    <strong>load_credentials ()</strong>
+    </dt>
+    <dd>
+    returns the credentials loaded from the config files.
+ Options are based on <code>AWS_SHARED_CREDENTIALS_FILE</code> and <code>AWS_PROFILE</code>. Falls back to
+ the config file (see <a href="../modules/resty.aws.config.html#load_config">config.load_config</a>). Returns an empty
+ table if the credentials file does not exist.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        credentials table as gotten from the credentials file, or a table
+ with the key, id, and token from the configuration file, table can be empty.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "load_credentials_file"></a>
+    <strong>load_credentials_file (filename[, profile])</strong>
+    </dt>
+    <dd>
+    loads a credential file.
+ The returned table is a hash table with options. If profiles are returned
+ then they will be sub-tables, with key "[profile-name]".
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">filename</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the filename of the credentials file to load
+        </li>
+        <li><span class="parameter">profile</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the profile to retrieve from the credentials file. If
+ the profile doesn't exist, then it returns an empty table. Use <code>default</code> to get the default profile.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with the contents of the file, or only the profile if a profile was specified or
+ nil+err if there was a problem loading the file
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-06-01 07:33:03 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
