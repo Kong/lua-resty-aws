@@ -145,10 +145,10 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### unreleased
+### 0.5.1 (01-Jun-2022)
 
  - feat: socket compatibility; overriding luasocket use in phases now returns
-   the existin g setting
+   the existing setting
 
 ### 0.5.0 (01-Jun-2022)
 
