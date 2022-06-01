@@ -144,7 +144,13 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### 0.5.0 (01-jun-2022)
+
+### unreleased
+
+ - feat: socket compatibility; overriding luasocket use in phases now returns
+   the existin g setting
+
+### 0.5.0 (01-Jun-2022)
 
  - feat: enable use of regional STS endpoints
  - deps: bumped the [lua-resty-http](https://github.com/ledgetech/lua-resty-http)
@@ -160,7 +166,7 @@ Release process:
      Behaviour might change, but is expected to be very rare.
 
 
-### 0.4.0 (06-dec-2021)
+### 0.4.0 (06-Dec-2021)
 
  - feat: added TokenFileWebIdentityCredentials. This adds default IAM credentials
    to be picked up on EKS. The default AWS instance creates a CredentialProviderChain
