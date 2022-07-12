@@ -23,6 +23,23 @@ regular CI.
 
 ---
 
+## Example
+
+```lua
+local AWS = require("resty.aws")
+local AWS_global_config = require("resty.aws.config").global
+
+local aws = AWS()
+
+local myLambda = aws:Lambda { region = AWS_global_config.region }
+local ok, err = myLambda:invoke {
+  FunctionName = "testFunction",
+  Payload = '{ "John": "Smith" }',
+}
+```
+
+---
+
 ## Usage IMPORTANT!!
 
 ### Global settings
@@ -145,7 +162,7 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### 0.5.2 (unreleased)
+### 0.5.2 (12-Jul-2022)
 
  - fix: relax validation to not validate some generic metadata fields. Encountered
    while trying to use Lambda [#21](https://github.com/Kong/lua-resty-aws/pull/21)
