@@ -149,6 +149,8 @@ Release process:
 
  - fix: relax validation to not validate some generic metadata fields. Encountered
    while trying to use Lambda [#21](https://github.com/Kong/lua-resty-aws/pull/21)
+ - fix: better error handling when credential providers fail to load
+   [#22](https://github.com/Kong/lua-resty-aws/pull/22)
 
 ### 0.5.1 (01-Jun-2022)
 

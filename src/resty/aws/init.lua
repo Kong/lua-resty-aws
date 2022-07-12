@@ -480,9 +480,14 @@ function AWS:new(config)
         return creds, err
       end
     else
-      -- not implemented yet
-      aws_instance[class_name] = function(self, opts)
-        error(("'%s' hasn't been implemented yet"):format(class_name), 2)
+      if cred_class:find("module 'resty.aws.credentials." .. class_name .. "' not found", 1, true) then
+        -- not implemented yet
+        aws_instance[class_name] = function(self, opts)
+          error(("'%s' hasn't been implemented yet"):format(class_name), 2)
+        end
+      else
+        -- some other error, bail out
+        error(cred_class)
       end
     end
   end
