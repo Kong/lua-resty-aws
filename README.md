@@ -145,6 +145,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### 0.5.2 (unreleased)
+
+ - fix: relax validation to not validate some generic metadata fields. Encountered
+   while trying to use Lambda [#21](https://github.com/Kong/lua-resty-aws/pull/21)
+
 ### 0.5.1 (01-Jun-2022)
 
  - feat: socket compatibility; overriding luasocket use in phases now returns
