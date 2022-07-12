@@ -6,7 +6,7 @@
 -- <h3>Usage</h3>
 --
 -- Simply collect the global config table:
---     local config = require("resty.aws.config").config
+--     local config = require("resty.aws.config").global
 --     print("AWS region: ", (config.region or "failed to detect"))
 --
 -- <h3>Additional environment variables</h3>
@@ -261,7 +261,7 @@ end
 -- for that, or get the `config.global` table which will auto-detect.
 -- @return table with configuration options, table can be empty.
 -- @usage
--- local config = require("resty.aws.config").config       -- does auto-detect region
+-- local config = require("resty.aws.config").global       -- does auto-detect region
 --
 -- -- is equivalent to:
 -- local config = require("resty.aws.config").get_config()
