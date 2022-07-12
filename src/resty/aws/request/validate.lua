@@ -411,6 +411,8 @@ local validators do
                   table.concat(enums, "', '") .. "'"
     end,
     type = always_pass,
+    locationName = always_pass,
+    location = always_pass,
     deprecatedMessage = always_pass,
     deprecated = always_pass,
     sensitive = always_pass,
@@ -557,6 +559,7 @@ local validators do
       end
       return true
     end,
+    payload = always_pass,
     type = always_pass,
     deprecatedMessage = always_pass,
     deprecated = always_pass,
