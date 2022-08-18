@@ -6,6 +6,7 @@ local build_request = require("resty.aws.request.build")
 local sign_request = require("resty.aws.request.sign")
 local execute_request = require("resty.aws.request.execute")
 local split = require("pl.utils").split
+local tablex = require("pl.tablex")
 
 
 
@@ -70,44 +71,55 @@ AWS.__index = lookup_helper
 
 
 
-local aws_config do
-  aws_config = {
-    region = require("resty.aws.raw-api.region_config_data"),
-    api = {},
-  }
+local aws_config = {
+  region = require("resty.aws.raw-api.region_config_data"),
+  api = {},
+}
 
+local load_api
+do
   -- The API table is a map, where the index is the service-name. The value is a table.
   -- The table is another map, indexed by version (string). The value of that one
   -- is the raw AWS api.
   -- That raw-api is loaded upon demand by meta-table magic so we only load what we need.
   local list = require("resty.aws.raw-api.table_of_contents")
-  for i, filename in ipairs(list) do
-    -- example filename: "AWSMigrationHub-2017-05-31"
-    local module_name = "resty.aws.raw-api." .. filename
+  for _, filename in ipairs(list) do
     -- example module_name: "resty.aws.raw-api.AWSMigrationHub-2017-05-31"
-    local service_name, version = assert(filename:match("^(.-)%-(%d%d%d%d%-%d%d%-%d%d)$"))
-    -- example service_name: "AWSMigrationHub"
+    -- example table_of_contents: "MigrationHub:AWSMigrationHub-2017-05-31"
+    local service_id, service, version = assert(filename:match("^(.-)%:(.-)%-(%d%d%d%d%-%d%d%-%d%d)$"))
+    -- example filename: "AWSMigrationHub-2017-05-31"
+    local module_name = "resty.aws.raw-api." .. service .. "-" .. version
+    -- example service_id: "MigrationHub"
     -- example version: "2017-05-31"
-    local service_table = aws_config.api[service_name]
-    if not service_table then
-      service_table = {}
-      aws_config.api[service_name] = service_table
+    local service_table = aws_config.api[service_id] or {}
+    service_table[version] = module_name
+
+    local sorted_versions = tablex.keys(service_table)
+    table.sort(sorted_versions)
+
+    service_table.latest = service_table[sorted_versions[#sorted_versions]]
+
+    aws_config.api[service_id] = service_table
+  end
+
+  local cache = setmetatable({}, { __mode = "v" })
+
+  function load_api(service, version)
+    local module_name = aws_config.api[service] and aws_config.api[service][version]
+    if not module_name then
+      return nil, "unknown service: " .. tostring(service) .. "/" .. tostring(version)
     end
-    -- load the file and dereference shapes
-    local api = require(module_name)
+
+    local api = cache[module_name]
+    if api then
+      return api
+    end
+
+    api = require(module_name)
     dereference_service(api)
 
-    service_table[version] = api
-
-    if service_table.latest then
-      -- update 'latest' if this one is newer
-      if service_table.latest.metadata.apiVersion < version then
-        service_table.latest = api
-      end
-    else
-      -- we're the only one, and hence also 'latest' so far
-      service_table.latest = api
-    end
+    cache[module_name] = api
+    return api
   end
 end
 
@@ -378,13 +390,9 @@ function AWS:new(config)
   end
 
   -- create service methods/constructors
-  for service_name, versions in pairs(aws_config.api) do
+  for service_id in pairs(aws_config.api) do
     -- Create service specific functions, by `serviceId`
-
-    local serviceId = versions[next(versions)].metadata.serviceId
-    local cleanId = serviceId:gsub(" ", "") -- for interface drop all spaces
-
-    aws_instance[cleanId] = function(aws, config)
+    aws_instance[service_id] = function(aws, config)
       if getmetatable(aws) ~= AWS then
         error("must instantiate AWS services by calling aws_instance:ServiceName(config)", 2)
       end
@@ -404,9 +412,9 @@ function AWS:new(config)
 
       -- create the service
       -- `config.apiVersion`: the api version to use
-      local api = versions[service_config.apiVersion]
+      local api = load_api(service_id, service_config.apiVersion)
       if not api then
-        return nil, ("service '%s' does not have an apiVersion '%s'"):format(serviceId, tostring(service_config.apiVersion))
+        return nil, ("service '%s' does not have an apiVersion '%s'"):format(service_id, tostring(service_config.apiVersion))
       end
       if service_config.apiVersion == "latest" then
         service_config.apiVersion = api.metadata.apiVersion
