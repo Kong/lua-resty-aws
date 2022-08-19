@@ -338,9 +338,3 @@ return setmetatable(config, {
     return self.global
   end
 })
-
-
-
-
-
-

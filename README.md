@@ -161,6 +161,10 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 0.5.4 (19-Aug-2022)
+
+ - chore: remove error message when no region is found
+   during config initialization [#24](https://github.com/Kong/lua-resty-aws/pull/24)
 
 ### 0.5.3 (19-Aug-2022)
 

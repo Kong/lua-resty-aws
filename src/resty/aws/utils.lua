@@ -294,7 +294,6 @@ do  -- getCurrentRegion
     if not detected then
       local ok, err = detect_region_locked()
       if not ok then
-        ngx.log(ngx.ERR, "failed detecting current AWS region: ", err)
         return nil, "failed detecting current AWS region: " .. tostring(err)
       end
     end
