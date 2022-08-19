@@ -53,9 +53,11 @@ FILENAME=$TARGET/table_of_contents.lua
 echo "adding: $FILENAME"
 echo "return {" >> $FILENAME
 for f in "${file_list[@]}"; do
+  source_file=$SOURCE/apis/$f.normal.json
+  service_id=$(jq -r '.metadata.serviceId' $source_file | tr -d ' ')
   # replace . with - since . can't be in a Lua module name
   f=${f//./-}
-  echo '  "'"$f"'",' >> $FILENAME
+  echo '  "'"$service_id:$f"'",' >> $FILENAME
 done
 echo "}" >> $FILENAME
 
