@@ -162,6 +162,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### 0.5.3 (19-Aug-2022)
+
+ - feat: lazy load API modules
+   [#23](https://github.com/Kong/lua-resty-aws/pull/23)
+
 ### 0.5.2 (12-Jul-2022)
 
  - fix: relax validation to not validate some generic metadata fields. Encountered
