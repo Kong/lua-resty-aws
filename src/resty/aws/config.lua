@@ -47,8 +47,8 @@
 -- The following environment variables are also read (so only loading this config
 -- module in the `init` phase will suffice for most use cases):
 --
--- * `ECS_CONTAINERMETADATA_URI_V4`
--- * `ECS_CONTAINERMETADATA_URI`
+-- * `ECS_CONTAINER_METADATA_URI_V4`
+-- * `ECS_CONTAINER_METADATA_URI`
 -- * `AMAZON_ACCESS_KEY_ID`
 -- * `AMAZON_SECRET_ACCESS_KEY`
 -- * `AMAZON_SESSION_TOKEN`
@@ -126,8 +126,8 @@ local env_vars = {
   -- 'init' phase because envs are not available in later stages)
 
   -- ECS metadata urls
-  ECS_CONTAINERMETADATA_URI_V4 = { name = "ECS_CONTAINERMETADATA_URI_V4", default = nil },
-  ECS_CONTAINERMETADATA_URI = { name = "ECS_CONTAINERMETADATA_URI", default = nil },
+  ECS_CONTAINER_METADATA_URI_V4 = { name = "ECS_CONTAINER_METADATA_URI_V4", default = nil },
+  ECS_CONTAINER_METADATA_URI = { name = "ECS_CONTAINER_METADATA_URI", default = nil },
 
   -- Variables used in the CredentialProviderChain; EnvironmentCredentials with 'AMAZON' prefix
   AMAZON_ACCESS_KEY_ID = { name = "AMAZON_ACCESS_KEY_ID", default = nil },
