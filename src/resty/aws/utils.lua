@@ -11,9 +11,9 @@ local global_config = require("resty.aws.config").global
 local AWS_REGION = global_config.AWS_REGION
 local AWS_DEFAULT_REGION = global_config.AWS_DEFAULT_REGION
 local AWS_EC2_METADATA_DISABLED = global_config.AWS_EC2_METADATA_DISABLED
-local ECS_CONTAINERMETADATA_URI_V4 = global_config.ECS_CONTAINERMETADATA_URI_V4
-local ECS_CONTAINERMETADATA_URI_V3 = global_config.ECS_CONTAINERMETADATA_URI
-local ECS_CONTAINERMETADATA_URI_V2 = "http://169.254.170.2/v2/"
+local ECS_CONTAINER_METADATA_URI_V4 = global_config.ECS_CONTAINER_METADATA_URI_V4
+local ECS_CONTAINER_METADATA_URI_V3 = global_config.ECS_CONTAINER_METADATA_URI
+local ECS_CONTAINER_METADATA_URI_V2 = "http://169.254.170.2/v2/"
 local IDMS_URI = "http://169.254.169.254"
 local METADATA_TIMEOUTS = 5000  -- in milliseconds
 
@@ -112,17 +112,17 @@ function Utils.getECSTaskMetadata(subpath, version)
   local url
   local version = version and version:upper() or "V4"
   if version == "V4" then
-    url = ECS_CONTAINERMETADATA_URI_V4
+    url = ECS_CONTAINER_METADATA_URI_V4
     if not url then
-      return nil, "ECS metadata url V4 not found in env var ECS_CONTAINERMETADATA_URI_V4"
+      return nil, "ECS metadata url V4 not found in env var ECS_CONTAINER_METADATA_URI_V4"
     end
   elseif version == "V3" then
-    url = ECS_CONTAINERMETADATA_URI_V3
+    url = ECS_CONTAINER_METADATA_URI_V3
     if not url then
-      return nil, "ECS metadata url V3 not found in env var ECS_CONTAINERMETADATA_URI"
+      return nil, "ECS metadata url V3 not found in env var ECS_CONTAINER_METADATA_URI"
     end
   elseif version == "V2" then
-    url = ECS_CONTAINERMETADATA_URI_V2
+    url = ECS_CONTAINER_METADATA_URI_V2
     if not subpath then
       subpath = "/metadata"
     end
@@ -188,8 +188,8 @@ do  -- getCurrentRegion
       ngx.log(ngx.DEBUG, "no AWS_DEFAULT_REGION env variable")
     end
 
-    if ECS_CONTAINERMETADATA_URI_V4 then
-      ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINERMETADATA_URI_V4 env variable")
+    if ECS_CONTAINER_METADATA_URI_V4 then
+      ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINER_METADATA_URI_V4 env variable")
       local metadata, err = Utils.getECSTaskMetadata("/task", "V4")
       if not metadata then
         ngx.log(ngx.DEBUG, "failed getting ECS metdata V4: ", err)
@@ -198,11 +198,11 @@ do  -- getCurrentRegion
         return true
       end
     else
-      ngx.log(ngx.DEBUG, "no ECS_CONTAINERMETADATA_URI_V4 env variable")
+      ngx.log(ngx.DEBUG, "no ECS_CONTAINER_METADATA_URI_V4 env variable")
     end
 
-    if ECS_CONTAINERMETADATA_URI_V3 then
-      ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINERMETADATA_URI env variable")
+    if ECS_CONTAINER_METADATA_URI_V3 then
+      ngx.log(ngx.DEBUG, "detecting AWS region from ECS_CONTAINER_METADATA_URI env variable")
       local metadata, err = Utils.getECSTaskMetadata("/task", "V3")
       if not metadata then
         ngx.log(ngx.DEBUG, "failed getting ECS metadata V3: ", err)
@@ -211,7 +211,7 @@ do  -- getCurrentRegion
         return true
       end
     else
-      ngx.log(ngx.DEBUG, "no ECS_CONTAINERMETADATA_URI env variable")
+      ngx.log(ngx.DEBUG, "no ECS_CONTAINER_METADATA_URI env variable")
     end
 
     if AWS_EC2_METADATA_DISABLED then
@@ -280,9 +280,9 @@ do  -- getCurrentRegion
   -- 1. environment variable `AWS_REGION`
   -- 2. environment variable `AWS_DEFAULT_REGION`
   -- 3. ECS metadata V4 (parse region from "AvailabilityZone") if the environment
-  --    variable `ECS_CONTAINERMETADATA_URI_V4` is available
+  --    variable `ECS_CONTAINER_METADATA_URI_V4` is available
   -- 4. ECS metadata V3 (parse region from "AvailabilityZone") if the environment
-  --    variable `ECS_CONTAINERMETADATA_URI` is available
+  --    variable `ECS_CONTAINER_METADATA_URI` is available
   -- 5. IDMSv2 metadata (only if `AWS_EC2_METADATA_DISABLED` hasn't been set to `true`)
   --
   -- The IDMSv2 call makes a call to an IP endpoint, and hence could timeout
