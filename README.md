@@ -161,6 +161,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 0.5.5 (26-Sep-2022)
+
+ - fix: variable names for ECS Conatiner Metatdata were missing an '_'
+   [#26](https://github.com/Kong/lua-resty-aws/pull/26)
+
 ### 0.5.4 (19-Aug-2022)
 
  - chore: remove error message when no region is found
