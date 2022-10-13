@@ -94,7 +94,8 @@ do
     local service_table = aws_config.api[service_id] or {}
     service_table[version] = module_name
 
-    local sorted_versions = tablex.keys(service_table)
+    local sorted_versions = tablex.filter(tablex.keys(service_table),
+                              function(v) return v ~= "latest" end)
     table.sort(sorted_versions)
 
     service_table.latest = service_table[sorted_versions[#sorted_versions]]

@@ -1,3 +1,5 @@
+local tablex = require "pl.tablex"
+
 describe("service generator", function()
 
 
@@ -39,6 +41,22 @@ describe("service generator", function()
 
     local mesh = assert(AWS():AppMesh({ apiVersion = "2018-10-01", region = "us-east-1" }))
     assert.equal("2018-10-01", mesh.config.apiVersion)
+  end)
+
+
+  it("'latest' indicates the most recent service version", function()
+    -- Find latest version from table of contents
+    local list = require("resty.aws.raw-api.table_of_contents")
+    local service_list = tablex.filter(list, function(v) return v:find("DynamoDB:") end)
+    table.sort(service_list)
+    local _, _, latest_version = service_list[#service_list]:match("^(.-)%:(.-)%-(%d%d%d%d%-%d%d%-%d%d)$")
+
+    local dynamoDB = assert(AWS():DynamoDB({ apiVersion = "latest", region = "us-east-1" }))
+    assert.equal(latest_version, dynamoDB.config.apiVersion)
+
+    -- use latest version by default
+    dynamoDB = assert(AWS():DynamoDB({ region = "us-east-1" }))
+    assert.equal(latest_version, dynamoDB.config.apiVersion)
   end)
 
 
