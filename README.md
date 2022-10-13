@@ -37,6 +37,66 @@ local ok, err = myLambda:invoke {
   Payload = '{ "John": "Smith" }',
 }
 ```
+---
+
+## Example - ACM
+```lua
+local config = { region = "ap-south-1" }
+local aws = AWS(config)
+local credentials = aws:Credentials {
+  accessKeyId = "AK**********",
+  secretAccessKey = "ZS************",
+}
+aws.config.credentials = credentials
+local acm = aws:ACM { region = "ap-south-1" }
+
+local response = acm:getCertificate({
+  CertificateArn = "arn:aws:acm:ap-south-1:************:certificate/**********s**********"
+})
+
+if response.status < 200 and response.status >= 300 then
+  -- kong.log.error(dump(response))
+  print(dump(response))
+  --[[
+    {
+      body = {
+        CertificateChain = **,
+        Certificate = **,
+      },
+      status = 200,
+      reason = OK,
+      headers = {
+        Date = Thu, 13 Oct 2022 09:50:33 GMT,
+        Content-Type = application/x-amz-json-1.1,
+        x-amzn-RequestId = ************,
+        Content-Length = 2488
+      }
+    }
+  ]]--
+  return
+end
+
+-- kong.log.debug(dump(response))
+print(dump(response))
+--[[
+  {
+    headers = {
+      Connection = close,
+      x-amzn-RequestId = ************************************,
+      Content-Type = application/x-amz-json-1.1,
+      Date = Thu, 13 Oct 2022 09:48:15 GMT,
+      Content-Length = 163
+    },
+    reason = Bad Request,
+    status = 400,
+    body = {
+      __type = ResourceNotFoundException,
+      message = Could not find certificate arn:aws:acm:ap-south-1:**********:certificate/**************************.
+    }
+  }
+]]--
+```
+Got the dump function from this stackoverflow thread: https://stackoverflow.com/questions/55650773/trying-to-print-a-table-in-lua
 
 ---
 
