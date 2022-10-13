@@ -161,6 +161,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 0.5.6 (Unreleased)
+
+- fix: `latest` doesn't indicate the most recent service version
+   [#28](https://github.com/Kong/lua-resty-aws/pull/28)
+
 ### 0.5.5 (26-Sep-2022)
 
  - fix: variable names for ECS Conatiner Metatdata were missing an '_'
