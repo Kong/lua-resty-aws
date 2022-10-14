@@ -17,7 +17,7 @@ For a quick start on how to use this library checkout
 
 ## Status
 
-This library is under early development. Not everything has been implemented,
+Not everything has been implemented,
 and testing is hard since it requires access to AWS resources and not just
 regular CI.
 
@@ -25,22 +25,16 @@ regular CI.
 
 ## Example
 
-```lua
-local AWS = require("resty.aws")
-local AWS_global_config = require("resty.aws.config").global
-
-local aws = AWS()
-
-local myLambda = aws:Lambda { region = AWS_global_config.region }
-local ok, err = myLambda:invoke {
-  FunctionName = "testFunction",
-  Payload = '{ "John": "Smith" }',
-}
-```
+See [the example](https://kong.github.io/lua-resty-aws/classes/AWS.html) in the documentation.
 
 ---
 
 ## Usage IMPORTANT!!
+
+### `attempt to yield across C-call boundary` error
+
+This typically happens when initializing from within a `require` call.
+See [Global settings](#global-settings) below on how to initialize properly.
 
 ### Global settings
 
@@ -133,7 +127,7 @@ or run
 
 ## Copyright and license
 
-Copyright: (c) 2020-2021 Kong, Inc.
+Copyright: (c) 2020-2022 Kong, Inc.
 
 Author: Thijs Schreijer
 
@@ -143,9 +137,7 @@ License: [Apache 2.0](https://github.com/Kong/lua-resty-aws/blob/main/LICENSE)
 
 ## History
 
-Versioning is strictly based on [Semantic Versioning](https://semver.org/) (please
-note that in the pre-1.0 stage the API is not considered stable and can change at
-any time, and in any release, major, minor, and patch)
+Versioning is strictly based on [Semantic Versioning](https://semver.org/)
 
 Release process:
 

@@ -349,15 +349,21 @@ end
 -- create, so you might want to reuse them.
 -- @param config (optional) the config table to be copied into the instance as the global `aws_instance.config`
 -- @usage
+-- -- in the "init" phase initialize the configuration
+-- local _ = require("resty.aws.config").global
+--
+--
+-- @usage
+-- -- In your code
 -- local AWS = require("resty.aws")
--- local utils = require("resty.aws.utils")
--- local config = { region = utils.getCurrentRegion() }
+-- local AWS_global_config = require("resty.aws.config").global
+--
+-- local config = { region = AWS_global_config.region }
 --
 -- local aws = AWS(config)
--- -- or similarly
--- local aws = AWS:new(config)
 --
--- -- Override default "CredentialProviderChain" credentials
+-- -- Override default "CredentialProviderChain" credentials.
+-- -- This is optional, the defaults should work with AWS-IAM.
 -- local my_creds = aws:Credentials {
 --   accessKeyId = "access",
 --   secretAccessKey = "secret",
@@ -365,12 +371,14 @@ end
 -- }
 -- aws.config.credentials = my_creds
 --
--- -- instantiate a service (optionally overriding the global config)
+-- -- instantiate a service (optionally overriding the aws-instance config)
 -- local sm = aws:SecretsManager {
 --   region = "us-east-2",
 -- }
 --
--- -- Invoke a method
+-- -- Invoke a method.
+-- -- Note this only takes the parameter table, and NOT a callback as the
+-- -- JS sdk requires. Instead this call will directly return the results.
 -- local results, err = sm:GetSecretValue {
 --   SecretId = "arn:aws:secretsmanager:us-east-2:238406704566:secret:test-HN1F1k",
 -- })
