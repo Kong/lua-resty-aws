@@ -136,9 +136,9 @@ aws.config.credentials = my_creds
 <span class="comment">-- Invoke a method.
 </span><span class="comment">-- Note this only takes the parameter table, and NOT a callback as the
 </span><span class="comment">-- JS sdk requires. Instead this call will directly return the results.
-</span><span class="keyword">local</span> results, err = sm:GetSecretValue {
+</span><span class="keyword">local</span> results, err = sm:getSecretValue {
   SecretId = <span class="string">"arn:aws:secretsmanager:us-east-2:238406704566:secret:test-HN1F1k"</span>,
-})</pre></li>
+}</pre></li>
     </ul>
 
 </dd>
