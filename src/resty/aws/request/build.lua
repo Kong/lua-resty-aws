@@ -100,7 +100,7 @@ local function build_request(operation, config, params)
       -- print(name," = ", param_value, ": ",location, " (", locationName,")")
 
       if location == "uri" then
-        local place_holder = "{" .. locationName .. "}"
+        local place_holder = "{" .. locationName .. "%+?}"
         request.path = request.path:gsub(place_holder, param_value)
 
       elseif location == "querystring" then
