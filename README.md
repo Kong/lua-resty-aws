@@ -142,10 +142,7 @@ Versioning is strictly based on [Semantic Versioning](https://semver.org/)
 Release process:
 
 1. update the changelog below
-1. run `make clean`
-1. run `make dev`
-1. run `make test`
-1. run `make docs`
+1. run `make clean && make dev && make test && make docs`
 1. commit, and tag the commit with the version `x.y.z`
 1. push the commit and tag
 1. run `VERSION=x.y.z make pack`
