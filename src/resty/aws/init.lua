@@ -379,9 +379,9 @@ end
 -- -- Invoke a method.
 -- -- Note this only takes the parameter table, and NOT a callback as the
 -- -- JS sdk requires. Instead this call will directly return the results.
--- local results, err = sm:GetSecretValue {
+-- local results, err = sm:getSecretValue {
 --   SecretId = "arn:aws:secretsmanager:us-east-2:238406704566:secret:test-HN1F1k",
--- })
+-- }
 function AWS:new(config)
   if self ~= AWS then
     error("must instantiate AWS instances by calling AWS(config) or AWS:new(config)", 2)
