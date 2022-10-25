@@ -5,6 +5,10 @@ local signatures = setmetatable({}, {
   __index = function(self, key)
     -- if we do not have a specific signature version, then load it
     assert(type(key) == "string", "the signature type must be a string")
+    if key == "s3" then
+      key = "v4"
+    end
+
     local ok, mod = pcall(require, "resty.aws.request.signatures." .. key)
     if not ok then
       return error("AWS signature version '"..key.."' does not exist or hasn't been implemented")

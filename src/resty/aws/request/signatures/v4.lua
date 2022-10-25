@@ -198,6 +198,16 @@ local function prepare_awsv4_request(config, request_data)
     ["X-Amz-Security-Token"] = session_token,
   }
 
+  local S3 = config.signatureVersion == "s3"
+
+  local hashed_payload = hex_encode(hash(req_payload or ""))
+
+  -- Special handling of S3
+  -- https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html#:~:text=Unsigned%20payload%20option
+  if S3 then
+    headers["X-Amz-Content-Sha256"] = hashed_payload
+  end
+
   local add_auth_header = true
   for k, v in pairs(req_headers) do
     k = k:gsub("%f[^%z-]%w", string.upper) -- convert to standard header title case
@@ -242,7 +252,7 @@ local function prepare_awsv4_request(config, request_data)
     (canonical_querystring or "") .. '\n' ..
     canonical_headers .. '\n' ..
     signed_headers .. '\n' ..
-    hex_encode(hash(req_payload or ""))
+    hashed_payload
 
   local hashed_canonical_request = hex_encode(hash(canonical_request))
 
