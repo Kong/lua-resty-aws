@@ -29,7 +29,7 @@ describe("operations protocol", function()
       name = "AssumeRole",
       http = {
         method = "POST",
-        requestUri = "/hello/{InstanceId}"
+        requestUri = "/hello/{InstanceId}?nice",
       },
       input = {
         type = "structure",
@@ -150,6 +150,7 @@ describe("operations protocol", function()
         UserId = "Arthur Dent",
         Action = "AssumeRole",
         Version = "2011-06-15",
+        nice = '',
       }
     }, request)
   end)
@@ -185,6 +186,7 @@ describe("operations protocol", function()
       },
       query = {
         UserId = "Arthur Dent",
+        nice = '',
       }
     }, request)
   end)
@@ -220,6 +222,7 @@ describe("operations protocol", function()
       },
       query = {
         UserId = "Arthur Dent",
+        nice = '',
       }
     }, request)
   end)
@@ -288,6 +291,7 @@ describe("operations protocol", function()
         tag = 'mainXmlElement' },
       query = {
         UserId = "Arthur Dent",
+        nice = '',
       }
     }, request)
   end)

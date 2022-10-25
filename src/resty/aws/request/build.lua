@@ -50,6 +50,13 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
   end
 end
 
+local function parse_query(q)
+  local query_tbl = {}
+  for k, v in q:gmatch('([^&=?]+)=?([^&=?]*)') do
+    query_tbl[k] = v
+  end
+  return query_tbl
+end
 
 
 -- implement AWS api protocols.
@@ -71,9 +78,13 @@ local function build_request(operation, config, params)
     error("Bad config, field protocol is invalid, got: '" .. tostring(config.protocol) .. "'")
   end
 
+  local http = operation.http or {}
+  local uri = http.requestUri or ""
+
+
   local request = {
-    path =  (operation.http or {}).requestUri or "",
-    method = (operation.http or {}).method,
+    path =  uri,
+    method = http.method,
     query = {},
     headers = {},
     body = {},
@@ -119,6 +130,13 @@ local function build_request(operation, config, params)
         end
       end
     end
+  end
+
+  local path, query = request.path:match("([^?]+)%??(.*)")
+  request.path = path
+
+  for k,v in pairs(parse_query(query)) do
+    request.query[k] = v
   end
 
   -- format the body
