@@ -32,7 +32,7 @@ CredentialProviderChain.defaultProviders = {} do
   -- add the defaults
   add_if_exists("EnvironmentCredentials", { envPrefix = 'AWS' })
   add_if_exists("EnvironmentCredentials", { envPrefix = 'AMAZON' })
-  add_if_exists("SharedIniFileCredentials")
+  add_if_exists("SharedFileCredentials")
   add_if_exists("RemoteCredentials") -- since "ECSCredentials" doesn't exist? and for ECS RemoteCredentials is used???
   add_if_exists("ProcessCredentials")
   add_if_exists("TokenFileWebIdentityCredentials")
