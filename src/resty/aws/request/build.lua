@@ -124,6 +124,8 @@ local function build_request(operation, config, params)
         if config.protocol == "query" then
           -- no location specified, but protocol is query, so it goes into query
           request.query[name] = param_value
+        elseif member_config.type == "blob" then
+          request.body = param_value
         else
           -- nowhere else to go, so put it in the body (for json and xml)
           request.body[name] = param_value
@@ -140,10 +142,11 @@ local function build_request(operation, config, params)
   end
 
   -- format the body
-  if not next(request.body) then
+  local body_typ = type(request.body)
+  if body_typ == "table" and not next(request.body) then
     -- No body values left, remove table
     request.body = nil
-  else
+  elseif not body_typ == "string" then
     -- encode the body
     if config.protocol == "ec2" then
       error("protocol 'ec2' not implemented yet")
