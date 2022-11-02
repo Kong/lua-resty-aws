@@ -101,8 +101,10 @@ local function build_request(operation, config, params)
     method = http.method,
     query = {},
     headers = {},
-    body = {},
   }
+
+  local body_tbl = {}
+
   if config.signingName or config.targetPrefix then
     request.headers["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name
   end
@@ -143,7 +145,7 @@ local function build_request(operation, config, params)
           request.body = param_value
         else
           -- nowhere else to go, so put it in the body (for json and xml)
-          request.body[name] = param_value
+          body_tbl[name] = param_value
         end
       end
     end
@@ -156,37 +158,42 @@ local function build_request(operation, config, params)
     request.query[k] = v
   end
 
-  -- format the body
-  local body_typ = type(request.body)
-  if body_typ == "table" and not next(request.body) then
-    -- No body values left, remove table
-    request.body = nil
-  elseif not body_typ == "string" then
-    -- encode the body
-    if config.protocol == "ec2" then
-      error("protocol 'ec2' not implemented yet")
-
-    elseif config.protocol == "rest-xml" then
-      local xml_data = {
-        '<?xml version="1.0" encoding="UTF-8"?>',
-      }
-
-      -- encode rest of the body data here
-      poor_mans_xml_encoding(xml_data, operation.input, "input", request.body)
-
-      -- TODO: untested, assuming "application/xml" as the default type here???
-      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/xml"
-      request.body = table.concat(xml_data, "\n")
-
-
-    else
-      -- assuming remaining protocols "rest-json", "json", "query" to be safe to json encode
-      local version = config.jsonVersion or '1.0'
-      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-" .. version
-      request.body = json_encode(request.body)
-    end
+  local table_empty = not next(body_tbl)
+  -- already has a raw body, or no body at all
+  if request.body then
+    assert(table_empty, "raw body set while parameters need to be encoded in body")
     request.headers["Content-Length"] = #request.body
+    return request
   end
+
+  if table_empty then
+    return request
+  end
+
+  -- format the body
+  if config.protocol == "ec2" then
+    error("protocol 'ec2' not implemented yet")
+
+  elseif config.protocol == "rest-xml" then
+    local xml_data = {
+      '<?xml version="1.0" encoding="UTF-8"?>',
+    }
+
+    -- encode rest of the body data here
+    poor_mans_xml_encoding(xml_data, operation.input, "input", body_tbl)
+
+    -- TODO: untested, assuming "application/xml" as the default type here???
+    request.headers["Content-Type"] = request.headers["Content-Type"] or "application/xml"
+    request.body = table.concat(xml_data, "\n")
+
+
+  else
+    -- assuming remaining protocols "rest-json", "json", "query" to be safe to json encode
+    local version = config.jsonVersion or '1.0'
+    request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-" .. version
+    request.body = json_encode(body_tbl)
+  end
+  request.headers["Content-Length"] = #request.body
 
   return request
 end
