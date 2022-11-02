@@ -50,6 +50,20 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
   end
 end
 
+local ESCAPE_PATTERN = "[^!#$&'()*+,/:;=?@[\\]A-Z\\d-_.~%]"
+
+local function percent_escape(m)
+  return string.format("%%%02X", string.byte(m[0]))
+end
+
+local function escape_uri(uri)
+  if ngx.re.find(uri, ESCAPE_PATTERN, "joi") then
+    return (ngx.re.gsub(uri, ESCAPE_PATTERN, percent_escape, "joi"))
+  end
+
+  return uri
+end
+
 local function parse_query(q)
   local query_tbl = {}
   for k, v in q:gmatch('([^&=?]+)=?([^&=?]*)') do
@@ -112,8 +126,9 @@ local function build_request(operation, config, params)
 
       if location == "uri" then
         local place_holder = "{" .. locationName .. "%+?}"
-        request.path = request.path:gsub(place_holder, param_value)
-
+        local replacement = escape_uri(param_value):gsub("%%", "%%%%")
+        request.path = request.path:gsub(place_holder, replacement)
+        
       elseif location == "querystring" then
         request.query[locationName] = param_value
 
