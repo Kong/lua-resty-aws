@@ -137,7 +137,12 @@ local function build_request(operation, config, params)
       elseif location == "header" then
         request.headers[locationName] = param_value
 
-      else
+      elseif location == "headers" then
+        for k,v in pairs(param_value) do
+          request.headers[locationName .. k] = v
+        end
+
+      elseif location == nil then
         if config.protocol == "query" then
           -- no location specified, but protocol is query, so it goes into query
           request.query[name] = param_value
@@ -147,6 +152,9 @@ local function build_request(operation, config, params)
           -- nowhere else to go, so put it in the body (for json and xml)
           body_tbl[name] = param_value
         end
+
+      else
+        error("Unknown location: " .. location)
       end
     end
   end
