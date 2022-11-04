@@ -29,7 +29,7 @@ describe("operations protocol", function()
       name = "AssumeRole",
       http = {
         method = "POST",
-        requestUri = "/hello/{InstanceId}?nice",
+        requestUri = "/{Operation+}/{InstanceId}?nice",
       },
       input = {
         type = "structure",
@@ -47,6 +47,14 @@ describe("operations protocol", function()
             type = "string",
             location = "uri",
             locationName = "InstanceId"
+          },
+          Operation = {
+            type = "string",
+            location = "uri",
+            locationName = "Operation"
+          },
+          RawBody = {
+            type = "blob",
           },
           -- querystring location
           UserId = {
@@ -108,13 +116,14 @@ describe("operations protocol", function()
       RoleArn = "hello",
       RoleSessionName = "world",
       InstanceId = "42",
+      Operation = "hello",
       UserId = "Arthur Dent",
       Token = "towel",
       subStructure = {
         hello = "the default hello thinghy",
         world = "the default world thinghy"
       },
-      subList = { 1, 2 ,3}
+      subList = { 1, 2 ,3, }
     }
 
   end)
@@ -144,6 +153,8 @@ describe("operations protocol", function()
       },
       method = 'POST',
       path = '/hello/42',
+      host = 'sts.amazonaws.com',
+      port = 80,
       query = {
         RoleArn = 'hello',
         RoleSessionName = 'world',
@@ -175,6 +186,8 @@ describe("operations protocol", function()
       },
       method = 'POST',
       path = '/hello/42',
+      host = 'sts.amazonaws.com',
+      port = 80,
       body = {
         subStructure = {
           hello = "the default hello thinghy",
@@ -211,6 +224,8 @@ describe("operations protocol", function()
       },
       method = 'POST',
       path = '/hello/42',
+      host = 'sts.amazonaws.com',
+      port = 80,
       body = {
         subStructure = {
           hello = "the default hello thinghy",
@@ -263,6 +278,8 @@ describe("operations protocol", function()
       },
       method = 'POST',
       path = '/hello/42',
+      host = 'sts.amazonaws.com',
+      port = 80,
       body = {
         RoleArn = {
           [1] = 'hello' },
