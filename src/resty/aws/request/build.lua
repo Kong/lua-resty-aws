@@ -72,6 +72,39 @@ local function parse_query(q)
   return query_tbl
 end
 
+local function get_host_port(config)
+  local host = config.endpoint or config.globalEndpoint
+  do
+    local s, e = host:find("://")
+    if s then
+      -- the "globalSSL" one from the region_config_data file
+      local scheme = host:sub(1, s-1):lower()
+      host = host:sub(e+1, -1)
+      if config.tls == nil then
+        config.tls = scheme == "https"
+      end
+    end
+  end
+
+  local tls = config.tls
+  local port = config.port or (tls and 443 or 80)
+
+  local host_header do -- If the "standard" port is not in use, the port should be added to the Host header
+    local with_port
+    if tls then
+      with_port = port ~= 443
+    else
+      with_port = port ~= 80
+    end
+    if with_port then
+      host_header = string.format("%s:%d", host, port)
+    else
+      host_header = host
+    end
+  end
+
+  return host_header, port
+end
 
 -- implement AWS api protocols.
 -- returns a request table;
@@ -95,12 +128,15 @@ local function build_request(operation, config, params)
   local http = operation.http or {}
   local uri = http.requestUri or ""
 
+  local host, port = get_host_port(config)
 
   local request = {
     path =  uri,
     method = http.method,
     query = {},
     headers = {},
+    host = host,
+    port = port,
   }
 
   local body_tbl = {}
@@ -130,7 +166,7 @@ local function build_request(operation, config, params)
         local place_holder = "{" .. locationName .. "%+?}"
         local replacement = escape_uri(param_value):gsub("%%", "%%%%")
         request.path = request.path:gsub(place_holder, replacement)
-        
+
       elseif location == "querystring" then
         request.query[locationName] = param_value
 

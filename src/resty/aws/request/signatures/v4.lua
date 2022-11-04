@@ -141,7 +141,7 @@ local function prepare_awsv4_request(config, request_data)
     canonical_querystring = canonicalise_query_string(query)
   end
 
-  local req_headers = request_data.headers or {}
+  local req_headers = request_data.headers
   local req_payload = request_data.body
 
   -- get credentials
@@ -157,44 +157,16 @@ local function prepare_awsv4_request(config, request_data)
   end
 
   local tls = config.tls
-  local host = config.endpoint
-  do
-    local s, e = host:find("://")
-    if s then
-      -- the "globalSSL" one from the region_config_data file
-      local scheme = host:sub(1, s-1):lower()
-      host = host:sub(e+1, -1)
-      if config.tls == nil then
-        config.tls = scheme == "https"
-      end
-    end
-  end
 
-  if tls == nil then
-    tls = true
-  end
-  local port = config.port or (tls and 443 or 80)
+  local host = request_data.host
+  local port = request_data.port
   local timestamp = ngx.time()
   local req_date = os.date("!%Y%m%dT%H%M%SZ", timestamp)
   local date = os.date("!%Y%m%d", timestamp)
 
-  local host_header do -- If the "standard" port is not in use, the port should be added to the Host header
-    local with_port
-    if tls then
-      with_port = port ~= 443
-    else
-      with_port = port ~= 80
-    end
-    if with_port then
-      host_header = string.format("%s:%d", host, port)
-    else
-      host_header = host
-    end
-  end
-
   local headers = {
     ["X-Amz-Date"] = req_date,
-    ["Host"] = host_header,
+    ["Host"] = host,
     ["X-Amz-Security-Token"] = session_token,
   }
 
