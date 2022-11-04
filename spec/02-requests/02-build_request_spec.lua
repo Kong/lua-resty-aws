@@ -116,7 +116,7 @@ describe("operations protocol", function()
       RoleArn = "hello",
       RoleSessionName = "world",
       InstanceId = "42",
-      Operation = "hello",
+      Operation = "hello world",
       UserId = "Arthur Dent",
       Token = "towel",
       subStructure = {
@@ -152,7 +152,7 @@ describe("operations protocol", function()
         ["X-Amz-Target"] = "sts.AssumeRole",
       },
       method = 'POST',
-      path = '/hello/42',
+      path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
       port = 80,
       query = {
@@ -185,7 +185,7 @@ describe("operations protocol", function()
         ["X-Amz-Target"] = "sts.AssumeRole",
       },
       method = 'POST',
-      path = '/hello/42',
+      path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
       port = 80,
       body = {
@@ -223,7 +223,7 @@ describe("operations protocol", function()
         ["X-Amz-Target"] = "sts.AssumeRole",
       },
       method = 'POST',
-      path = '/hello/42',
+      path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
       port = 80,
       body = {
@@ -277,7 +277,7 @@ describe("operations protocol", function()
         ["X-Amz-Target"] = "sts.AssumeRole",
       },
       method = 'POST',
-      path = '/hello/42',
+      path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
       port = 80,
       body = {
