@@ -533,6 +533,7 @@ local validators do
       end,
       type = always_pass,
       locationName = always_pass,
+      location = always_pass,
       sensitive = always_pass,
     },ops_mt)
   end
@@ -570,6 +571,10 @@ local validators do
 
 
   validators = setmetatable({
+    ["nil"] = function ()
+      return true
+    end,
+
     string = function(value, shape, id)
       if type(value) ~= "string" then
         return nil, (id and id .. ": " or "") .. "expected a string value, got '" .. tostring(value) .. "' ("..type(value)..")"
@@ -716,7 +721,7 @@ end
 -- @param shape the shape object to validate against
 -- @param id (string) field name to construct a nested name for error messages
 function validate(value, shape, id)
-  return validators[shape.type](value, shape, id)
+  return validators[shape.type or "nil"](value, shape, id)
 end
 
 return validate

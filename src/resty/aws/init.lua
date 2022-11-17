@@ -273,6 +273,23 @@ local unsigned = {
 }
 
 
+local function s3_patch(request, bucket)
+  if not bucket then
+    return
+  end
+
+  request.host = bucket .. "." .. request.host
+
+  local path = request.path
+  if bucket and path then
+    path = path:sub(#bucket + 2)
+    if path == "/" then
+      path = ""
+    end
+
+    request.path = path
+  end
+end
 
 -- Generate a function for each operation in the service api "operations" table
 local function generate_service_methods(service)
@@ -315,6 +332,10 @@ local function generate_service_methods(service)
         -- were not signing this one, patch signature version
         old_sig = self.config.signatureVersion
         self.config.signatureVersion = "none"
+      end
+
+      if not self.config.s3_bucket_in_path then
+        s3_patch(request, params.Bucket)
       end
 
       -- sign the request according to the signature version required

@@ -150,6 +150,17 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.1.0 (04-Nov-2022)
+
+- fix: template handling of query string [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: blob param should be in raw body [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- feat: support for credential from file [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: escaping for param in uri [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: handling raw body conflict with body param [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: crash when no type check designated [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: support for "headers" location in API template [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+- fix: support new API format (bucket in host) for S3 [#36](https://github.com/Kong/lua-resty-aws/pull/36)
+
 ### 1.0.1 (20-Oct-2022)
 
 - fix: for some method incorrect URL is generates because of incorrect handling of "+" in URL template

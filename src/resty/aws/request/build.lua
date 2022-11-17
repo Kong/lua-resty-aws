@@ -50,7 +50,61 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
   end
 end
 
+local ESCAPE_PATTERN = "[^!#$&'()*+,/:;=?@[\\]A-Z\\d-_.~%]"
 
+local function percent_escape(m)
+  return string.format("%%%02X", string.byte(m[0]))
+end
+
+local function escape_uri(uri)
+  if ngx.re.find(uri, ESCAPE_PATTERN, "joi") then
+    return (ngx.re.gsub(uri, ESCAPE_PATTERN, percent_escape, "joi"))
+  end
+
+  return uri
+end
+
+local function parse_query(q)
+  local query_tbl = {}
+  for k, v in q:gmatch('([^&=?]+)=?([^&=?]*)') do
+    query_tbl[k] = v
+  end
+  return query_tbl
+end
+
+local function get_host_port(config)
+  local host = config.endpoint or config.globalEndpoint
+  do
+    local s, e = host:find("://")
+    if s then
+      -- the "globalSSL" one from the region_config_data file
+      local scheme = host:sub(1, s-1):lower()
+      host = host:sub(e+1, -1)
+      if config.tls == nil then
+        config.tls = scheme == "https"
+      end
+    end
+  end
+
+  local tls = config.tls
+  local port = config.port or (tls and 443 or 80)
+
+  local host_header do -- If the "standard" port is not in use, the port should be added to the Host header
+    local with_port
+    if tls then
+      with_port = port ~= 443
+    else
+      with_port = port ~= 80
+    end
+    if with_port then
+      host_header = string.format("%s:%d", host, port)
+    else
+      host_header = host
+    end
+  end
+
+  return host_header, port
+end
 
 -- implement AWS api protocols.
 -- returns a request table;
@@ -71,13 +125,22 @@ local function build_request(operation, config, params)
     error("Bad config, field protocol is invalid, got: '" .. tostring(config.protocol) .. "'")
   end
 
+  local http = operation.http or {}
+  local uri = http.requestUri or ""
+
+  local host, port = get_host_port(config)
+
   local request = {
-    path =  (operation.http or {}).requestUri or "",
-    method = (operation.http or {}).method,
+    path =  uri,
+    method = http.method,
     query = {},
     headers = {},
-    body = {},
+    host = host,
+    port = port,
   }
+
+  local body_tbl = {}
+
   if config.signingName or config.targetPrefix then
     request.headers["X-Amz-Target"] = (config.signingName or config.targetPrefix) .. "." .. operation.name
   end
@@ -101,7 +164,8 @@ local function build_request(operation, config, params)
 
       if location == "uri" then
         local place_holder = "{" .. locationName .. "%+?}"
-        request.path = request.path:gsub(place_holder, param_value)
+        local replacement = escape_uri(param_value):gsub("%%", "%%%%")
+        request.path = request.path:gsub(place_holder, replacement)
 
       elseif location == "querystring" then
         request.query[locationName] = param_value
@@ -109,48 +173,71 @@ local function build_request(operation, config, params)
       elseif location == "header" then
         request.headers[locationName] = param_value
 
-      else
+      elseif location == "headers" then
+        for k,v in pairs(param_value) do
+          request.headers[locationName .. k] = v
+        end
+
+      elseif location == nil then
         if config.protocol == "query" then
           -- no location specified, but protocol is query, so it goes into query
           request.query[name] = param_value
+        elseif member_config.type == "blob" then
+          request.body = param_value
         else
           -- nowhere else to go, so put it in the body (for json and xml)
-          request.body[name] = param_value
+          body_tbl[name] = param_value
         end
+
+      else
+        error("Unknown location: " .. location)
       end
     end
   end
 
-  -- format the body
-  if not next(request.body) then
-    -- No body values left, remove table
-    request.body = nil
-  else
-    -- encode the body
-    if config.protocol == "ec2" then
-      error("protocol 'ec2' not implemented yet")
+  local path, query = request.path:match("([^?]+)%??(.*)")
+  request.path = path
 
-    elseif config.protocol == "rest-xml" then
-      local xml_data = {
-        '<?xml version="1.0" encoding="UTF-8"?>',
-      }
-
-      -- encode rest of the body data here
-      poor_mans_xml_encoding(xml_data, operation.input, "input", request.body)
-
-      -- TODO: untested, assuming "application/xml" as the default type here???
-      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/xml"
-      request.body = table.concat(xml_data, "\n")
-
-
-    else
-      -- assuming remaining protocols "rest-json", "json", "query" to be safe to json encode
-      local version = config.jsonVersion or '1.0'
-      request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-" .. version
-      request.body = json_encode(request.body)
-    end
-    request.headers["Content-Length"] = #request.body
+  for k,v in pairs(parse_query(query)) do
+    request.query[k] = v
   end
+
+  local table_empty = not next(body_tbl)
+  -- already has a raw body, or no body at all
+  if request.body then
+    assert(table_empty, "raw body set while parameters need to be encoded in body")
+    request.headers["Content-Length"] = #request.body
+    return request
+  end
+
+  if table_empty then
+    return request
+  end
+
+  -- format the body
+  if config.protocol == "ec2" then
+    error("protocol 'ec2' not implemented yet")
+
+  elseif config.protocol == "rest-xml" then
+    local xml_data = {
+      '<?xml version="1.0" encoding="UTF-8"?>',
+    }
+
+    -- encode rest of the body data here
+    poor_mans_xml_encoding(xml_data, operation.input, "input", body_tbl)
+
+    -- TODO: untested, assuming "application/xml" as the default type here???
+    request.headers["Content-Type"] = request.headers["Content-Type"] or "application/xml"
+    request.body = table.concat(xml_data, "\n")
+
+
+  else
+    -- assuming remaining protocols "rest-json", "json", "query" to be safe to json encode
+    local version = config.jsonVersion or '1.0'
+    request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-amz-json-" .. version
+    request.body = json_encode(body_tbl)
+  end
+  request.headers["Content-Length"] = #request.body
 
   return request
 end
