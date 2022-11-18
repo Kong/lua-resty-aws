@@ -48,4 +48,5 @@ jobs:
     - name: Run tests
       run: |
         make dev
+        /usr/local/openresty/luajit/bin/luarocks install
         busted
