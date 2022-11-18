@@ -14,6 +14,8 @@ jobs:
             args: src
 
   tests:
+    name: Busted Tests
+
     strategy:
       matrix:
         openresty_version:
@@ -48,5 +50,5 @@ jobs:
     - name: Run tests
       run: |
         make dev
-        /usr/local/openresty/luajit/bin/luarocks install
+        /usr/local/openresty/luajit/bin/luarocks make
         busted
