@@ -3,18 +3,17 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  luacheck:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: leafo/gh-actions-lua@v8
-      with:
-        luaVersion: "luajit-openresty"
-    - uses: leafo/gh-actions-luarocks@v4
-    - run: luarocks install luacheck
-    - run: luacheck .
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Luacheck linter
+        uses: lunarmodules/luacheck@v0
+        with:
+            args: src
 
-  run_tests:
+  tests:
     strategy:
       matrix:
         openresty_version:
