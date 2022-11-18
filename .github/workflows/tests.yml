@@ -1,35 +1,50 @@
-name: Tests
+name: Test
 
 on: [push, pull_request]
 
 jobs:
-  tests:
-    name: Tests
-    runs-on: ubuntu-22.04
+  luacheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: leafo/gh-actions-lua@v8
+      with:
+        luaVersion: "luajit-openresty"
+    - uses: leafo/gh-actions-luarocks@v4
+    - run: luarocks install luacheck
+    - run: luacheck .
 
-    env:
-      JOBS: 1  # must be 1 as socket tests interfere with each other
-      OPENRESTY: ${{ matrix.openresty }}
-      CODE_PATH: ${{ github.workspace }}
-      BASE_PATH: /home/runner/work/cache
+  run_tests:
+    strategy:
+      matrix:
+        openresty_version:
+          - 1.17.8.2
+          - 1.19.9.1
+
+    runs-on: ubuntu-latest
+    container:
+      image: openresty/openresty:${{ matrix.openresty_version }}-alpine-fat
+      # --init runs tinit as PID 1 and prevents the 'WARNING: killing the child process' spam from the test suite
+      options: --init
 
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v2
-
-    - name: Install packages
+    - uses: actions/checkout@v2
+    - name: Install deps
       run: |
-        sudo apt-get -y install --no-install-recommends wget gnupg ca-certificates
-        wget -O - https://openresty.org/package/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/openresty.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/ubuntu $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/openresty.list > /dev/null
-        sudo apt-get update
-        sudo apt-get -y install --no-install-recommends openresty
-        luarocks install busted luacheck
+        apk add --no-cache curl perl bash wget git perl-dev libarchive-tools nodejs
+        ln -s /usr/bin/bsdtar /usr/bin/tar
 
-    - name: Lint
-      run: |
-        luacheck .
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache
+        key: ${{ runner.os }}-${{ matrix.openresty_version }}-cache
 
-    - name: Busted Tests
-      run: |
-        busted
+    - name: Install Busted
+      run: /usr/local/openresty/luajit/bin/luarocks install busted
+
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: busted
