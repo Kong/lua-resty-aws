@@ -43,7 +43,9 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.openresty_version }}-cache
 
     - name: Install Busted
-      run: /usr/local/openresty/luajit/bin/luarocks install busted luatz
+      run: |
+        /usr/local/openresty/luajit/bin/luarocks install busted
+        /usr/local/openresty/luajit/bin/luarocks install luatz
 
     - uses: actions/checkout@v2
 
