@@ -1,0 +1,57 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Luacheck linter
+        uses: lunarmodules/luacheck@v0
+        with:
+            args: src
+
+  tests:
+    name: Busted Tests
+
+    strategy:
+      matrix:
+        openresty_version:
+          - 1.17.8.2
+          - 1.19.9.1
+
+    runs-on: ubuntu-latest
+    container:
+      image: openresty/openresty:${{ matrix.openresty_version }}-alpine-fat
+      # --init runs tinit as PID 1 and prevents the 'WARNING: killing the child process' spam from the test suite
+      options: --init
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install deps
+      run: |
+        apk add --no-cache curl perl bash wget git perl-dev libarchive-tools nodejs jq
+        ln -s /usr/bin/bsdtar /usr/bin/tar
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache
+        key: ${{ runner.os }}-${{ matrix.openresty_version }}-cache
+
+    - name: Install Busted
+      run: |
+        /usr/local/openresty/luajit/bin/luarocks install busted
+        /usr/local/openresty/luajit/bin/luarocks install luatz
+        /usr/local/openresty/luajit/bin/luarocks install luasocket
+
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: |
+        make dev
+        /usr/local/openresty/luajit/bin/luarocks make
+        busted
