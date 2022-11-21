@@ -103,7 +103,7 @@ local function get_host_port(config)
     end
   end
 
-  return host_header, port
+  return host, port, host_header
 end
 
 -- implement AWS api protocols.
@@ -128,13 +128,13 @@ local function build_request(operation, config, params)
   local http = operation.http or {}
   local uri = http.requestUri or ""
 
-  local host, port = get_host_port(config)
+  local host, port, host_header = get_host_port(config)
 
   local request = {
     path =  uri,
     method = http.method,
     query = {},
-    headers = {},
+    headers = { ["Host"] = host_header, },
     host = host,
     port = port,
   }
