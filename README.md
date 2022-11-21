@@ -154,7 +154,7 @@ Release process:
 
 - fix: port is repeated when port is not standard [#39](https://github.com/Kong/lua-resty-aws/pull/39)
 
-### 1.1.0 (04-Nov-2022)
+### 1.1.0 (18-Nov-2022)
 
 - fix: template handling of query string [#36](https://github.com/Kong/lua-resty-aws/pull/36)
 - fix: blob param should be in raw body [#36](https://github.com/Kong/lua-resty-aws/pull/36)
