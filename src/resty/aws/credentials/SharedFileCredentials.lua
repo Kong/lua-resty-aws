@@ -1,5 +1,5 @@
---- EnvironmentCredentials class.
--- @classmod EnvironmentCredentials
+--- SharedFileCredentials class.
+-- @classmod SharedFileCredentials
 
 
 -- Create class
