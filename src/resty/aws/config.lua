@@ -3,6 +3,9 @@
 -- This is based of [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 -- and [Environment variables to configure the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
 --
+-- NOTE: this configuration resembles the CLI configuration. It is NOT the input object
+-- for instantiating the AWS instances, or individual services!
+--
 -- <h3>Usage</h3>
 --
 -- Simply collect the global config table:
