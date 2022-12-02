@@ -73,16 +73,21 @@ local function parse_query(q)
 end
 
 local function get_host_port(config)
-  local host = config.endpoint or config.globalEndpoint
+  local endpoint = config.endpoint or config.globalEndpoint
   do
-    local s, e = host:find("://")
+    local s, e = endpoint:find("://")
+    local scheme = config.scheme
     if s then
-      -- the "globalSSL" one from the region_config_data file
-      local scheme = host:sub(1, s-1):lower()
-      host = host:sub(e+1, -1)
-      if config.tls == nil then
-        config.tls = scheme == "https"
-      end
+      scheme = scheme or endpoint:sub(1, s-1):lower()
+      endpoint = endpoint:sub(e+1, -1)
+    end
+
+    scheme = scheme or "https"
+    config.scheme = scheme
+
+    -- the "globalSSL" one from the region_config_data file
+    if config.tls == nil then
+      config.tls = scheme == "https"
     end
   end
 
@@ -97,13 +102,13 @@ local function get_host_port(config)
       with_port = port ~= 80
     end
     if with_port then
-      host_header = string.format("%s:%d", host, port)
+      host_header = string.format("%s:%d", endpoint, port)
     else
-      host_header = host
+      host_header = endpoint
     end
   end
 
-  return host, port, host_header
+  return endpoint, port, host_header
 end
 
 -- implement AWS api protocols.
