@@ -79,13 +79,13 @@ local function get_host_port(config)
     local scheme = config.scheme
     if s then
       scheme = scheme or endpoint:sub(1, s-1):lower()
+      -- the "globalSSL" one from the region_config_data file
       endpoint = endpoint:sub(e+1, -1)
     end
 
     scheme = scheme or "https"
     config.scheme = scheme
 
-    -- the "globalSSL" one from the region_config_data file
     if config.tls == nil then
       config.tls = scheme == "https"
     end
