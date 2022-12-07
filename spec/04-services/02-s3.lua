@@ -34,7 +34,7 @@ describe("S3 service", function()
     s3_3rd = assert(aws:S3 {
       scheme = "http",
       endpoint = "testendpoint.com",
-      port = 80,
+      port = 443,
       tls = false,
     })
   end)
@@ -83,7 +83,7 @@ describe("S3 service", function()
         host = 'testbucket.testendpoint.com',
         method = 'PUT',
         path = '/testkey',
-        port = 80,
+        port = 443,
         query = {},
         tls = false,
       },
@@ -117,7 +117,7 @@ describe("S3 service", function()
         ['host'] = 'testbucket.testendpoint.com',
         ['method'] = 'GET',
         ['path'] = '/testkey',
-        ['port'] = 80,
+        ['port'] = 443,
         ['query'] = {},
         ['tls'] = false,
       }
@@ -152,7 +152,7 @@ describe("S3 service", function()
         ['host'] = 'testbucket.testendpoint.com',
         ['method'] = 'GET',
         ['path'] = '',
-        ['port'] = 80,
+        ['port'] = 443,
         ['query'] = {
           ['acl'] = ''
         },

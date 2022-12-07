@@ -150,6 +150,10 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.1.2 (5-Dec-2022)
+
+- fix: auto detection scheme and default to tls [#42](https://github.com/Kong/lua-resty-aws/pull/42)
+
 ### 1.1.1 (21-Nov-2022)
 
 - fix: port is repeated when port is not standard [#39](https://github.com/Kong/lua-resty-aws/pull/39)

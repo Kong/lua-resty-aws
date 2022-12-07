@@ -155,7 +155,7 @@ describe("operations protocol", function()
       method = 'POST',
       path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
-      port = 80,
+      port = 443,
       query = {
         RoleArn = 'hello',
         RoleSessionName = 'world',
@@ -189,7 +189,7 @@ describe("operations protocol", function()
       method = 'POST',
       path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
-      port = 80,
+      port = 443,
       body = {
         subStructure = {
           hello = "the default hello thinghy",
@@ -228,7 +228,7 @@ describe("operations protocol", function()
       method = 'POST',
       path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
-      port = 80,
+      port = 443,
       body = {
         subStructure = {
           hello = "the default hello thinghy",
@@ -283,7 +283,7 @@ describe("operations protocol", function()
       method = 'POST',
       path = '/hello%20world/42',
       host = 'sts.amazonaws.com',
-      port = 80,
+      port = 443,
       body = {
         RoleArn = {
           [1] = 'hello' },
