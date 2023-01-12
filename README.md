@@ -38,10 +38,10 @@ See [Global settings](#global-settings) below on how to initialize properly.
 
 ### Global settings
 
-This library depends on global settings. Escpecially the core services for authentication
+This library depends on global settings. Especially the core services for authentication
 and metadata. Many of those can (also) be specified as environment variables.
 
-Hence it is recommended to populate the global confguration object at application start
+Hence it is recommended to populate the global configuration object at application start
 in the OpenResty `init` phase. Simply add the following line;
 
 ```
