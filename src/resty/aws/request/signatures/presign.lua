@@ -119,7 +119,7 @@ local function add_args_to_query_string(query_args, query_string)
     error("bad query type, expected string or table, got: ".. type(query_args))
   end
 
-  for key, val in pairs(query_string) do
+  for key, val in query_string:gmatch("([^&=]+)=?([^&]*)") do
     q[#q+1] = key .. "=" .. val
   end
 
