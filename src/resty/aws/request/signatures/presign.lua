@@ -222,21 +222,31 @@ local function presign_awsv4_request(config, request_data, service, region, expi
 
   -- Request body SHA256 digest
   local hashed_payload
-  local include_sha256_in_header = true
-  local is_s3_presign = service == "s3" or service == "s3-object-lambda"
-  if is_s3_presign then
-    hashed_payload = "UNSIGNED-PAYLOAD"
-    include_sha256_in_header = false
 
-  elseif req_headers["X-Amz-Content-Sha256"] then
+  if req_headers["X-Amz-Content-Sha256"] then
     hashed_payload = req_headers["X-Amz-Content-Sha256"]
-
-  else
-    hashed_payload = hex_encode(hash(req_payload or ""))
+    headers["X-Amz-Content-Sha256"] = hashed_payload
+    req_headers["X-Amz-Content-Sha256"] = nil
   end
 
-  if include_sha256_in_header then
-    headers["X-Amz-Content-Sha256"] = hashed_payload
+  if not hashed_payload then
+    -- TODO: unsigned_payload?
+    local include_sha256_in_header = config.unsigned_payload
+                                      or service == "s3"
+                                      or service == "s3-object-lambda"
+                                      or service == "glacier"
+    local is_s3_presign = service == "s3" or service == "s3-object-lambda"
+    if config.unsigned_payload or is_s3_presign then
+      hashed_payload = "UNSIGNED-PAYLOAD"
+      include_sha256_in_header = not is_s3_presign
+
+    else
+      hashed_payload = hex_encode(hash(req_payload or ""))
+    end
+
+    if include_sha256_in_header then
+      headers["X-Amz-Content-Sha256"] = hashed_payload
+    end
   end
 
   for k, v in pairs(req_headers) do
