@@ -222,7 +222,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
     ["X-Amz-Algorithm"] = ALGORITHM,
     ["X-Amz-Security-Token"] = session_token,
     ["X-Amz-Date"] = req_date,
-    ["X-Amz-Expire"] = expire_time,
+    ["X-Amz-Expires"] = expire_time,
     ["X-Amz-Credential"] = access_key .. "/" .. credential_scope
   }
 
@@ -308,7 +308,6 @@ local function presign_awsv4_request(config, request_data, service, region, expi
 
   -- Task 2: Create a String to Sign for Signature Version 4
   -- http://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html
-  local credential_scope = date .. "/" .. region .. "/" .. service .. "/aws4_request"
   local string_to_sign =
     ALGORITHM .. '\n' ..
     req_date .. '\n' ..
