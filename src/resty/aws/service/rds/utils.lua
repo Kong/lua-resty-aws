@@ -46,7 +46,7 @@ local function build_auth_token(config, endpoint, region, db_user)
     path = path,
     query = query,
     headers = {
-      ["Host"] = host,
+      ["Host"] = host .. ":" .. port,
     },
   }
 
@@ -55,7 +55,7 @@ local function build_auth_token(config, endpoint, region, db_user)
     return nil, err
   end
 
-  return presigned_request.host .. presigned_request.path .. "?" .. presigned_request.query
+  return presigned_request.host .. ":" .. presigned_request.port .. presigned_request.path .. "?" .. presigned_request.query
 end
 
 
