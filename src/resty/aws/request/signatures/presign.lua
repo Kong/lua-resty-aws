@@ -91,6 +91,8 @@ local function canonicalise_presign_query_string(query)
 
   elseif type(query) == "table" then
     for key, val in pairs(query) do
+      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
+      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
@@ -107,11 +109,15 @@ local function add_args_to_query_string(query_args, query_string)
   local q = {}
   if type(query_args) == "string" then
     for key, val in query_args:gmatch("([^&=]+)=?([^&]*)") do
+      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
+      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
   elseif type(query_args) == "table" then
     for key, val in pairs(query_args) do
+      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
+      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
@@ -120,6 +126,8 @@ local function add_args_to_query_string(query_args, query_string)
   end
 
   for key, val in query_string:gmatch("([^&=]+)=?([^&]*)") do
+    key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
+    val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
     q[#q+1] = key .. "=" .. val
   end
 
@@ -285,7 +293,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
     canonical_headers = table.concat(canonical_headers, nil, 1, i)
   end
 
-  canonical_querystring = add_args_to_query_string(headers, canonical_querystring)
+  -- canonical_querystring = add_args_to_query_string(headers, canonical_querystring)
   canonical_querystring = add_args_to_query_string(amz_query_args, canonical_querystring)
 
   local canonical_request =
