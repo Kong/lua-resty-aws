@@ -172,6 +172,11 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   if type(expire) ~= "number" then
     return nil, "bad expire type, expected number, got: ".. type(expire)
   end
+
+  if expire < 1 or expire > 604800 then
+    return nil, "bad expire value, expected 1 <= expire <= 604800, got: ".. expire
+  end
+
   -- force expire time to integer
   local expire_time = tonumber(expire or 3600, 10)
 
