@@ -105,7 +105,7 @@ local function canonicalise_presign_query_string(query)
 end
 
 
-local function add_args_to_query_string(query_args, query_string)
+local function add_args_to_query_string(query_args, query_string, sort)
   local q = {}
   if type(query_args) == "string" then
     for key, val in query_args:gmatch("([^&=]+)=?([^&]*)") do
@@ -131,7 +131,10 @@ local function add_args_to_query_string(query_args, query_string)
     q[#q+1] = key .. "=" .. val
   end
 
-  table.sort(q)
+  if sort then
+    table.sort(q)
+  end
+
   return table.concat(q, "&")
 end
 
@@ -178,7 +181,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   end
 
   -- force expire time to integer
-  local expire_time = tonumber(expire or 3600, 10)
+  local expire_time = tonumber(expire, 10)
 
   local region =  region or config.signingRegion or config.region
   local service = service or config.endpointPrefix or config.targetPrefix -- TODO: Presign may not need fallback on service name
@@ -299,7 +302,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   end
 
   -- canonical_querystring = add_args_to_query_string(headers, canonical_querystring)
-  canonical_querystring = add_args_to_query_string(amz_query_args, canonical_querystring)
+  canonical_querystring = add_args_to_query_string(amz_query_args, canonical_querystring, true)
 
   local canonical_request =
     request_method .. '\n' ..
