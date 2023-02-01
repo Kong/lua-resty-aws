@@ -237,7 +237,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
     req_headers["X-Amz-Content-Sha256"] = nil
   end
 
-  if not hashed_payload then
+  if hashed_payload == "" or hashed_payload == nil then
     -- TODO: unsigned_payload?
     local include_sha256_in_header = config.unsigned_payload
                                       or service == "s3"
