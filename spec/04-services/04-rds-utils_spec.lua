@@ -14,7 +14,7 @@ end
 local AWS = require("resty.aws")
 local AWS_global_config = require("resty.aws.config").global
 
-local build_auth_token = require("resty.aws.services.rds.utils").build_auth_token
+local build_auth_token = require("resty.aws.service.rds.utils").build_auth_token
 
 local config = AWS_global_config
 local aws = AWS(config)
