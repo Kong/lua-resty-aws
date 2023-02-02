@@ -109,15 +109,15 @@ local function add_args_to_query_string(query_args, query_string, sort)
   local q = {}
   if type(query_args) == "string" then
     for key, val in query_args:gmatch("([^&=]+)=?([^&]*)") do
-      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
-      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
+      key = tostring(key):gsub("[^%w%-%._~]", percent_encode)
+      val = tostring(val):gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
   elseif type(query_args) == "table" then
     for key, val in pairs(query_args) do
-      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
-      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
+      key = tostring(key):gsub("[^%w%-%._~]", percent_encode)
+      val = tostring(val):gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
