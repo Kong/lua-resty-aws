@@ -4,29 +4,53 @@ local presign_awsv4_request = require("resty.aws.request.signatures.presign")
 
 local RDS_IAM_AUTH_EXPIRE_TIME = 15 * 60
 
--- BuildAuthToken will return an authorization token used as the password for a DB
--- connection.
+-- Return an authorization token used as the password for a RDS DB connection.
 --
--- * endpoint - Endpoint consists of the port needed to connect to the DB. <host>:<port>
--- * region - Region is the location of where the DB is
--- * dbUser - User account within the database to sign in with
--- * creds - Credentials to be signed with
+-- @param config - AWS config object
+-- @param endpoint - Endpoint consists of the port needed to connect to the DB. <host>:<port>
+-- @param region - Region is the location of where the DB is
+-- @param dbUser - User account within the database to sign in with
 --
--- The following example shows how to use BuildAuthToken to create an authentication
--- token for connecting to a MySQL database in RDS.
+-- The following example shows how to use build_auth_token to create an authentication
+-- token for connecting to a PostgreSQL database in RDS.
 --
---	authToken, err := BuildAuthToken(dbEndpoint, awsRegion, dbUser, awsCreds)
+-- local pgmoon = require "pgmoon"
+-- local AWS = require("resty.aws")
+-- local AWS_global_config = require("resty.aws.config").global
+-- local config = { region = AWS_global_config.region }
+-- local aws = AWS(config)
 --
---	-- Create the MySQL DNS string for the DB connection
---	-- user:password@protocol(endpoint)/dbname?<params>
---	connectStr = fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&tls=rds",
---	   dbUser, authToken, dbEndpoint, dbName,
---	)
+-- local db_domain = "DB_NAME.us-east-1.rds.amazonaws.com"
+-- local db_port = 5432
+-- local db_endpoint = db_domain .. ":" .. db_port
+-- local region = "us-east-1"
+-- local db_user = "dbuser"
+-- local db_name = "DB_NAME"
+-- local auth_token, err = build_auth_token(aws.config, db_endpoint, region, user)
 --
---	-- Use db to perform SQL operations on database
---	db, err := sql.Open("mysql", connectStr)
+-- if err then
+--   ngx.log(ngx.ERR, "Failed to build auth token: ", err)
+--   return
+-- end
 --
--- See http:--docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html
+-- local pg = pgmoon.new({
+--   host = db_domain,
+--   port = db_port,
+--   database = db_name,
+--   user = db_user,
+--   password = auth_token,
+--   ssl = true,
+-- })
+--
+-- local flag, err = pg:connect()
+-- if err then
+--  ngx.log(ngx.ERR, "Failed to connect to database: ", err)
+--  return
+-- end
+-- -- Test query
+-- assert(pg:query("select * from users where status = 'active' limit 20"))
+--
+-- See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html
 -- for more information on using IAM database authentication with RDS.
 local function build_auth_token(config, endpoint, region, db_user)
   if not(pl_string.startswith(endpoint, "http://") or pl_string.startswith(endpoint, "https://")) then
