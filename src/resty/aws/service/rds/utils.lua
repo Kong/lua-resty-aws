@@ -6,10 +6,11 @@ local RDS_IAM_AUTH_EXPIRE_TIME = 15 * 60
 
 -- Return an authorization token used as the password for a RDS DB connection.
 --
--- @param config - AWS config object
+-- @param config - AWS config instance
 -- @param endpoint - Endpoint consists of the port needed to connect to the DB. <host>:<port>
 -- @param region - Region is the location of where the DB is
 -- @param dbUser - User account within the database to sign in with
+-- @return token, err - Returns the token to use as the password for the DB connection, or nil and error if any occurs
 --
 -- The following example shows how to use build_auth_token to create an authentication
 -- token for connecting to a PostgreSQL database in RDS.

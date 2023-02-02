@@ -47,12 +47,19 @@ local function handle_presign_removal(query)
   return table.concat(q, "&")
 end
 
-
+-- Presigning AWS v4 Request
+-- @param config - AWS config instance
+-- @param request_data - request data table
+-- @param service - AWS service name
+-- @param region - AWS region name
+-- @param expires - expires time in seconds, should be less than 604800 (7 days)
+-- @return presigned request data table
+--
 -- config to contain:
 -- config.endpoint: hostname to connect to
 -- config.credentials: the Credentials class to use
 --
--- tbl to contain:
+-- request_data tbl to contain:
 -- tbl.domain: optional, defaults to "amazon.com"
 -- tbl.region: amazon region identifier, eg. "us-east-1"
 -- tbl.service: amazon service targetted, eg. "lambda"
