@@ -150,6 +150,12 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### unreleased
+
+- fix: STS regional endpoints woudl re-inject the region on every authentication
+  (after a token expired), causing bad hostnames to be used
+  [#45](https://github.com/Kong/lua-resty-aws/issues/45)
+
 ### 1.1.2 (7-Dec-2022)
 
 - fix: auto detection scheme and default to tls [#42](https://github.com/Kong/lua-resty-aws/pull/42)
