@@ -42,11 +42,11 @@ describe("EC2MetadataCredentials", function()
   local EC2MetadataCredentials
 
   setup(function()
-    package.loaded["resty.aws.request.http.http"] = http
+    package.loaded["resty.luasocket.http"] = http
   end)
 
   teardown(function()
-    package.loaded["resty.aws.request.http.http"] = nil
+    package.loaded["resty.luasocket.http"] = nil
   end)
 
   before_each(function()

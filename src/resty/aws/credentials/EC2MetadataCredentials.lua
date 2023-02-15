@@ -1,7 +1,7 @@
 --- EC2MetadataCredentials class.
 -- @classmod EC2MetadataCredentials
 
-local http = require "resty.aws.request.http.http"
+local http = require "resty.luasocket.http"
 local json = require("cjson.safe").new()
 local log = ngx.log
 local DEBUG = ngx.DEBUG
