@@ -25,6 +25,7 @@ description = {
 dependencies = {
   "penlight ~> 1",
   "lua-resty-http >= 0.16",
+  "lua-resty-luasocket ~> 1",
 }
 
 build = {
@@ -37,8 +38,6 @@ build = {
     ["resty.aws.request.build"]                               = "src/resty/aws/request/build.lua",
     ["resty.aws.request.sign"]                                = "src/resty/aws/request/sign.lua",
     ["resty.aws.request.execute"]                             = "src/resty/aws/request/execute.lua",
-    ["resty.aws.request.http.http"]                           = "src/resty/aws/request/http/http.lua",
-    ["resty.aws.request.http.socket"]                         = "src/resty/aws/request/http/socket.lua",
     ["resty.aws.request.signatures.v4"]                       = "src/resty/aws/request/signatures/v4.lua",
     ["resty.aws.request.signatures.none"]                     = "src/resty/aws/request/signatures/none.lua",
     ["resty.aws.credentials.Credentials"]                     = "src/resty/aws/credentials/Credentials.lua",

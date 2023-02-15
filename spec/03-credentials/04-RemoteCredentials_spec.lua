@@ -40,7 +40,7 @@ describe("RemoteCredentials", function()
     restore.setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI", "https://localhost/test/path")
 
     local _ = require("resty.aws.config").global -- load config before mocking http client
-    package.loaded["resty.aws.request.http.http"] = http
+    package.loaded["resty.luasocket.http"] = http
 
     RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
   end)

@@ -11,7 +11,7 @@ local DEBUG = ngx.DEBUG
 local DEFAULT_SERVICE_REQUEST_TIMEOUT = 5000
 
 local url = require "socket.url"
-local http = require "resty.aws.request.http.http"
+local http = require "resty.luasocket.http"
 local json = require "cjson"
 
 

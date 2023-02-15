@@ -3,7 +3,7 @@
 -- Provides methods for detecting the AWS Region, as well as fetching metadata.
 
 local semaphore = require "ngx.semaphore"
-local http = require "resty.aws.request.http.http"
+local http = require "resty.luasocket.http"
 local json = require "cjson"
 local global_config = require("resty.aws.config").global
 
