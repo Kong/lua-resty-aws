@@ -36,6 +36,13 @@ See [the example](https://kong.github.io/lua-resty-aws/classes/AWS.html) in the 
 This typically happens when initializing from within a `require` call.
 See [Global settings](#global-settings) below on how to initialize properly.
 
+### TLS and certificate failures
+
+The http client defaults to tls name verification. For this to work, the CA store must be set.
+With OpenResty this is done through the [`lua_ssl_trusted_certificate`](https://github.com/openresty/lua-nginx-module#lua_ssl_trusted_certificate)
+directive. However; the compatibility module used, [`lua-resty-luasocket`](https://github.com/Tieske/lua-resty-luasocket), cannot automatically
+read that setting, hence you have to set it manually, see [the docs](https://tieske.github.io/lua-resty-luasocket/modules/resty.luasocket.html#get_luasec_defaults).
+
 ### Global settings
 
 This library depends on global settings. Especially the core services for authentication
@@ -152,6 +159,9 @@ Release process:
 
 ### unreleased
 
+- **IMPORTANT-IMPORTANT-IMPORTANT** feat: enable TLS name verification. This might
+  break if your CA store is not the default system one. See [usage notes](#usage-important).
+  [#47](https://github.com/Kong/lua-resty-aws/pull/47)
 - fix: STS regional endpoints woudl re-inject the region on every authentication
   (after a token expired), causing bad hostnames to be used
   [#45](https://github.com/Kong/lua-resty-aws/issues/45)
