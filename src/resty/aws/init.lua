@@ -322,9 +322,13 @@ local function generate_service_methods(service)
         -- we use regional endpoints, see
         -- https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js#L78-L82
         assert(service.config.region, "region is required when using STS regional endpoints")
-        local pre, post = service.config.endpoint:match("^(.+)(%.amazonaws%.com)$")
-        service.config.endpoint = pre .. "." .. service.config.region .. post
-        service.config.signingRegion = service.config.region
+
+        if not service.config._regionalEndpointInjected then
+          local pre, post = service.config.endpoint:match("^(.+)(%.amazonaws%.com)$")
+          service.config.endpoint = pre .. "." .. service.config.region .. post
+          service.config.signingRegion = service.config.region
+          service.config._regionalEndpointInjected = true
+        end
       end
 
       local old_sig
