@@ -1,11 +1,5 @@
 setmetatable(_G, nil)
 
--- to get a definitive result
--- luacheck:ignore
-ngx.time = function()
-  return 1667543171
-end
-
 -- -- hock request sending
 -- package.loaded["resty.aws.request.execute"] = function(...)
 --   return ...
@@ -31,6 +25,10 @@ describe("Presign request", function()
   local presigned_request_data
 
   before_each(function()
+    ngx.origin_time = ngx.time
+    ngx.time = function ()
+      return 1667543171
+    end
     local request_data = {
       method = "GET",
       scheme = "https",
@@ -49,6 +47,8 @@ describe("Presign request", function()
 
   after_each(function()
     presigned_request_data = nil
+    ngx.time = ngx.origin_time
+    ngx.origin_time = nil
   end)
 
   it("should have correct signed request host header", function()
