@@ -24,11 +24,19 @@ aws.config.region = "test_region"
 describe("Presign request", function()
   local presigned_request_data
 
-  before_each(function()
+  setup(function()
     ngx.origin_time = ngx.time
     ngx.time = function ()
       return 1667543171
     end
+  end)
+
+  teardown(function ()
+    ngx.time = ngx.origin_time
+    ngx.origin_time = nil
+  end)
+
+  before_each(function()
     local request_data = {
       method = "GET",
       scheme = "https",
@@ -47,8 +55,6 @@ describe("Presign request", function()
 
   after_each(function()
     presigned_request_data = nil
-    ngx.time = ngx.origin_time
-    ngx.origin_time = nil
   end)
 
   it("should have correct signed request host header", function()

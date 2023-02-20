@@ -23,17 +23,24 @@ aws.config.region = "test_region"
 
 describe("Secret Manager service", function()
   local sm
-  before_each(function()
-    sm = assert(aws:SecretsManager {})
+
+  setup(function()
     ngx.origin_time = ngx.time
     ngx.time = function ()
       return 1667543171
     end
   end)
 
-  after_each(function()
+  teardown(function ()
     ngx.time = ngx.origin_time
     ngx.origin_time = nil
+  end)
+
+  before_each(function()
+    sm = assert(aws:SecretsManager {})
+  end)
+
+  after_each(function()
   end)
 
   local testcases = {

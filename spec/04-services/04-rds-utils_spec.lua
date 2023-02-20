@@ -21,16 +21,22 @@ aws.config.credentials = aws:Credentials {
 aws.config.region = "test_region"
 
 describe("RDS utils", function()
-  before_each(function()
+  setup(function()
     ngx.origin_time = ngx.time
     ngx.time = function ()
       return 1667543171
     end
   end)
 
-  after_each(function()
+  teardown(function ()
     ngx.time = ngx.origin_time
     ngx.origin_time = nil
+  end)
+
+  before_each(function()
+  end)
+
+  after_each(function()
   end)
 
   it("should generate expected IAM auth token with mock key", function()
