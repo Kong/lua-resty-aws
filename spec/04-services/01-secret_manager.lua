@@ -1,11 +1,5 @@
 setmetatable(_G, nil)
 
--- to get a definitive result
--- luacheck:ignore
-ngx.time = function()
-  return 1667543171
-end
-
 -- hook request sending
 package.loaded["resty.aws.request.execute"] = function(...)
   return ...
@@ -31,9 +25,15 @@ describe("Secret Manager service", function()
   local sm
   before_each(function()
     sm = assert(aws:SecretsManager {})
+    ngx.origin_time = ngx.time
+    ngx.time = function ()
+      return 1667543171
+    end
   end)
 
   after_each(function()
+    ngx.time = ngx.origin_time
+    ngx.origin_time = nil
   end)
 
   local testcases = {
