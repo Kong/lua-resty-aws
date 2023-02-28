@@ -463,6 +463,8 @@ function AWS:new(config)
         aws = aws_instance,
         config = service_config,
         api = api,
+        -- Add service specific methods:
+        Signer = (service_id == "RDS") and require("resty.aws.service.rds.signer") or nil
       }
 
       AWS.configureEndpoint(service_instance)

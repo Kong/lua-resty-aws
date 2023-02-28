@@ -28,6 +28,7 @@ clean:
 	-@rm *.rock
 	-@rm -rf delete-me
 	-@rm -rf src/resty/aws/raw-api
+	-@rm -rf ./docs; git checkout ./docs
 
 $(target_rock):
 	[ -n "$$VERSION" ] || { echo VERSION not set; exit 1; }
