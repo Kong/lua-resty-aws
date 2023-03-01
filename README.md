@@ -36,12 +36,16 @@ See [the example](https://kong.github.io/lua-resty-aws/classes/AWS.html) in the 
 This typically happens when initializing from within a `require` call.
 See [Global settings](#global-settings) below on how to initialize properly.
 
+---
+
 ### TLS and certificate failures
 
 The http client defaults to tls name verification. For this to work, the CA store must be set.
 With OpenResty this is done through the [`lua_ssl_trusted_certificate`](https://github.com/openresty/lua-nginx-module#lua_ssl_trusted_certificate)
 directive. However; the compatibility module used, [`lua-resty-luasocket`](https://github.com/Tieske/lua-resty-luasocket), cannot automatically
 read that setting, hence you have to set it manually, see [the docs](https://tieske.github.io/lua-resty-luasocket/modules/resty.luasocket.html#get_luasec_defaults).
+
+---
 
 ### Global settings
 
@@ -57,6 +61,8 @@ in the OpenResty `init` phase. Simply add the following line;
 
 This ensures the environment variables can still be read (in the `init` phase). And
 the auto-detection of the AWS region will execute.
+
+---
 
 ### EC2 metadata
 
@@ -134,7 +140,7 @@ or run
 
 ## Copyright and license
 
-Copyright: (c) 2020-2022 Kong, Inc.
+Copyright: (c) 2020-2023 Kong, Inc.
 
 Author: Thijs Schreijer
 
@@ -157,7 +163,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### 1.x.0 (unreleased)
+### 1.2.0 (1-Mar-2023)
 
 - **IMPORTANT-IMPORTANT-IMPORTANT** feat: enable TLS name verification. This might
   break if your CA store is not the default system one. See [usage notes](#usage-important).
