@@ -99,7 +99,7 @@ local function getAuthToken(self, opts) --endpoint, region, db_user)
     },
   }
 
-  local presigned_request, err = presign_awsv4_request(self, req_data, opts.signingName, region, RDS_IAM_AUTH_EXPIRE_TIME)
+  local presigned_request, err = presign_awsv4_request(self.config, req_data, opts.signingName, region, RDS_IAM_AUTH_EXPIRE_TIME)
   if err then
     return nil, err
   end
