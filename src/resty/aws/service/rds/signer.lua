@@ -17,7 +17,7 @@ local RDS_IAM_AUTH_EXPIRE_TIME = 15 * 60
 -- @name Signer:getAuthToken
 -- @tparam table opts configuration to use, to override the options inherited from the underlying `AWS` instance;
 -- @tparam string opts.region The AWS region
--- @tparam string opts.hostname the DB hostname to connect to, eg. `"DB_NAME.us-east-1.rds.amazonaws.com"`
+-- @tparam string opts.hostname the DB hostname to connect to, eg. `"DB_INSTANCE.DB_CLUSTER.us-east-1.rds.amazonaws.com"`
 -- @tparam number opts.port the port for the DB connection
 -- @tparam string opts.username username of the account in the database to sign in with
 -- @tparam Credentials opts.credentials aws credentials
@@ -30,7 +30,7 @@ local RDS_IAM_AUTH_EXPIRE_TIME = 15 * 60
 -- local rds = aws:RDS()
 --
 --
--- local db_hostname = "DB_NAME.us-east-1.rds.amazonaws.com"
+-- local db_hostname = "DB_INSTANCE.DB_CLUSTER.us-east-1.rds.amazonaws.com"
 -- local db_port = 5432
 -- local db_name = "DB_NAME"
 --
