@@ -23,17 +23,17 @@ aws.config.region = "test_region"
 
 describe("Presign request", function()
   local presigned_request_data
+  local origin_time
 
   setup(function()
-    ngx.origin_time = ngx.time
-    ngx.time = function ()
+    origin_time = ngx.time
+    ngx.time = function () --luacheck: ignore
       return 1667543171
     end
   end)
 
   teardown(function ()
-    ngx.time = ngx.origin_time
-    ngx.origin_time = nil
+    ngx.time = origin_time --luacheck: ignore
   end)
 
   before_each(function()
