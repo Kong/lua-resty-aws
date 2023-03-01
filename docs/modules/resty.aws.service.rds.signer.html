@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AWS SDK for OpenResty</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>lua-resty-aws</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/resty.aws.config.html">resty.aws.config</a></li>
+  <li><strong>resty.aws.service.rds.signer</strong></li>
+  <li><a href="../modules/resty.aws.utils.html">resty.aws.utils</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/AWS.html">AWS</a></li>
+  <li><a href="../classes/ChainedTemporaryCredentials.html">ChainedTemporaryCredentials</a></li>
+  <li><a href="../classes/CredentialProviderChain.html">CredentialProviderChain</a></li>
+  <li><a href="../classes/Credentials.html">Credentials</a></li>
+  <li><a href="../classes/EC2MetadataCredentials.html">EC2MetadataCredentials</a></li>
+  <li><a href="../classes/EnvironmentCredentials.html">EnvironmentCredentials</a></li>
+  <li><a href="../classes/RemoteCredentials.html">RemoteCredentials</a></li>
+  <li><a href="../classes/SharedFileCredentials.html">SharedFileCredentials</a></li>
+  <li><a href="../classes/TokenFileWebIdentityCredentials.html">TokenFileWebIdentityCredentials</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>resty.aws.service.rds.signer</code></h1>
+<p>Signer class for RDS tokens for RDS DB access.</p>
+<p> See <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html">IAM database authentication for MariaDB, MySQL, and PostgreSQL</a>
+ for more information on using IAM database authentication with RDS.</p>
+
+<p> RDS services created will get a <code>Signer</code> method to create an instance. The <code>Signer</code> will
+ inherit its configuration from the <a href="../classes/AWS.html#">AWS</a> instance (not from the RDS instance!).</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Signer:getAuthToken">Signer:getAuthToken (opts)</a></td>
+	<td class="summary">Return an authorization token used as the password for a RDS DB connection.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Signer:getAuthToken"></a>
+    <strong>Signer:getAuthToken (opts)</strong>
+    </dt>
+    <dd>
+    Return an authorization token used as the password for a RDS DB connection.
+ The example shows how to use <a href="../modules/resty.aws.service.rds.signer.html#Signer:getAuthToken">getAuthToken</a> to create an authentication
+ token for connecting to a PostgreSQL database in RDS.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">opts</span> configuration to use, to override the options inherited from the underlying <a href="../classes/AWS.html#">AWS</a> instance;
+        <ul>
+        <li><span class="parameter">region</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The AWS region
+        </li>
+        <li><span class="parameter">hostname</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         the DB hostname to connect to, eg. <code>&quot;DB_INSTANCE.DB_CLUSTER.us-east-1.rds.amazonaws.com&quot;</code>
+        </li>
+        <li><span class="parameter">port</span>
+            <span class="types"><span class="type">number</span></span>
+         the port for the DB connection
+        </li>
+        <li><span class="parameter">username</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         username of the account in the database to sign in with
+        </li>
+        <li><span class="parameter">credentials</span>
+            <span class="types"><a class="type" href="../classes/Credentials.html#">Credentials</a></span>
+         aws credentials
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        token, err - Returns the token to use as the password for the DB connection, or nil and error if an error occurs
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> pgmoon = <span class="global">require</span> <span class="string">"pgmoon"</span>
+<span class="keyword">local</span> AWS = <span class="global">require</span>(<span class="string">"resty.aws"</span>)
+<span class="keyword">local</span> AWS_global_config = <span class="global">require</span>(<span class="string">"resty.aws.config"</span>).global
+<span class="keyword">local</span> aws = AWS { region = AWS_global_config.region }
+<span class="keyword">local</span> rds = aws:RDS()
+
+
+<span class="keyword">local</span> db_hostname = <span class="string">"DB_INSTANCE.DB_CLUSTER.us-east-1.rds.amazonaws.com"</span>
+<span class="keyword">local</span> db_port = <span class="number">5432</span>
+<span class="keyword">local</span> db_name = <span class="string">"DB_NAME"</span>
+
+<span class="keyword">local</span> signer = rds:Signer {  <span class="comment">-- create a signer instance
+</span>  hostname = db_hostname,
+  username = <span class="string">"db_user"</span>,
+  port = db_port,
+  region = <span class="keyword">nil</span>,              <span class="comment">-- will be inherited from <code>aws</code>
+</span>  credentials = <span class="keyword">nil</span>,         <span class="comment">-- will be inherited from <code>aws</code>
+</span>}
+
+<span class="comment">-- use the 'signer' to generate the token, whilst overriding some options
+</span><span class="keyword">local</span> auth_token, err = signer:getAuthToken {
+  username = <span class="string">"another_user"</span>  <span class="comment">-- this overrides the earlier provided config above
+</span>}
+
+<span class="keyword">if</span> err <span class="keyword">then</span>
+  ngx.log(ngx.ERR, <span class="string">"Failed to build auth token: "</span>, err)
+  <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> pg = pgmoon.new({
+  host = db_hostname,
+  port = db_port,
+  database = db_name,
+  user = <span class="string">"another_user"</span>,
+  password = auth_token,
+  ssl = <span class="keyword">true</span>,
+})
+
+<span class="keyword">local</span> flag, err = pg:connect()
+<span class="keyword">if</span> err <span class="keyword">then</span>
+ ngx.log(ngx.ERR, <span class="string">"Failed to connect to database: "</span>, err)
+ <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+<span class="comment">-- Test query
+</span><span class="global">assert</span>(pg:query(<span class="string">"select * from users where status = 'active' limit 20"</span>))</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2023-03-01 12:16:19 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
