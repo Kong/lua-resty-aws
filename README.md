@@ -157,7 +157,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### unreleased
+### 1.x.0 (unreleased)
 
 - **IMPORTANT-IMPORTANT-IMPORTANT** feat: enable TLS name verification. This might
   break if your CA store is not the default system one. See [usage notes](#usage-important).
@@ -165,6 +165,8 @@ Release process:
 - fix: STS regional endpoints woudl re-inject the region on every authentication
   (after a token expired), causing bad hostnames to be used
   [#45](https://github.com/Kong/lua-resty-aws/issues/45)
+- Feat: add RDS.Signer to generate tokens for RDS DB access
+  [#44](https://github.com/Kong/lua-resty-aws/issues/44)
 
 ### 1.1.2 (7-Dec-2022)
 

@@ -1,11 +1,5 @@
 setmetatable(_G, nil)
 
--- to get a definitive result
--- luacheck:ignore
-ngx.time = function()
-  return 1667543171
-end
-
 -- hook request sending
 package.loaded["resty.aws.request.execute"] = function(...)
   return ...
@@ -29,6 +23,19 @@ aws.config.region = "test_region"
 
 describe("Secret Manager service", function()
   local sm
+
+  setup(function()
+    ngx.origin_time = ngx.time
+    ngx.time = function ()
+      return 1667543171
+    end
+  end)
+
+  teardown(function ()
+    ngx.time = ngx.origin_time
+    ngx.origin_time = nil
+  end)
+
   before_each(function()
     sm = assert(aws:SecretsManager {})
   end)

@@ -1,5 +1,4 @@
--- Performs AWSv4 Signing
--- http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+-- Performs AWS v4 request presigning.
 
 local pl_string = require "pl.stringx"
 
@@ -10,16 +9,57 @@ local hex_encode = utils.hex_encode
 local canonicalise_path = utils.canonicalise_path
 local canonicalise_query_string = utils.canonicalise_query_string
 local derive_signing_key = utils.derive_signing_key
+local add_args_to_query_string = utils.add_args_to_query_string
 
 
 local ALGORITHM = "AWS4-HMAC-SHA256"
 
 
+local PRESIGN_SIGNING_FLAGS = {
+  ["X-Amz-Algorithm"] = true,
+  ["X-Amz-Signature"] = true,
+  ["X-Amz-Security-Token"] = true,
+  ["X-Amz-Date"] = true,
+  ["X-Amz-Expires"] = true,
+  ["X-Amz-Credential"] = true,
+  ["X-Amz-SignedHeaders"] = true
+}
+
+
+-- remove old signing flags in the original request
+local function handle_presign_removal(query)
+  local q = {}
+  if type(query) == "string" then
+    for key, val in query:gmatch("([^&=]+)=?([^&]*)") do
+      if not PRESIGN_SIGNING_FLAGS[key] then
+        q[#q+1] = key .. "=" .. val
+      end
+    end
+
+  elseif type(query) == "table" then
+    for key, val in pairs(query) do
+      if not PRESIGN_SIGNING_FLAGS[key] then
+        q[#q+1] = key .. "=" .. val
+      end
+    end
+  end
+
+  return table.concat(q, "&")
+end
+
+-- Presigning AWS v4 Request
+-- @param config - AWS config instance
+-- @param request_data - request data table
+-- @param service - AWS service name
+-- @param region - AWS region name
+-- @param expires - expires time in seconds, should be less than 604800 (7 days)
+-- @return presigned request data table
+--
 -- config to contain:
 -- config.endpoint: hostname to connect to
 -- config.credentials: the Credentials class to use
 --
--- tbl to contain:
+-- request_data tbl to contain:
 -- tbl.domain: optional, defaults to "amazon.com"
 -- tbl.region: amazon region identifier, eg. "us-east-1"
 -- tbl.service: amazon service targetted, eg. "lambda"
@@ -37,10 +77,21 @@ local ALGORITHM = "AWS4-HMAC-SHA256"
 -- tbl.timestamp: number defaults to 'ngx.time()''
 -- tbl.global_endpoint: if true, then use "us-east-1" as signing region and different
 --     hostname template: see https://github.com/aws/aws-sdk-js/blob/ae07e498e77000e55da70b20996dc8fd2f8b3051/lib/region_config_data.json
-local function prepare_awsv4_request(config, request_data)
-  local region = config.signingRegion or config.region
-  local service = config.endpointPrefix or config.targetPrefix -- TODO: targetPrefix as fallback, correct???
-  local request_method = request_data.method -- TODO: should this get a fallback/default??
+local function presign_awsv4_request(config, request_data, service, region, expire)
+  if type(expire) ~= "number" then
+    return nil, "bad expire type, expected number, got: ".. type(expire)
+  end
+
+  if expire < 1 or expire > 604800 then
+    return nil, "bad expire value, expected 1 <= expire <= 604800, got: ".. expire
+  end
+
+  -- force expire time to integer
+  local expire_time = tonumber(expire, 10)
+
+  local region =  region or config.signingRegion or config.region
+  local service = service or config.endpointPrefix or config.targetPrefix -- TODO: Presign may not need fallback on service name
+  local request_method = request_data.method
 
   local canonicalURI = request_data.canonicalURI
   local path = request_data.path
@@ -54,6 +105,7 @@ local function prepare_awsv4_request(config, request_data)
   local query = request_data.query
   if query and not canonical_querystring then
     canonical_querystring = canonicalise_query_string(query)
+    canonical_querystring = handle_presign_removal(canonical_querystring)
   end
 
   local req_headers = request_data.headers
@@ -79,28 +131,50 @@ local function prepare_awsv4_request(config, request_data)
   local req_date = os.date("!%Y%m%dT%H%M%SZ", timestamp)
   local date = os.date("!%Y%m%d", timestamp)
 
-  local headers = {
-    ["X-Amz-Date"] = req_date,
-    ["Host"] = host,
+  local credential_scope = date .. "/" .. region .. "/" .. service .. "/aws4_request"
+
+  local amz_query_args = {
+    ["X-Amz-Algorithm"] = ALGORITHM,
     ["X-Amz-Security-Token"] = session_token,
+    ["X-Amz-Date"] = req_date,
+    ["X-Amz-Expires"] = expire_time,
+    ["X-Amz-Credential"] = access_key .. "/" .. credential_scope
   }
 
-  local S3 = config.signatureVersion == "s3"
+  local headers = {}
 
-  local hashed_payload = hex_encode(hash(req_payload or ""))
+  -- Request body SHA256 digest
+  local hashed_payload
 
-  -- Special handling of S3
-  -- https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html#:~:text=Unsigned%20payload%20option
-  if S3 then
+  if req_headers["X-Amz-Content-Sha256"] then
+    hashed_payload = req_headers["X-Amz-Content-Sha256"]
     headers["X-Amz-Content-Sha256"] = hashed_payload
+    req_headers["X-Amz-Content-Sha256"] = nil
   end
 
-  local add_auth_header = true
+  if hashed_payload == "" or hashed_payload == nil then
+    -- TODO: unsigned_payload?
+    local include_sha256_in_header = config.unsigned_payload
+                                      or service == "s3"
+                                      or service == "s3-object-lambda"
+                                      or service == "glacier"
+    local is_s3_presign = service == "s3" or service == "s3-object-lambda"
+    if config.unsigned_payload or is_s3_presign then
+      hashed_payload = "UNSIGNED-PAYLOAD"
+      include_sha256_in_header = not is_s3_presign
+
+    else
+      hashed_payload = hex_encode(hash(req_payload or ""))
+    end
+
+    if include_sha256_in_header then
+      headers["X-Amz-Content-Sha256"] = hashed_payload
+    end
+  end
+
   for k, v in pairs(req_headers) do
     k = k:gsub("%f[^%z-]%w", string.upper) -- convert to standard header title case
-    if k == "Authorization" then
-      add_auth_header = false
-    elseif v == false then -- don't allow a default value for this header
+    if v == false then -- don't allow a default value for this header
       v = nil
     end
     headers[k] = v
@@ -130,8 +204,12 @@ local function prepare_awsv4_request(config, request_data)
       canonical_headers[j] = name .. ":" .. value .. "\n"
     end
     signed_headers = table.concat(signed_headers, ";", 1, i)
+    amz_query_args["X-Amz-SignedHeaders"] = signed_headers
     canonical_headers = table.concat(canonical_headers, nil, 1, i)
   end
+
+  -- canonical_querystring = add_args_to_query_string(headers, canonical_querystring)
+  canonical_querystring = add_args_to_query_string(amz_query_args, canonical_querystring, true)
 
   local canonical_request =
     request_method .. '\n' ..
@@ -145,7 +223,6 @@ local function prepare_awsv4_request(config, request_data)
 
   -- Task 2: Create a String to Sign for Signature Version 4
   -- http://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html
-  local credential_scope = date .. "/" .. region .. "/" .. service .. "/aws4_request"
   local string_to_sign =
     ALGORITHM .. '\n' ..
     req_date .. '\n' ..
@@ -156,16 +233,7 @@ local function prepare_awsv4_request(config, request_data)
   -- http://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html
   local signing_key = derive_signing_key(secret_key, date, region, service)
   local signature = hex_encode(hmac(signing_key, string_to_sign))
-
-  -- Task 4: Add the Signing Information to the Request
-  -- http://docs.aws.amazon.com/general/latest/gr/sigv4-add-signature-to-request.html
-  local authorization = ALGORITHM
-    .. " Credential=" .. access_key .. "/" .. credential_scope
-    .. ", SignedHeaders=" .. signed_headers
-    .. ", Signature=" .. signature
-  if add_auth_header then
-    headers.Authorization = authorization
-  end
+  canonical_querystring = add_args_to_query_string("X-Amz-Signature=" .. signature, canonical_querystring)
 
   -- local target = path or canonicalURI
   -- if query or canonical_querystring then
@@ -181,11 +249,10 @@ local function prepare_awsv4_request(config, request_data)
     tls = tls,      -- true
     path = path or canonicalURI,             -- "/some/path"
     method = request_method,  -- "GET"
-    query = query or canonical_querystring,  -- "query1=val1"
+    query = canonical_querystring,  -- "query1=val1"
     headers = headers,  -- table
-    body = req_payload, -- string
-    --target = target,  -- "/some/path?query1=val1"
+    -- body = req_payload, -- Presign does not need to include body in request
   }
 end
 
-return prepare_awsv4_request
+return presign_awsv4_request
