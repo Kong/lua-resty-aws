@@ -6,7 +6,7 @@
 -- RDS services created will get a `Signer` method to create an instance. The `Signer` will
 -- inherit its configuration from the `AWS` instance (not from the RDS instance!).
 
-local httpc = require("resty.http").new()
+local httpc = require("resty.luasocket.http")
 local presign_awsv4_request = require("resty.aws.request.signatures.presign")
 
 local RDS_IAM_AUTH_EXPIRE_TIME = 15 * 60
