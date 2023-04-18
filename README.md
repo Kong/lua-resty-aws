@@ -163,6 +163,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### Unreleased
+
+- fix: fix the rds signer cannot be used in init phase.
+  [#50](https://github.com/Kong/lua-resty-aws/pull/50)
+
 ### 1.2.0 (1-Mar-2023)
 
 - **IMPORTANT-IMPORTANT-IMPORTANT** feat: enable TLS name verification. This might
