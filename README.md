@@ -167,6 +167,8 @@ Release process:
 
 - fix: add the SharedFileCredentials into rockspec so it can be packed and used correctly.
   [#53](https://github.com/Kong/lua-resty-aws/pull/53)
+- fix: the field `idempotencyToken` should be allowed and remain unvalidated as an opaque string.
+  [#52](https://github.com/Kong/lua-resty-aws/pull/52)
 
 ### 1.2.1 (24-Apr-2023)
 
