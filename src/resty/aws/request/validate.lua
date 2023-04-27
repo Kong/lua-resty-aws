@@ -418,6 +418,7 @@ local validators do
     sensitive = always_pass,
     streaming = always_pass,  -- for type 'blob'
     description = always_pass,  -- for type 'blob'
+    idempotencyToken = always_pass,
   },ops_mt)
 
 

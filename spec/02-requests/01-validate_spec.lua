@@ -432,6 +432,32 @@ local test_data = {
         error = "my.field.an_integer: maximum of 256, got 1024"
       }
     }
+  }, {
+    shape = {
+      type = "structure",
+      members = {
+        token = {
+          type = "string",
+          idempotencyToken = true,
+        }
+      },
+    },
+
+    cases = {
+      {
+        description = "valid structure without optional field is accepted",
+        input = {},
+        error = nil
+      }, {
+        description = "valid structure with idempotencyToken field is accepted",
+        input = { token = "cd467e65-3452-4784-b777-f2b65aafa078" },
+        error = nil
+      }, {
+        description = "invalid structure with idempotencyToken field is rejected",
+        input = { token = 123 },
+        error = "token: expected a string value, got '123' (number)",
+      }
+    }
   }
 
 }
