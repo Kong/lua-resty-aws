@@ -49,6 +49,7 @@ build = {
     ["resty.aws.credentials.CredentialProviderChain"]         = "src/resty/aws/credentials/CredentialProviderChain.lua",
     ["resty.aws.credentials.EC2MetadataCredentials"]          = "src/resty/aws/credentials/EC2MetadataCredentials.lua",
     ["resty.aws.credentials.EnvironmentCredentials"]          = "src/resty/aws/credentials/EnvironmentCredentials.lua",
+    ["resty.aws.credentials.SharedFileCredentials"]           = "src/resty/aws/credentials/SharedFileCredentials.lua",
     ["resty.aws.credentials.RemoteCredentials"]               = "src/resty/aws/credentials/RemoteCredentials.lua",
     ["resty.aws.credentials.TokenFileWebIdentityCredentials"] = "src/resty/aws/credentials/TokenFileWebIdentityCredentials.lua",
 
