@@ -165,6 +165,11 @@ Release process:
 
 ### Unreleased
 
+- fix: add the SharedFileCredentials into rockspec so it can be packed and used correctly.
+  [#53](https://github.com/Kong/lua-resty-aws/pull/53)
+
+### 1.2.1 (24-Apr-2023)
+
 - fix: fix the rds signer cannot be used in init phase.
   [#50](https://github.com/Kong/lua-resty-aws/pull/50)
 
