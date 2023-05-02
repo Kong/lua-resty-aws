@@ -163,7 +163,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### 1.2.1 (24-Apr-2023)
+### 1.2.2 (2-May-2023)
 
 - fix: add the SharedFileCredentials into rockspec so it can be packed and used correctly.
   [#53](https://github.com/Kong/lua-resty-aws/pull/53)
