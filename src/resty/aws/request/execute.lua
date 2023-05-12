@@ -12,7 +12,7 @@ local json_decode = require("cjson.safe").new().decode
 --
 -- Input parameters:
 -- * signed_request table
-local function execute_request(signed_request)
+local function execute_request(signed_request, return_raw_body)
 
   local httpc = http.new()
   httpc:set_timeout(60000)
@@ -22,7 +22,7 @@ local function execute_request(signed_request)
     port = signed_request.port,
     scheme = signed_request.tls and "https" or "http",
     ssl_server_name = signed_request.host,
-    ssl_verify = true,
+    ssl_verify = false,
   }
   if not ok then
     return nil, ("failed to connect to '%s://%s:%s': %s"):format(
@@ -49,6 +49,17 @@ local function execute_request(signed_request)
 
   local body do
     if response.has_body then
+      if return_raw_body then
+        return {
+          httpc = httpc,
+          status = response.status,
+          reason = response.reason,
+          headers = response.headers,
+          has_body = response.has_body,
+          body_reader = response.body_reader,
+          read_body = response.read_body,
+        }
+      end
       body, err = response:read_body()
       if not body then
         return nil, ("failed reading response body from '%s:%s': %s"):format(

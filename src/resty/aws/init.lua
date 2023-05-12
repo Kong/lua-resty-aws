@@ -279,12 +279,13 @@ local function s3_patch(request, bucket)
   end
 
   request.host = bucket .. "." .. request.host
+  request.headers['Host'] = request.host
 
   local path = request.path
   if bucket and path then
     path = path:sub(#bucket + 2)
-    if path == "/" then
-      path = ""
+    if path == "" then
+      path = "/"
     end
 
     request.path = path
@@ -307,9 +308,11 @@ local function generate_service_methods(service)
       --print(require("pl.pretty").write(self.config))
 
       -- validate parameters
-      local ok, err = validate_input(params, operation.input, "params")
-      if not ok then
-        return nil, operation_prefix .. " validation error: " .. tostring(err)
+      if operation.input then
+        local ok, err = validate_input(params, operation.input, "params")
+        if not ok then
+          return nil, operation_prefix .. " validation error: " .. tostring(err)
+        end
       end
 
       -- generate request data and format it according to the protocol
@@ -354,8 +357,18 @@ local function generate_service_methods(service)
 
       --print(require("pl.pretty").write(signed_request))
 
+      local need_raw_reader = false
+      if operation.output then
+        for key, shape in pairs(operation.output.members) do
+          if shape.type == 'blob' or shape.streaming then
+            need_raw_reader = true
+            break
+          end
+        end
+      end
+
       -- execute the request
-      local response, err = execute_request(signed_request)
+      local response, err = execute_request(signed_request, need_raw_reader)
       if not response then
         return nil, operation_prefix .. " " .. tostring(err)
       end

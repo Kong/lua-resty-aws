@@ -157,45 +157,47 @@ local function build_request(operation, config, params)
 
   -- inject parameters in the right places; path/query/header/body
   -- this assumes they all live on the top-level of the structure, is this correct??
-  for name, member_config in pairs(operation.input.members) do
-    local param_value = params[name]
-    -- TODO: date-time value should be properly formatted???
-    if param_value ~= nil then
+  if operation.input then
+    for name, member_config in pairs(operation.input.members) do
+      local param_value = params[name]
+      -- TODO: date-time value should be properly formatted???
+      if param_value ~= nil then
 
-      -- a parameter value is provided
-      local location = member_config.location
-      local locationName = member_config.locationName
-      -- print(name," = ", param_value, ": ",location, " (", locationName,")")
+        -- a parameter value is provided
+        local location = member_config.location
+        local locationName = member_config.locationName
+        -- print(name," = ", param_value, ": ",location, " (", locationName,")")
 
-      if location == "uri" then
-        local place_holder = "{" .. locationName .. "%+?}"
-        local replacement = escape_uri(param_value):gsub("%%", "%%%%")
-        request.path = request.path:gsub(place_holder, replacement)
+        if location == "uri" then
+          local place_holder = "{" .. locationName .. "%+?}"
+          local replacement = escape_uri(param_value):gsub("%%", "%%%%")
+          request.path = request.path:gsub(place_holder, replacement)
 
-      elseif location == "querystring" then
-        request.query[locationName] = param_value
+        elseif location == "querystring" then
+          request.query[locationName] = param_value
 
-      elseif location == "header" then
-        request.headers[locationName] = param_value
+        elseif location == "header" then
+          request.headers[locationName] = param_value
 
-      elseif location == "headers" then
-        for k,v in pairs(param_value) do
-          request.headers[locationName .. k] = v
-        end
+        elseif location == "headers" then
+          for k,v in pairs(param_value) do
+            request.headers[locationName .. k] = v
+          end
 
-      elseif location == nil then
-        if config.protocol == "query" then
-          -- no location specified, but protocol is query, so it goes into query
-          request.query[name] = param_value
-        elseif member_config.type == "blob" then
-          request.body = param_value
+        elseif location == nil then
+          if config.protocol == "query" then
+            -- no location specified, but protocol is query, so it goes into query
+            request.query[name] = param_value
+          elseif member_config.type == "blob" then
+            request.body = param_value
+          else
+            -- nowhere else to go, so put it in the body (for json and xml)
+            body_tbl[name] = param_value
+          end
+
         else
-          -- nowhere else to go, so put it in the body (for json and xml)
-          body_tbl[name] = param_value
+          error("Unknown location: " .. location)
         end
-
-      else
-        error("Unknown location: " .. location)
       end
     end
   end
