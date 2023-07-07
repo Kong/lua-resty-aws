@@ -104,7 +104,7 @@ end
 -- updates credentials.
 -- @return success, or nil+err
 function ChainedTemporaryCredentials:refresh()
-  local result, err = self.sts:AssumeRole(self.params)
+  local result, err = self.sts:assumeRole(self.params)
   if not result then
     return nil, err
   end
