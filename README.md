@@ -163,6 +163,10 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### Unreleased
+- fix: fix assumeRole function name on STS.
+  [#59](https://github.com/Kong/lua-resty-aws/pull/59)
+
 ### 1.2.2 (2-May-2023)
 
 - fix: add the SharedFileCredentials into rockspec so it can be packed and used correctly.
