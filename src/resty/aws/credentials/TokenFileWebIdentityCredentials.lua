@@ -2,7 +2,7 @@
 -- @classmod TokenFileWebIdentityCredentials
 
 local readfile = require("pl.utils").readfile
-local xml = require("pl.xml")
+local lom = require("lxp.lom")
 
 
 local global_config = require("resty.aws.config").global
@@ -79,14 +79,17 @@ function TokenFileWebIdentityCredentials:refresh()
     return nil, ("request for token returned '%s': %s"):format(tostring(response.status), response.body)
   end
 
-  local cred = xml.parse(response.body, nil, true):
-    child_with_name("AssumeRoleWithWebIdentityResult"):
-    child_with_name("Credentials")
+  local resp_body_lom, err = lom.parse(response.body)
+  if not resp_body_lom then
+    return nil, "failed to parse response body: " .. err
+  end
 
-  local AccessKeyId = cred:child_with_name("AccessKeyId")[1]
-  local SecretAccessKey = cred:child_with_name("SecretAccessKey")[1]
-  local SessionToken = cred:child_with_name("SessionToken")[1]
-  local Expiration = cred:child_with_name("Expiration")[1]
+  local cred_lom = lom.find_elem(lom.find_elem(resp_body_lom, "AssumeRoleWithWebIdentityResult"), "Credentials")
+
+  local AccessKeyId = lom.find_elem(cred_lom, "AccessKeyId")[1]
+  local SecretAccessKey = lom.find_elem(cred_lom, "SecretAccessKey")[1]
+  local SessionToken = lom.find_elem(cred_lom, "SessionToken")[1]
+  local Expiration = lom.find_elem(cred_lom, "Expiration")[1]
 
   self:set(AccessKeyId, SecretAccessKey, SessionToken, Expiration)
 

@@ -1,7 +1,7 @@
 --- ChainedTemporaryCredentials class.
 -- @classmod ChainedTemporaryCredentials
 
-local cjson = require("cjson.safe").new()
+local lom = require("lxp.lom")
 
 
 -- Create class
@@ -104,21 +104,30 @@ end
 -- updates credentials.
 -- @return success, or nil+err
 function ChainedTemporaryCredentials:refresh()
-  local result, err = self.sts:assumeRole(self.params)
-  if not result then
-    return nil, err
+  local response, err = self.sts:assumeRole(self.params)
+  if not response then
+    return nil, "Request for token data failed: " .. tostring(err)
   end
 
-  if type(result) == "string" then
-    local res, err = cjson.decode(result)
-    if not res then
-      return nil, "failed to json-decode assumeRole results with '" .. err .. "', input: " .. result
-    end
-    result = res
+  if response.status ~= 200 then
+    return nil, ("request for token returned '%s': %s"):format(tostring(response.status), response.body)
   end
 
-  local cred = result.Credentials
-  self:set(cred.AccessKeyId, cred.SecretAccessKey, cred.SessionToken, cred.Expiration)
+  local resp_body_lom, err = lom.parse(response.body)
+  if not resp_body_lom then
+    return nil, "failed to parse response body: " .. err
+  end
+
+  local cred_lom = lom.find_elem(lom.find_elem(resp_body_lom, "AssumeRoleResult"), "Credentials")
+
+  local AccessKeyId = lom.find_elem(cred_lom, "AccessKeyId")[1]
+  local SecretAccessKey = lom.find_elem(cred_lom, "SecretAccessKey")[1]
+  local SessionToken = lom.find_elem(cred_lom, "SessionToken")[1]
+  local Expiration = lom.find_elem(cred_lom, "Expiration")[1]
+
+  self:set(AccessKeyId, SecretAccessKey, SessionToken, Expiration)
+
+  return true
 end
 
 return ChainedTemporaryCredentials
