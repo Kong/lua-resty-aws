@@ -78,14 +78,14 @@ describe("AWS main instance", function()
     }
 
     assert.is.table(aws.config)
-    local sts, err = aws:STS()
-    local _, err = sts:assumeRole {
+    local sts, _ = aws:STS()
+    local _, _ = sts:assumeRole {
       RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
       RoleSessionName = "aws-test",
     }
     assert.same("https://sts.eu-central-1.amazonaws.com", sts.config.endpoint)
 
-    local _, err = sts:assumeRole {
+    local _, _ = sts:assumeRole {
       RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
       RoleSessionName = "aws-test",
     }
