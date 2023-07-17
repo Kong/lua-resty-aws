@@ -79,6 +79,10 @@ function TokenFileWebIdentityCredentials:refresh()
     return nil, ("request for token returned '%s': %s"):format(tostring(response.status), response.body)
   end
 
+  if type(response.body) ~= "string" then
+    return nil, "request for token returned invalid body: " .. err
+  end
+
   local resp_body_lom, err = lom.parse(response.body)
   if not resp_body_lom then
     return nil, "failed to parse response body: " .. err
