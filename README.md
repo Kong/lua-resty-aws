@@ -164,8 +164,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 ### Unreleased
+
 - fix: fix assumeRole function name on STS.
   [#59](https://github.com/Kong/lua-resty-aws/pull/59)
+- fix: fix STS regional endpoint injection in build_request
+  [#62](https://github.com/Kong/lua-resty-aws/pull/62)
 
 ### 1.2.2 (2-May-2023)
 

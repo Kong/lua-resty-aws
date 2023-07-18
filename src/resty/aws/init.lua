@@ -312,9 +312,6 @@ local function generate_service_methods(service)
         return nil, operation_prefix .. " validation error: " .. tostring(err)
       end
 
-      -- generate request data and format it according to the protocol
-      local request = build_request(operation, self.config, params)
-
       -- implement stsRegionalEndpoints config setting,
       if service.api.metadata.serviceId == "STS"
         and service.config.stsRegionalEndpoints == "regional"
@@ -330,6 +327,9 @@ local function generate_service_methods(service)
           service.config._regionalEndpointInjected = true
         end
       end
+
+      -- generate request data and format it according to the protocol
+      local request = build_request(operation, self.config, params)
 
       local old_sig
       if (unsigned[service.api.metadata.serviceId] or {})[operation.name] then

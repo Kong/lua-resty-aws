@@ -4,7 +4,16 @@ describe("AWS main instance", function()
   local AWS
 
   setup(function()
+    package.loaded["resty.aws.request.execute"] = function ()
+      return {
+        status = 200,
+        reason = "OK",
+        headers = {},
+        body = ""
+      }
+    end
     AWS = require "resty.aws"
+    -- execute_request = require "resty.aws.request.execute"
   end)
 
   teardown(function()
@@ -55,6 +64,32 @@ describe("AWS main instance", function()
   it("gets methods for services, spaces removed from serviceId", function()
     local aws = AWS()
     assert.is.Function(aws.AppMesh) -- serviceId = "App Mesh"
+  end)
+
+  it("support sts regional endpoint inject and only inject once", function()
+    local aws = AWS({
+      region = "eu-central-1",
+      stsRegionalEndpoints = "regional",
+    })
+
+    aws.config.credentials = aws:Credentials {
+      accessKeyId = "test_id",
+      secretAccessKey = "test_key",
+    }
+
+    assert.is.table(aws.config)
+    local sts, _ = aws:STS()
+    local _, _ = sts:assumeRole {
+      RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
+      RoleSessionName = "aws-test",
+    }
+    assert.same("https://sts.eu-central-1.amazonaws.com", sts.config.endpoint)
+
+    local _, _ = sts:assumeRole {
+      RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
+      RoleSessionName = "aws-test",
+    }
+    assert.same("https://sts.eu-central-1.amazonaws.com", sts.config.endpoint)
   end)
 
 end)
