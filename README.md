@@ -169,6 +169,8 @@ Release process:
   [#59](https://github.com/Kong/lua-resty-aws/pull/59)
 - fix: fix STS regional endpoint injection in build_request
   [#62](https://github.com/Kong/lua-resty-aws/pull/62)
+- fix: replace deprecated pl.xml with luaexpat; fix STS assume role logic.
+  [#61](https://github.com/Kong/lua-resty-aws/pull/61)
 
 ### 1.2.2 (2-May-2023)
 

@@ -1,4 +1,5 @@
 local cjson = require "cjson"
+local pl_stringx = require "pl.stringx"
 
 describe("operations protocol", function()
 
@@ -253,7 +254,11 @@ describe("operations protocol", function()
     local request = build_request(operation, config, params)
     if request and request.body then
       -- cannot reliably compare non-canonicalized json, so decode to Lua table
-      request.body = assert(require("pl.xml").parse(request.body))
+      local body_lines = pl_stringx.splitlines(request.body)
+      for i, line in ipairs(body_lines) do
+        body_lines[i] = pl_stringx.strip(line, ' ')
+      end
+      request.body = assert(require("pl.xml").parse(table.concat(body_lines, "")))
       local to_lua = function(t)
         -- convert LOM to comparable Lua table
         for i, v in ipairs(t) do
@@ -290,6 +295,7 @@ describe("operations protocol", function()
         RoleSessionName = {
           [1] = 'world' },
         attr = {
+          [1] = 'xmlns',
           xmlns = 'cool-name-space' },
         someSubStructure = {
           hello = {
