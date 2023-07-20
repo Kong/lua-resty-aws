@@ -154,15 +154,15 @@ Versioning is strictly based on [Semantic Versioning](https://semver.org/)
 
 Release process:
 
-1. create a release branch `git checkout main && git pull && git checkout -b release/x.y.z`
+1. create a release branch `VERSION=x.y.z && git checkout main && git pull && git checkout -b release/$VERSION`
 1. update the changelog below
 1. run `make clean && make dev && make test && make docs`
 1. commit as `release x.y.z`
 1. push the branch, create a PR and get it merged.
-1. tag the release commit with the version `git checkout main && git pull && git tag x.y.z`
+1. tag the release commit with the version `VERSION=x.y.z && git checkout main && git pull && git tag $VERSION`
 1. push the tag
 1. run `VERSION=x.y.z make pack`
-1. test the created `.rock` file
+1. test the created `.rock` file `VERSION=x.y.z && luarocks install lua-resty-aws-$VERSION-1.src.rock`
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
