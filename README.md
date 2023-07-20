@@ -154,10 +154,13 @@ Versioning is strictly based on [Semantic Versioning](https://semver.org/)
 
 Release process:
 
+1. create a release branch `git checkout main && git pull && git checkout -b release/x.y.z`
 1. update the changelog below
 1. run `make clean && make dev && make test && make docs`
-1. commit, and tag the commit with the version `x.y.z`
-1. push the commit and tag
+1. commit as `release x.y.z`
+1. push the branch, create a PR and get it merged.
+1. tag the release commit with the version `git checkout main && git pull && git tag x.y.z`
+1. push the tag
 1. run `VERSION=x.y.z make pack`
 1. test the created `.rock` file
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
