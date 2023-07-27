@@ -50,7 +50,6 @@ describe("RemoteCredentials", function()
   end)
 
 
-
   it("fetches credentials", function()
     local cred = RemoteCredentials:new()
     local success, key, secret, token = cred:get()
@@ -60,4 +59,29 @@ describe("RemoteCredentials", function()
     assert.equal("token", token)
   end)
 
+end)
+
+
+describe("RemoteCredentials with customized full URI", function ()
+  it("fetches credentials", function ()
+    local RemoteCredentials
+
+    restore()
+    restore.setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI", "http://localhost:12345/test/path")
+
+    local _ = require("resty.aws.config").global -- load config before mocking http client
+    package.loaded["resty.luasocket.http"] = http
+
+    RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
+    finally(function()
+      restore()
+    end)
+
+    local cred = RemoteCredentials:new()
+    local success, key, secret, token = cred:get()
+    assert.equal(true, success)
+    assert.equal("access", key)
+    assert.equal("secret", secret)
+    assert.equal("token", token)
+  end)
 end)
