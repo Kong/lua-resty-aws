@@ -166,6 +166,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### Unreleased
+
+- fix: fix AWS_CONTAINER_CREDENTIALS_FULL_URI parsing.
+  [#65](https://github.com/Kong/lua-resty-aws/pull/65)
+
 ### 1.2.3 (20-Jul-2023)
 
 - fix: fix assumeRole function name on STS.

@@ -48,7 +48,7 @@ local FullUri do
       end
 
       if (not FULL_URI_UNRESTRICTED_PROTOCOLS[parsed_url.scheme]) and
-          (not FULL_URI_ALLOWED_HOSTNAMES[parsed_url.hostname]) then
+          (not FULL_URI_ALLOWED_HOSTNAMES[parsed_url.host]) then
             return nil, 'Unsupported hostname: AWS.RemoteCredentials only supports '
                   .. table.concat(FULL_URI_ALLOWED_HOSTNAMES, ',') .. ' for '
                   .. parsed_url.scheme .. '; ' .. parsed_url.scheme .. '://'
