@@ -15,14 +15,14 @@ local json_decode = require("cjson.safe").new().decode
 local function execute_request(signed_request)
 
   local httpc = http.new()
-  httpc:set_timeout(60000)
+  httpc:set_timeout(signed_request.timeout or 60000)
 
   local ok, err = httpc:connect {
     host = signed_request.host,
     port = signed_request.port,
     scheme = signed_request.tls and "https" or "http",
     ssl_server_name = signed_request.host,
-    ssl_verify = true,
+    ssl_verify = signed_request.ssl_verify,
   }
   if not ok then
     return nil, ("failed to connect to '%s://%s:%s': %s"):format(
@@ -59,7 +59,11 @@ local function execute_request(signed_request)
     end
   end
 
-  httpc:close()
+  if signed_request.keepalive_idle_timeout then
+    httpc:set_keepalive(signed_request.keepalive_idle_timeout)
+  else
+    httpc:close()
+  end
 
   local ct = response.headers["Content-Type"]
   if (ct and ct:lower():match("application/.*json")) then
