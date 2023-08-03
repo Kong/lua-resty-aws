@@ -133,7 +133,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   -- for the client to use, so here we just keep aligned
   -- with v4 signing, if the user want to use the
   -- request object directly.
-  local ssl_verify = config.ssl_verify == nil or config.ssl_verify
+  local ssl_verify = config.ssl_verify
 
   local host = request_data.host
   local port = request_data.port

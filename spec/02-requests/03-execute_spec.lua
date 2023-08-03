@@ -66,31 +66,6 @@ describe("request execution", function()
     assert.same(request.tls, false)
   end)
 
-  it("ssl verify defaults to true", function ()
-    local config = {
-      region = "us-east-1"
-    }
-
-    config.credentials = Credentials:new({
-      accessKeyId = "teqst_id",
-      secretAccessKey = "test_key",
-    })
-
-    local aws = AWS(config)
-    aws.config.dry_run = true
-
-    local s3 = aws:S3()
-
-    assert.same(type(s3.getObject), "function")
-    local request, err = s3:getObject({
-      Bucket = "test-bucket",
-      Key = "test-key",
-    })
-
-    assert.same(err, nil)
-    assert.same(request.ssl_verify, true)
-  end)
-
   it("support configuring ssl verify false", function ()
     local config = {
       region = "us-east-1"

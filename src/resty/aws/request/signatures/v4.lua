@@ -77,7 +77,7 @@ local function prepare_awsv4_request(config, request_data)
   local timeout = config.timeout
   local keepalive_idle_timeout = config.keepalive_idle_timeout
   local tls = config.tls
-  local ssl_verify = config.ssl_verify == nil or config.ssl_verify
+  local ssl_verify = config.ssl_verify
 
   local host = request_data.host
   local port = request_data.port
