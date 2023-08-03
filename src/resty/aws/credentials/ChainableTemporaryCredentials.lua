@@ -1,13 +1,13 @@
---- ChainedTemporaryCredentials class.
--- @classmod ChainedTemporaryCredentials
+--- ChainableTemporaryCredentials class.
+-- @classmod ChainableTemporaryCredentials
 
 local lom = require("lxp.lom")
 
 
 -- Create class
 local Super = require "resty.aws.credentials.Credentials"
-local ChainedTemporaryCredentials = setmetatable({}, Super)
-ChainedTemporaryCredentials.__index = ChainedTemporaryCredentials
+local ChainableTemporaryCredentials = setmetatable({}, Super)
+ChainableTemporaryCredentials.__index = ChainableTemporaryCredentials
 
 
 --- Constructor, inherits from `Credentials`.
@@ -37,9 +37,9 @@ ChainedTemporaryCredentials.__index = ChainedTemporaryCredentials
 --   return nil, id
 -- end
 
-function ChainedTemporaryCredentials:new(opts)
+function ChainableTemporaryCredentials:new(opts)
   local self = Super:new(opts)  -- override 'self' to be the new object/class
-  setmetatable(self, ChainedTemporaryCredentials)
+  setmetatable(self, ChainableTemporaryCredentials)
 
   opts = opts or {}
 
@@ -90,7 +90,7 @@ function ChainedTemporaryCredentials:new(opts)
     self.sts = sts
     self.params = params[#params]
     params[#params] = nil
-    self.masterCredentials = ChainedTemporaryCredentials:new {
+    self.masterCredentials = ChainableTemporaryCredentials:new {
       masterCredentials = mCredentials,
       params = params,
       aws = opts.aws,
@@ -103,7 +103,7 @@ end
 
 -- updates credentials.
 -- @return success, or nil+err
-function ChainedTemporaryCredentials:refresh()
+function ChainableTemporaryCredentials:refresh()
   local response, err = self.sts:assumeRole(self.params)
   if not response then
     return nil, "Request for token data failed: " .. tostring(err)
@@ -134,4 +134,4 @@ function ChainedTemporaryCredentials:refresh()
   return true
 end
 
-return ChainedTemporaryCredentials
+return ChainableTemporaryCredentials
