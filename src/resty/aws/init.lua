@@ -354,6 +354,9 @@ local function generate_service_methods(service)
 
       --print(require("pl.pretty").write(signed_request))
 
+      if self.config.dry_run then
+        return signed_request
+      end
       -- execute the request
       local response, err = execute_request(signed_request)
       if not response then

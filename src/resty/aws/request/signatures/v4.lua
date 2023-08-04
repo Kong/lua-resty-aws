@@ -32,7 +32,10 @@ local ALGORITHM = "AWS4-HMAC-SHA256"
 --    note: for headers "Host" and "Authorization"; they will be used if
 --          provided, and not be overridden by the generated ones
 -- tbl.body: string, defaults to ""
+-- tbl.timeout: number socket timeout (in ms), defaults to 60000
+-- tbl.keepalive_idle_timeout: number keepalive idle timeout (in ms), no keepalive if nil
 -- tbl.tls: defaults to true (if nil)
+-- tbl.ssl_verify: defaults to true (if nil)
 -- tbl.port: defaults to 443 or 80 depending on 'tls'
 -- tbl.timestamp: number defaults to 'ngx.time()''
 -- tbl.global_endpoint: if true, then use "us-east-1" as signing region and different
@@ -71,7 +74,10 @@ local function prepare_awsv4_request(config, request_data)
     end
   end
 
+  local timeout = config.timeout
+  local keepalive_idle_timeout = config.keepalive_idle_timeout
   local tls = config.tls
+  local ssl_verify = config.ssl_verify
 
   local host = request_data.host
   local port = request_data.port
@@ -178,7 +184,10 @@ local function prepare_awsv4_request(config, request_data)
     --url = url,      -- "https://lambda.us-east-1.amazon.com:443/some/path?query1=val1"
     host = host,    -- "lambda.us-east-1.amazon.com"
     port = port,    -- 443
+    timeout = timeout,  -- 60000
+    keepalive_idle_timeout = keepalive_idle_timeout, -- 60000
     tls = tls,      -- true
+    ssl_verify = ssl_verify, -- true
     path = path or canonicalURI,             -- "/some/path"
     method = request_method,  -- "GET"
     query = query or canonical_querystring,  -- "query1=val1"
