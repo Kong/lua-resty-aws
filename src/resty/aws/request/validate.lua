@@ -435,6 +435,9 @@ local validators do
     type = always_pass,
     deprecated = always_pass,
     box = always_pass,
+    locationName = always_pass,
+    location = always_pass,
+    deprecatedMessage = always_pass,
   },ops_mt)
 
 
