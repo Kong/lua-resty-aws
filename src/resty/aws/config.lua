@@ -140,6 +140,11 @@ local env_vars = {
   -- Variables used in RemoteCredentials (and in the CredentialProviderChain)
   AWS_CONTAINER_CREDENTIALS_RELATIVE_URI = { name = "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", default = nil },
   AWS_CONTAINER_CREDENTIALS_FULL_URI = { name = "AWS_CONTAINER_CREDENTIALS_FULL_URI", default = nil },
+
+  -- HTTP/HTTPs proxy settings
+  HTTP_PROXY = { name = "HTTP_PROXY", default = nil },
+  HTTPS_PROXY = { name = "HTTPS_PROXY", default = nil },
+  NO_PROXY = { name = "NO_PROXY", default = nil },
 }
 
 -- populate the env vars with their values, or defaults
