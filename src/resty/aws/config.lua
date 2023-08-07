@@ -142,9 +142,9 @@ local env_vars = {
   AWS_CONTAINER_CREDENTIALS_FULL_URI = { name = "AWS_CONTAINER_CREDENTIALS_FULL_URI", default = nil },
 
   -- HTTP/HTTPs proxy settings
-  HTTP_PROXY = { name = "HTTP_PROXY", default = nil },
-  HTTPS_PROXY = { name = "HTTPS_PROXY", default = nil },
-  NO_PROXY = { name = "NO_PROXY", default = nil },
+  HTTP_PROXY = { name = "http_proxy", default = nil },
+  HTTPS_PROXY = { name = "https_proxy", default = nil },
+  NO_PROXY = { name = "no_proxy", default = nil },
 }
 
 -- populate the env vars with their values, or defaults
