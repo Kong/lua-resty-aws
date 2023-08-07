@@ -134,6 +134,11 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   -- with v4 signing, if the user want to use the
   -- request object directly.
   local ssl_verify = config.ssl_verify
+  local proxy_opts = {
+    http_proxy = config.http_proxy,
+    https_proxy = config.https_proxy,
+    no_proxy = config.no_proxy,
+  }
 
   local host = request_data.host
   local port = request_data.port
@@ -260,6 +265,7 @@ local function presign_awsv4_request(config, request_data, service, region, expi
     keepalive_idle_timeout = keepalive_idle_timeout, -- 60000
     tls = tls,      -- true
     ssl_verify = ssl_verify, -- true
+    proxy_opts = proxy_opts, -- table
     path = path or canonicalURI,             -- "/some/path"
     method = request_method,  -- "GET"
     query = canonical_querystring,  -- "query1=val1"

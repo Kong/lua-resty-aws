@@ -23,6 +23,7 @@ local function execute_request(signed_request)
     scheme = signed_request.tls and "https" or "http",
     ssl_server_name = signed_request.host,
     ssl_verify = signed_request.ssl_verify,
+    proxy_opts = signed_request.proxy_opts,
   }
   if not ok then
     return nil, ("failed to connect to '%s://%s:%s': %s"):format(
