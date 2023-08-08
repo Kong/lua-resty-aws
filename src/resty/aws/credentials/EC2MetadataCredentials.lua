@@ -141,10 +141,18 @@ function EC2MetadataCredentials:refresh()
                 " " .. tostring(iam_security_token_request:read_body())
   end
 
-  local iam_security_token_data = json.decode(iam_security_token_request:read_body())
+  local iam_security_token_request_body = iam_security_token_request:read_body()
+  local iam_security_token_data = json.decode(iam_security_token_request_body)
+
+  if not iam_security_token_data.AccessKeyId then
+    return nil, "Unable to request EC2 IAM credentials for role " .. iam_role_name ..
+                " Request returned unexpected result " .. iam_security_token_request_body
+  end
 
   log(DEBUG, "Received temporary IAM credential from EC2 metadata service for role '",
-                     iam_role_name, "' with session token: ", iam_security_token_data.Token)
+              iam_role_name, "' with session token: ",
+              string.sub(iam_security_token_data.Token, 1 , 10),
+              "...")
 
   self:set(iam_security_token_data.AccessKeyId,
            iam_security_token_data.SecretAccessKey,
