@@ -12,6 +12,7 @@ local METADATA_SERVICE_SCHEME = "http"
 local METADATA_SERVICE_PORT = 80
 local METADATA_SERVICE_REQUEST_TIMEOUT = 5000  -- milliseconds
 local METADATA_SERVICE_HOST = "169.254.169.254"
+local METADATA_SERVICE_TOKEN_TTL = 300  -- seconds
 
 
 
@@ -46,9 +47,45 @@ function EC2MetadataCredentials:refresh()
     return nil, "Could not connect to EC2 metadata service: " .. tostring(err)
   end
 
+  local imds_token
+
+  local token_request_res, err = client:request {
+    method = "PUT",
+    path   = "/latest/api/token",
+    headers = {
+      ["X-aws-ec2-metadata-token-ttl-seconds"] = METADATA_SERVICE_TOKEN_TTL,
+    },
+  }
+
+  if not token_request_res then
+    log(DEBUG, "Could not fetch token from EC2 metadata service: " .. tostring(err))
+  elseif token_request_res.status ~= 200 then
+    log(DEBUG, "Failed to fetch token from EC2 metadata service: " .. tostring(err))
+  else
+    imds_token = tostring(token_request_res:read_body())
+  end
+
+  -- recycle the client, because the luasocket/ngx.socket compatibility is not
+  -- solid enough to reuse the httrp client
+  client:close()
+  client = http.new()
+  client:set_timeout(METADATA_SERVICE_REQUEST_TIMEOUT)
+
+  local ok, err = client:connect {
+    scheme = METADATA_SERVICE_SCHEME,
+    host = METADATA_SERVICE_HOST,
+    port = METADATA_SERVICE_PORT,
+  }
+  if not ok then
+    return nil, "Could not connect to EC2 metadata service: " .. tostring(err)
+  end
+
   local role_name_request_res, err = client:request {
     method = "GET",
     path   = "/latest/meta-data/iam/security-credentials/",
+    headers = {
+      ["X-aws-ec2-metadata-token"] = imds_token,
+    }
   }
 
   if not role_name_request_res then
@@ -83,6 +120,9 @@ function EC2MetadataCredentials:refresh()
   local iam_security_token_request, err = client:request {
     method = "GET",
     path   = "/latest/meta-data/iam/security-credentials/" .. iam_role_name,
+    headers = {
+      ["X-aws-ec2-metadata-token"] = imds_token,
+    }
   }
 
   if not iam_security_token_request then
