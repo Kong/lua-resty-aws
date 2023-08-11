@@ -6,7 +6,7 @@
 # It will convert the service descriptions of the specified SDK version
 # (see SDK_VERSION_TAG) into Lua modules and generate a rockspec.
 
-SDK_VERSION_TAG=v2.751.0
+SDK_VERSION_TAG="${SDK_VERSION_TAG:-v2.1434.0}"
 
 # ----------- nothing to customize below -----------
 TARGET=./src/resty/aws/raw-api
@@ -20,7 +20,7 @@ if [ -d $SOURCE ]; then
   echo "directory $SOURCE already exists, delete before updating"
   exit 1
 fi
-git clone --branch=$SDK_VERSION_TAG --depth=1 https://github.com/aws/aws-sdk-js.git $SOURCE
+git clone --branch="$SDK_VERSION_TAG" --depth=1 https://github.com/aws/aws-sdk-js.git $SOURCE
 
 
 # get a list of API files

@@ -58,6 +58,8 @@ jobs:
 
     - name: Run tests
       run: |
+        # Fetch latest aws-sdk-js release tag
+        export SDK_VERSION_TAG=$(curl -s https://api.github.com/repos/aws/aws-sdk-js/tags | jq '.[0].name')
         make dev
         /usr/local/openresty/luajit/bin/luarocks make
         busted
