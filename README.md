@@ -180,6 +180,8 @@ Release process:
   [#69](https://github.com/Kong/lua-resty-aws/pull/69)
 - fix: fix proxy-related global config var name to lowercase.
   [#70](https://github.com/Kong/lua-resty-aws/pull/70)
+- feat: EC2 metadata credential provider support IMDSv2
+  [#71]https://github.com/Kong/lua-resty-aws/pull/71
 
 ### 1.2.3 (20-Jul-2023)
 
