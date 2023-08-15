@@ -169,7 +169,7 @@ describe("request execution", function()
     local s3 = aws:S3()
 
     assert.same(type(s3.getObject), "function")
-    local request, err = s3:getObject({
+    local request, _ = s3:getObject({
       Bucket = "test-bucket",
       Key = "test-key",
     })
