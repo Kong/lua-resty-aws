@@ -166,7 +166,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### Unreleased
+### 1.3.0 (15-Aug-2023)
 
 - fix: fix AWS_CONTAINER_CREDENTIALS_FULL_URI parsing.
   [#65](https://github.com/Kong/lua-resty-aws/pull/65)
@@ -181,7 +181,7 @@ Release process:
 - fix: fix proxy-related global config var name to lowercase.
   [#70](https://github.com/Kong/lua-resty-aws/pull/70)
 - feat: EC2 metadata credential provider support IMDSv2
-  [#71]https://github.com/Kong/lua-resty-aws/pull/71
+  [#71](https://github.com/Kong/lua-resty-aws/pull/71)
 
 ### 1.2.3 (20-Jul-2023)
 
