@@ -21,11 +21,20 @@
 -- tbl.global_endpoint: if true, then use "us-east-1" as signing region and different
 --     hostname template: see https://github.com/aws/aws-sdk-js/blob/ae07e498e77000e55da70b20996dc8fd2f8b3051/lib/region_config_data.json
 local function prepare_request(config, request_data)
-  local tls = config.tls
   local host = request_data.host
   local port = request_data.port
   local timestamp = ngx.time()
   local req_date = os.date("!%Y%m%dT%H%M%SZ", timestamp)
+
+  local timeout = config.timeout
+  local keepalive_idle_timeout = config.keepalive_idle_timeout
+  local tls = config.tls
+  local ssl_verify = config.ssl_verify
+  local proxy_opts = {
+    http_proxy = config.http_proxy,
+    https_proxy = config.https_proxy,
+    no_proxy = config.no_proxy,
+  }
 
   local headers = {
     ["X-Amz-Date"] = req_date,
@@ -39,7 +48,11 @@ local function prepare_request(config, request_data)
     --url = url,                      -- "https://lambda.us-east-1.amazon.com:443/some/path?query1=val1"
     host = host,                      -- "lambda.us-east-1.amazon.com"
     port = port,                      -- 443
+    timeout = timeout,                -- 60000
+    keepalive_idle_timeout = keepalive_idle_timeout, -- 60000
     tls = tls,                        -- true
+    ssl_verify = ssl_verify,          -- true
+    proxy_opts = proxy_opts,          -- table
     path = request_data.path,         -- "/some/path"
     method = request_data.method,     -- "GET"
     query = request_data.query,       -- "query1=val1"
