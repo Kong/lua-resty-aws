@@ -46,8 +46,8 @@ function TokenFileWebIdentityCredentials:refresh()
     -- That's because this credentials class is part of the "CredentialProviderChain"
     local AWS = require "resty.aws"
     local aws = AWS {
-      region = global_config.region,
-      stsRegionalEndpoints = global_config.sts_regional_endpoints,
+      region = aws_config.global.region,
+      stsRegionalEndpoints = aws_config.global.sts_regional_endpoints,
     }
     local sts, err = aws:STS()
     if not sts then
