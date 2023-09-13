@@ -50,17 +50,20 @@ read that setting, hence you have to set it manually, see [the docs](https://tie
 ### Global settings
 
 This library depends on global settings. Especially the core services for authentication
-and metadata. Many of those can (also) be specified as environment variables.
+and metadata. Many of those can (also) be specified as environment variables.  Environment
+variables can only be accessed during the OpenResty `init` phase.  Thus, to ensure correct
+configuration from environment variables, the `resty.aws.config` module must be required on
+the top-level of the module using this library:
 
-Hence it is recommended to populate the global configuration object at application start
-in the OpenResty `init` phase. Simply add the following line;
-
+```Lua
+local aws_config = require("resty.aws.config")
 ```
-        local _ = require("resty.aws.config").global
-```
 
-This ensures the environment variables can still be read (in the `init` phase). And
-the auto-detection of the AWS region will execute.
+The `.global` property of the `aws_config` variable can then be used as the global
+configuration.  Note that when `.global` is first accessed, automatic region detection
+through the AWS metadata service is performed.  Thus, it is not advisable to access
+it on the module level unless to avoid startup delays in non-AWS environment, caused by
+the requests to the metadata service timing out.
 
 ---
 
@@ -165,6 +168,11 @@ Release process:
 1. test the created `.rock` file `VERSION=x.y.z && luarocks install lua-resty-aws-$VERSION-1.src.rock`
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
+
+### 1.3.3 (13-Sep-2023)
+
+- fix: don't invoke region detection code on the module toplevel and advise against trying to.
+  [81](https://github.com/Kong/lua-resty-aws/pull/81)
 
 ### 1.3.2 (13-Sep-2023)
 
