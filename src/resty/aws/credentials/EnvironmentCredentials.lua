@@ -2,6 +2,9 @@
 -- @classmod EnvironmentCredentials
 
 
+local aws_config = require("resty.aws.config")
+
+
 -- Create class
 local Super = require "resty.aws.credentials.Credentials"
 local EnvironmentCredentials = setmetatable({}, Super)
@@ -33,7 +36,7 @@ end
 -- updates credentials.
 -- @return success, or nil+err
 function EnvironmentCredentials:refresh()
-  local global_config = require("resty.aws.config").global
+  local global_config = aws_config.global
 
   local access = os.getenv(self.envPrefix .. "_ACCESS_KEY_ID") or global_config[self.envPrefix .. "_ACCESS_KEY_ID"]
   if not access then

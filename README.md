@@ -169,6 +169,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.3.4 (13-Sep-2023)
+
+- fix: remove more module-level uses of config.global
+  [83](https://github.com/Kong/lua-resty-aws/pull/83)
+
 ### 1.3.3 (13-Sep-2023)
 
 - fix: don't invoke region detection code on the module toplevel and advise against trying to.

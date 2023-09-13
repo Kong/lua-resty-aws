@@ -25,21 +25,19 @@ local FullUri do
     return t
   end
 
-  local global_config = require("resty.aws.config").global
+  local aws_config = require("resty.aws.config")
 
-  local ENV_RELATIVE_URI = global_config.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
-  local ENV_FULL_URI = global_config.AWS_CONTAINER_CREDENTIALS_FULL_URI
   local FULL_URI_UNRESTRICTED_PROTOCOLS = makeset { "https" }
   local FULL_URI_ALLOWED_PROTOCOLS = makeset { "http", "https" }
   local FULL_URI_ALLOWED_HOSTNAMES = makeset { "localhost", "127.0.0.1" }
   local RELATIVE_URI_HOST = '169.254.170.2'
 
   local function getFullUri()
-    if ENV_RELATIVE_URI then
-      return 'http://' .. RELATIVE_URI_HOST .. ENV_RELATIVE_URI
+    if aws_config.global.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI then
+      return 'http://' .. RELATIVE_URI_HOST .. aws_config.global.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
 
-    elseif ENV_FULL_URI then
-      local parsed_url = url.parse(ENV_FULL_URI)
+    elseif aws_config.global.AWS_CONTAINER_CREDENTIALS_FULL_URI then
+      local parsed_url = url.parse(aws_config.global.AWS_CONTAINER_CREDENTIALS_FULL_URI)
 
       if not FULL_URI_ALLOWED_PROTOCOLS[parsed_url.scheme] then
         return nil, 'Unsupported protocol, must be one of '
@@ -55,7 +53,7 @@ local FullUri do
                   .. parsed_url.host .. ' requested.'
       end
 
-      return ENV_FULL_URI
+      return aws_config.global.AWS_CONTAINER_CREDENTIALS_FULL_URI
 
     else
       return nil, 'Environment variable AWS_CONTAINER_CREDENTIALS_RELATIVE_URI or '
