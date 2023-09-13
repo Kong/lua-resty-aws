@@ -8,7 +8,7 @@ local CredentialProviderChain = setmetatable({}, Super)
 CredentialProviderChain.__index = CredentialProviderChain
 
 
-local AWS_EC2_METADATA_DISABLED = require("resty.aws.config").global.AWS_EC2_METADATA_DISABLED
+local aws_config = require("resty.aws.config")
 
 
 CredentialProviderChain.defaultProviders = {} do
@@ -36,7 +36,7 @@ CredentialProviderChain.defaultProviders = {} do
   add_if_exists("RemoteCredentials") -- since "ECSCredentials" doesn't exist? and for ECS RemoteCredentials is used???
   add_if_exists("ProcessCredentials")
   add_if_exists("TokenFileWebIdentityCredentials")
-  if AWS_EC2_METADATA_DISABLED then
+  if aws_config.global.AWS_EC2_METADATA_DISABLED then
     ngx.log(ngx.DEBUG, "AWS_EC2_METADATA_DISABLED is set, skipping EC2MetadataCredentials provider")
   else
     add_if_exists("EC2MetadataCredentials")

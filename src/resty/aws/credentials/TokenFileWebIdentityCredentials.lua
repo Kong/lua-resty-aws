@@ -4,11 +4,7 @@
 local readfile = require("pl.utils").readfile
 local lom = require("lxp.lom")
 
-
-local global_config = require("resty.aws.config").global
-local AWS_ROLE_ARN = global_config.role_arn
-local AWS_WEB_IDENTITY_TOKEN_FILE = global_config.web_identity_token_file
-local AWS_ROLE_SESSION_NAME = global_config.role_session_name or "session@lua-resty-aws"
+local aws_config = require("resty.aws.config")
 
 
 -- Create class
@@ -29,14 +25,14 @@ function TokenFileWebIdentityCredentials:new(opts)
 
   opts = opts or {}
   self.token_file = assert(
-    opts.token_file or AWS_WEB_IDENTITY_TOKEN_FILE,
+    opts.token_file or aws_config.global.AWS_WEB_IDENTITY_TOKEN_FILE,
     "either 'opts.token_file' or environment variable 'AWS_WEB_IDENTITY_TOKEN_FILE' must be set"
   )
   self.role_arn = assert(
-    opts.role_arn or AWS_ROLE_ARN,
+    opts.role_arn or aws_config.global.AWS_ROLE_ARN,
     "either 'opts.role_arn' or environment variable 'AWS_ROLE_ARN' must be set"
   )
-  self.session_name = opts.session_name or AWS_ROLE_SESSION_NAME
+  self.session_name = opts.session_name or aws_config.global.AWS_ROLE_SESSION_NAME or "session@lua-resty-aws"
 
   return self
 end
