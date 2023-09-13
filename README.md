@@ -166,7 +166,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### Unreleased
+### 1.3.2 (13-Sep-2023)
 
 - fix: unsigned request should support network related config option
   [79](https://github.com/Kong/lua-resty-aws/pull/79)
