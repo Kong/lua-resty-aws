@@ -61,6 +61,7 @@
 
 local pl_path = require "pl.path"
 local pl_config = require "pl.config"
+local aws_utils = require "resty.aws.utils"
 
 
 
@@ -340,8 +341,7 @@ return setmetatable(config, {
     -- between this module and the utils module.
     self.global = assert(self.get_config())
     if not self.global.region then
-      local utils = require "resty.aws.utils"
-      self.global.region = utils.getCurrentRegion()
+      self.global.region = aws_utils.getCurrentRegion()
     end
     return self.global
   end
