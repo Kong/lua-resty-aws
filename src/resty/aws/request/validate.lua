@@ -441,7 +441,7 @@ local validators do
   local list_checks do
     local function get_length(t)  -- gets length of an array (with holes)
       local size = 0
-      for k,v in pairs(t) do
+      for k in pairs(t) do
         if type(k) ~= "number" then
           return nil, "list contains non-numeric indices"
         end
