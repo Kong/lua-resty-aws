@@ -15,9 +15,11 @@ local http = require "resty.luasocket.http"
 local json = require "cjson"
 
 
-local FullUri do
-  -- construct the URL
+local FullUri
 
+
+local function initialize()
+  -- construct the URL
   local function makeset(t)
     for i = 1, #t do
       t[t[i]] = true
@@ -73,8 +75,9 @@ local FullUri do
     FullUri.port = FullUri.port or
                     ({ http = 80, https = 443 })[FullUri.scheme]
   end
-end
 
+  initialize = nil
+end
 
 
 -- Create class
@@ -96,6 +99,10 @@ end
 -- updates credentials.
 -- @return success, or nil+err
 function RemoteCredentials:refresh()
+  if initialize then
+    initialize()
+  end
+
   if not FullUri then
     return nil, "No URI environment variables found for RemoteCredentials"
   end
