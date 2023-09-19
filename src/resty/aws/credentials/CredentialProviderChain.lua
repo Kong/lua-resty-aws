@@ -11,7 +11,10 @@ CredentialProviderChain.__index = CredentialProviderChain
 local aws_config = require("resty.aws.config")
 
 
-CredentialProviderChain.defaultProviders = {} do
+CredentialProviderChain.defaultProviders = {}
+
+
+local function initialize()
   -- while not everything is implemented this will load what we do have without
   -- failing on what is missing. Will auto pick up newly added classes afterwards.
   local function add_if_exists(name, opts)
@@ -41,6 +44,8 @@ CredentialProviderChain.defaultProviders = {} do
   else
     add_if_exists("EC2MetadataCredentials")
   end
+
+  initialize = nil
 end
 
 --- Constructor, inherits from `Credentials`.
@@ -65,6 +70,10 @@ end
 -- @param opt options table, additional fields to the `Credentials` class:
 -- @param opt.providers array of `Credentials` objects or functions (functions must return a `Credentials` object)
 function CredentialProviderChain:new(opts)
+  if initialize then
+    initialize()
+  end
+
   local self = Super:new(opts)  -- override 'self' to be the new object/class
   setmetatable(self, CredentialProviderChain)
 
