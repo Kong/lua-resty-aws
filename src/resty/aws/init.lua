@@ -9,7 +9,6 @@ local split = require("pl.utils").split
 local tablex = require("pl.tablex")
 
 
-
 -- case-insensitive lookup help.
 -- always throws an error!
 local lookup_helper = function(self, key)  -- signature to match __index meta-method
@@ -298,6 +297,14 @@ local function generate_service_methods(service)
     -- decapitalize first character of method names to mimic JS sdk
     local method_name = operation.name:sub(1,1):lower() .. operation.name:sub(2,-1)
 
+    -- add hostPrefix for the methods that needs hostPrefix
+    -- issue: https://github.com/Kong/lua-resty-aws/issues/57
+    local hostPrefix = ""
+    if operation.endpoint then
+      hostPrefix = operation.endpoint.hostPrefix
+      service.config.endpoint = hostPrefix .. service.config.endpoint
+    end
+    
     local operation_prefix = ("%s:%s()"):format(
                               service.api.metadata.serviceId:gsub(" ",""),
                               method_name)
