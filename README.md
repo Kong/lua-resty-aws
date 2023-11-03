@@ -92,6 +92,14 @@ To install from the git repo:
     cd lua-resty-aws
     make install
 
+### Troubleshooting
+If you are MacOS(arm64) user and encounter `fatal error: 'expat_config.h' file not found
+#include "expat_config.h"` error when install, please make sure you have `expat` in your system.   
+If this error still happen, please add `EXPAT_DIR` parameter when install:   
+```
+luarocks install lua-resty-aws EXPAT_DIR=/path/to/expat
+```
+
 ---
 
 ## Development
