@@ -98,6 +98,7 @@ MacOS has a known issue that the libexpat header file 'expat_config.h' is missin
         luarocks install lua-resty-aws EXPAT_DIR=/path/to/expat
 
 Details: https://github.com/lunarmodules/luaexpat/issues/32
+
 ---
 
 ## Development
