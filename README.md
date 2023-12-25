@@ -176,8 +176,9 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-
 ### Unreleased
+
+### 1.3.6 (25-Dec-2023)
 
 - fix: validator failure for some of the field types
   [95](https://github.com/Kong/lua-resty-aws/pull/95)
