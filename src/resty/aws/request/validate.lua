@@ -435,6 +435,8 @@ local validators do
     type = always_pass,
     deprecated = always_pass,
     box = always_pass,
+    locationName = always_pass,
+    location = always_pass,
   },ops_mt)
 
 
@@ -491,6 +493,7 @@ local validators do
       locationName = always_pass,
       sensitive = always_pass,
       box = always_pass,
+      flattened = always_pass,
     },ops_mt)
   end
 
@@ -566,6 +569,9 @@ local validators do
     deprecatedMessage = always_pass,
     deprecated = always_pass,
     sensitive = always_pass,
+    locationName = always_pass,
+    location = always_pass,
+    xmlNamespace = always_pass,
   },ops_mt)
 
 

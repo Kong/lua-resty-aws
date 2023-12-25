@@ -177,6 +177,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### Unreleased
+
+- fix: validator failure for some of the field types
+  [95](https://github.com/Kong/lua-resty-aws/pull/95)
+
 ### 1.3.5 (19-Sep-2023)
 
 - fix: lazily initialize structures to avoid c-boundary errors on require
