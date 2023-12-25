@@ -66,7 +66,10 @@
 
 <h1>Module <code>resty.aws.config</code></h1>
 <p>Load AWS configuration.</p>
-<p><p> This is based of <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">Configuration and credential file settings</a>
+<p>
+
+
+<p> This is based of <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">Configuration and credential file settings</a>
  and <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html">Environment variables to configure the AWS CLI</a>.</p>
 
 <p> NOTE: this configuration resembles the CLI configuration. It is NOT the input object
@@ -74,22 +77,23 @@
 
 <p> <h3>Usage</h3></p>
 
-<p> Simply collect the global config table:
+<p> Simply collect the global config table:</p>
+
 <pre>
-<span class="keyword">local</span> config = <span class="global">require</span>(<span class="string">&ldquo;resty.aws.config&rdquo;</span>).global
-<span class="global">print</span>(<span class="string">&ldquo;AWS region: &rdquo;</span>, (config.region <span class="keyword">or</span> <span class="string">&ldquo;failed to detect&rdquo;</span>))
+<span class="keyword">local</span> config = <span class="global">require</span>(<span class="string">"resty.aws.config"</span>).global
+<span class="global">print</span>(<span class="string">"AWS region: "</span>, (config.region <span class="keyword">or</span> <span class="string">"failed to detect"</span>))
 </pre>
- <h3>Additional environment variables</h3></p>
+
+<p> <h3>Additional environment variables</h3></p>
 
 <p> The following config file entries do not have an environment variable override
  in the AWS CLI, but this Lua module adds them as follows:</p>
 
 <ul>
-<li><code>AWS_CLI_TIMESTAMP_FORMAT</code> will override <code>cli_timestamp_format</code></li>
-<li><code>AWS_DURATION_SECONDS</code> will override <code>duration_seconds</code></li>
-<li><code>AWS_PARAMETER_VALIDATION</code> will override <code>parameter_validation</code></li>
+    <li><code>AWS_CLI_TIMESTAMP_FORMAT</code> will override <code>cli_timestamp_format</code></li>
+    <li><code>AWS_DURATION_SECONDS</code> will override <code>duration_seconds</code></li>
+    <li><code>AWS_PARAMETER_VALIDATION</code> will override <code>parameter_validation</code></li>
 </ul>
-
 
 <p> <h3>Options processing and naming</h3></p>
 
@@ -97,27 +101,30 @@
  variables, and some in both. The options are processed as follows:</p>
 
 <ul>
-<li><p>profiles will be honored (see environment variable <code>AWS_PROFILE</code>)</p></li>
-<li><p>Numeric and boolean values will be converted to their equivalent Lua types</p></li>
-<li><p>properties will have the name as used in the config file, for any property
+    <li><p>profiles will be honored (see environment variable <code>AWS_PROFILE</code>)</p></li>
+    <li><p>Numeric and boolean values will be converted to their equivalent Lua types</p></li>
+    <li><p>properties will have the name as used in the config file, for any property
 that is a valid config file entry but also has an environment variable override.
-For example:
+For example:</p>
+
 <pre>
-export AWS_REGION=<span class="string">&ldquo;us-east-1&rdquo;</span>
+export AWS_REGION=<span class="string">"us-east-1"</span>
 </pre>
-will be available as <code>config.global.region</code> and <code>config.global.AWS_REGION</code>,
+
+<p>will be available as <code>config.global.region</code> and <code>config.global.AWS_REGION</code>,
 since in the config file the property
 is named <code>region</code>, whilst the environment variable is called <code>AWS_REGION</code>.</p></li>
-<li><p>properties that only have environment variable settings (eg. <code>AWS_SHARED_CREDENTIALS_FILE</code>)
+    <li><p>properties that only have environment variable settings (eg. <code>AWS_SHARED_CREDENTIALS_FILE</code>)
 will be added to the config table by their all-caps name.
-For example:
+For example:</p>
+
 <pre>
-export AWS_SHARED_CREDENTIALS_FILE=<span class="string">&ldquo;~/my_aws_config&rdquo;</span>
+export AWS_SHARED_CREDENTIALS_FILE=<span class="string">"~/my_aws_config"</span>
 </pre>
-will be available as <code>config.global.AWS_SHARED_CREDENTIALS_FILE</code>, since
+
+<p>will be available as <code>config.global.AWS_SHARED_CREDENTIALS_FILE</code>, since
 there is no config file property in this case.</p></li>
 </ul>
-
 
 <p> <h3>Other system variables</h3></p>
 
@@ -125,15 +132,14 @@ there is no config file property in this case.</p></li>
  module in the <code>init</code> phase will suffice for most use cases):</p>
 
 <ul>
-<li><code>ECS_CONTAINER_METADATA_URI_V4</code></li>
-<li><code>ECS_CONTAINER_METADATA_URI</code></li>
-<li><code>AMAZON_ACCESS_KEY_ID</code></li>
-<li><code>AMAZON_SECRET_ACCESS_KEY</code></li>
-<li><code>AMAZON_SESSION_TOKEN</code></li>
-<li><code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code></li>
-<li><code>AWS_CONTAINER_CREDENTIALS_FULL_URI</code></li>
+    <li><code>ECS_CONTAINER_METADATA_URI_V4</code></li>
+    <li><code>ECS_CONTAINER_METADATA_URI</code></li>
+    <li><code>AMAZON_ACCESS_KEY_ID</code></li>
+    <li><code>AMAZON_SECRET_ACCESS_KEY</code></li>
+    <li><code>AMAZON_SESSION_TOKEN</code></li>
+    <li><code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code></li>
+    <li><code>AWS_CONTAINER_CREDENTIALS_FULL_URI</code></li>
 </ul>
-
 </p>
 
 
@@ -255,7 +261,7 @@ there is no config file property in this case.</p></li>
     <dd>
     loads a configuration file.
  The returned table is a hash table with options. If profiles are returned
- then they will be sub-tables, with key &ldquo;profile [profile-name]&rdquo;.
+ then they will be sub-tables, with key "profile [profile-name]".
 
 
     <h3>Parameters:</h3>
@@ -267,7 +273,7 @@ there is no config file property in this case.</p></li>
         <li><span class="parameter">profile</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
          the profile to retrieve from the configuration file. If
- the profile doesn&rsquo;t exist, then it returns an empty table. Use <code>&quot;default&quot;</code> to get the default profile.
+ the profile doesn't exist, then it returns an empty table. Use <code>&quot;default&quot;</code> to get the default profile.
          (<em>optional</em>)
         </li>
     </ul>
@@ -313,7 +319,7 @@ there is no config file property in this case.</p></li>
     <dd>
     loads a credential file.
  The returned table is a hash table with options. If profiles are returned
- then they will be sub-tables, with key &ldquo;[profile-name]&rdquo;.
+ then they will be sub-tables, with key "[profile-name]".
 
 
     <h3>Parameters:</h3>
@@ -325,7 +331,7 @@ there is no config file property in this case.</p></li>
         <li><span class="parameter">profile</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
          the profile to retrieve from the credentials file. If
- the profile doesn&rsquo;t exist, then it returns an empty table. Use <code>default</code> to get the default profile.
+ the profile doesn't exist, then it returns an empty table. Use <code>default</code> to get the default profile.
          (<em>optional</em>)
         </li>
     </ul>
@@ -348,7 +354,7 @@ there is no config file property in this case.</p></li>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2023-09-19 17:44:16 </i>
+<i style="float:right;">Last updated 2023-12-25 06:16:21 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
