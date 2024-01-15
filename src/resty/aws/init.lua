@@ -299,11 +299,8 @@ local function generate_service_methods(service)
 
     -- add hostPrefix for the methods that needs hostPrefix
     -- issue: https://github.com/Kong/lua-resty-aws/issues/57
-    local hostPrefix = ""
-    if operation.endpoint then
-      hostPrefix = operation.endpoint.hostPrefix
-      service.config.endpoint = hostPrefix .. service.config.endpoint
-    end
+    local hostPrefix = operation.endpoint and operation.endpoint.hostPrefix or ""
+    service.config.endpoint = hostPrefix .. service.config.endpoint
     
     local operation_prefix = ("%s:%s()"):format(
                               service.api.metadata.serviceId:gsub(" ",""),
