@@ -178,6 +178,9 @@ Release process:
 
 ### Unreleased
 
+- fix: aws configuration cannot be loaded due to pl.path cannot resolve the path started with ~
+  [94](https://github.com/Kong/lua-resty-aws/pull/94)
+
 ### 1.3.6 (25-Dec-2023)
 
 - fix: validator failure for some of the field types
