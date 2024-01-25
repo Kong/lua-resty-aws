@@ -27,7 +27,7 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
 
     if shape.type == "structure" then
       for name, member in pairs(shape.members) do
-        if data[name] then
+        if nil ~= data[name] then
           poor_mans_xml_encoding(output, member, name, data[name], indent + 1)
         end
       end
