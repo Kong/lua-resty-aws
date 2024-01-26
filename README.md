@@ -180,6 +180,8 @@ Release process:
 
 - fix: aws configuration cannot be loaded due to pl.path cannot resolve the path started with ~
   [94](https://github.com/Kong/lua-resty-aws/pull/94)
+- fix: fix the bug of missing boolean type with a value of false in the generated request body
+  [100](https://github.com/Kong/lua-resty-aws/pull/100)
 
 ### 1.3.6 (25-Dec-2023)
 
