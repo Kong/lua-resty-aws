@@ -78,7 +78,7 @@ for f in "${file_list[@]}"; do
   ls -l "$source_file"
   ls -l "$TFILE"
   jq 'walk( if (type == "object") and has("documentation") and (.documentation|contains("wJalrXUtnFEMI")) then del(.documentation) else . end )' "$source_file" >| "$TFILE"
-  mv -f "$TFILE" "$source_file"
+  mv -f "$TFILE" "$source_file"; touch "$TFILE"
   # replace . with - since . can't be in a Lua module name
   target_file=$TARGET/${f//./-}.lua
   echo "adding: $target_file"
