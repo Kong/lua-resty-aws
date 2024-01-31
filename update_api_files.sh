@@ -11,7 +11,7 @@ SDK_VERSION_TAG=v2.751.0
 # ----------- nothing to customize below -----------
 TARGET=./src/resty/aws/raw-api
 SOURCE=./delete-me
-TFILE=$(mktemp -t tmpXXX)
+TFILE=$(mktemp)
 set -e
 pushd "$(dirname "$(realpath "$0")")" > /dev/null
 
