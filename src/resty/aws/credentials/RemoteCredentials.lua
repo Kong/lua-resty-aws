@@ -13,9 +13,11 @@ local DEFAULT_SERVICE_REQUEST_TIMEOUT = 5000
 local url = require "socket.url"
 local http = require "resty.luasocket.http"
 local json = require "cjson"
+local readfile = require("pl.utils").readfile
 
 
 local FullUri
+local AuthTokenFile
 
 
 local function initialize()
@@ -76,6 +78,11 @@ local function initialize()
                     ({ http = 80, https = 443 })[FullUri.scheme]
   end
 
+  -- get auth token file path
+  if aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE then
+    AuthTokenFile = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE
+  end
+
   initialize = nil
 end
 
@@ -107,6 +114,17 @@ function RemoteCredentials:refresh()
     return nil, "No URI environment variables found for RemoteCredentials"
   end
 
+
+  local headers = {}
+  if AuthTokenFile then
+    local token, err = readfile(AuthTokenFile)
+    if not token then
+      return nil, "Failed reading AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE: " .. err
+    end
+
+    headers["Authorization"] = token
+  end
+
   local client = http.new()
   client:set_timeout(DEFAULT_SERVICE_REQUEST_TIMEOUT)
 
@@ -122,6 +140,7 @@ function RemoteCredentials:refresh()
   local response, err = client:request {
     method = "GET",
     path   = FullUri.path,
+    headers = headers,
   }
 
   if not response then
