@@ -33,7 +33,7 @@ local function initialize()
 
   local FULL_URI_UNRESTRICTED_PROTOCOLS = makeset { "https" }
   local FULL_URI_ALLOWED_PROTOCOLS = makeset { "http", "https" }
-  local FULL_URI_ALLOWED_HOSTNAMES = makeset { "localhost", "127.0.0.1" }
+  local FULL_URI_ALLOWED_HOSTNAMES = makeset { "localhost", "127.0.0.1", "169.254.170.23" }
   local RELATIVE_URI_HOST = '169.254.170.2'
 
   local function getFullUri()
