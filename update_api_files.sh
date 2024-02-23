@@ -75,6 +75,7 @@ echo "]===]))" >> "$FILENAME"
 # Copy the individual API files
 for f in "${file_list[@]}"; do
   source_file=$SOURCE/apis/$f.normal.json
+  # remove example keys from documentation to prevent security reports from being triggered
   jq 'walk( if (type == "object") and has("documentation") and (.documentation|contains("wJalrXUtnFEMI")) then del(.documentation) else . end )' "$source_file" >| "$TFILE"
   mv -f "$TFILE" "$source_file"; touch "$TFILE"
   # replace . with - since . can't be in a Lua module name
