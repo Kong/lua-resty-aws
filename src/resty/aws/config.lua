@@ -147,14 +147,8 @@ local env_vars = {
   -- if both are set, the value in AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE will be used
   --
   -- This is also used by EKS Pod Identity authorization
+  AWS_CONTAINER_AUTHORIZATION_TOKEN = { name = "AWS_CONTAINER_AUTHORIZATION_TOKEN", default = nil },
   AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE = { name = "AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE", default = nil },
-  -- TODO: ---
-  -- A possible issue is that due to Nginx worker process's envvars isolation
-  -- the AWS_CONTAINER_AUTHORIZATION_TOKEN may not get refreshed.
-  -- According to the AWS documentation, the AWS_CONTAINER_AUTHORIZATION_TOKEN is only
-  -- used in IoT product Greengrass, which is not a common use case.
-  -- AWS_CONTAINER_AUTHORIZATION_TOKEN = { name = "AWS_CONTAINER_AUTHORIZATION_TOKEN", default = nil },
-  -- ---------
 
   -- HTTP/HTTPs proxy settings
   HTTP_PROXY = { name = "http_proxy", default = nil },

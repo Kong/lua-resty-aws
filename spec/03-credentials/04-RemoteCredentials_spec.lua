@@ -123,3 +123,34 @@ describe("RemoteCredentials with full URI and token file", function ()
     assert.equal(http_records[#http_records].headers["Authorization"], "testtokenabc123")
   end)
 end)
+
+describe("RemoteCredentials with full URI and token and token file, file takes higher precedence", function ()
+  it("fetches credentials", function ()
+    local RemoteCredentials
+
+    restore()
+    restore.setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI", "http://localhost:12345/test/path")
+    restore.setenv("AWS_CONTAINER_AUTHORIZATION_TOKEN", "testtoken")
+    restore.setenv("AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE", "/var/run/secrets/pods.eks.amazonaws.com/serviceaccount/eks-pod-identity-token")
+
+    local _ = require("resty.aws.config").global -- load config before mocking http client
+    package.loaded["resty.luasocket.http"] = http
+    package.loaded["pl.utils"] = pl_utils
+
+    RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
+    finally(function()
+      restore()
+    end)
+
+    local cred = RemoteCredentials:new()
+    local success, key, secret, token = cred:get()
+    assert.equal(true, success)
+    assert.equal("access", key)
+    assert.equal("secret", secret)
+    assert.equal("token", token)
+
+    assert.not_nil(http_records[#http_records].headers)
+    assert.equal(http_records[#http_records].headers["Authorization"], "testtokenabc123")
+  end)
+end)
+

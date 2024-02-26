@@ -17,6 +17,7 @@ local readfile = require("pl.utils").readfile
 
 
 local FullUri
+local AuthToken
 local AuthTokenFile
 
 
@@ -78,6 +79,11 @@ local function initialize()
                     ({ http = 80, https = 443 })[FullUri.scheme]
   end
 
+  -- get auth token
+  if aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN then
+    AuthToken = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN
+  end
+
   -- get auth token file path
   if aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE then
     AuthTokenFile = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE
@@ -116,6 +122,11 @@ function RemoteCredentials:refresh()
 
 
   local headers = {}
+
+  if AuthToken then
+    headers["Authorization"] = AuthToken
+  end
+
   if AuthTokenFile then
     local token, err = readfile(AuthTokenFile)
     if not token then
