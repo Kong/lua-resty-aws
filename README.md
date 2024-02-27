@@ -182,6 +182,8 @@ Release process:
   [94](https://github.com/Kong/lua-resty-aws/pull/94)
 - fix: fix the bug of missing boolean type with a value of false in the generated request body
   [100](https://github.com/Kong/lua-resty-aws/pull/100)
+- security: remove the documentation entry that contains a sample access key from AWS SDK. This
+  avoids false postive vulnerability report.
 
 ### 1.3.6 (25-Dec-2023)
 
