@@ -184,6 +184,7 @@ Release process:
   [100](https://github.com/Kong/lua-resty-aws/pull/100)
 - security: remove the documentation entry that contains a sample access key from AWS SDK. This
   avoids false postive vulnerability report.
+  [102](https://github.com/Kong/lua-resty-aws/pull/102)
 
 ### 1.3.6 (25-Dec-2023)
 
