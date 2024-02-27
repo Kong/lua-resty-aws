@@ -11,6 +11,7 @@ SDK_VERSION_TAG=v2.751.0
 # ----------- nothing to customize below -----------
 TARGET=./src/resty/aws/raw-api
 SOURCE=./delete-me
+TFILE=$(mktemp)
 set -e
 pushd "$(dirname "$(realpath "$0")")" > /dev/null
 
@@ -74,6 +75,9 @@ echo "]===]))" >> "$FILENAME"
 # Copy the individual API files
 for f in "${file_list[@]}"; do
   source_file=$SOURCE/apis/$f.normal.json
+  # remove example keys from documentation to prevent security reports from being triggered
+  jq 'walk( if (type == "object") and has("documentation") and (.documentation|contains("wJalrXUtnFEMI")) then del(.documentation) else . end )' "$source_file" >| "$TFILE"
+  mv -f "$TFILE" "$source_file"; touch "$TFILE"
   # replace . with - since . can't be in a Lua module name
   target_file=$TARGET/${f//./-}.lua
   echo "adding: $target_file"
