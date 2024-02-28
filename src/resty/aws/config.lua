@@ -57,6 +57,8 @@
 -- * `AMAZON_SESSION_TOKEN`
 -- * `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`
 -- * `AWS_CONTAINER_CREDENTIALS_FULL_URI`
+-- * `AWS_CONTAINER_AUTHORIZATION_TOKEN`
+-- * `AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE`
 
 
 local pl_path = require "pl.path"
@@ -140,6 +142,13 @@ local env_vars = {
   -- Variables used in RemoteCredentials (and in the CredentialProviderChain)
   AWS_CONTAINER_CREDENTIALS_RELATIVE_URI = { name = "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", default = nil },
   AWS_CONTAINER_CREDENTIALS_FULL_URI = { name = "AWS_CONTAINER_CREDENTIALS_FULL_URI", default = nil },
+  -- Token related Variables used in RemoteCredentials
+  -- Note that AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE has higher priority than AWS_CONTAINER_AUTHORIZATION_TOKEN
+  -- if both are set, the value in AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE will be used
+  --
+  -- This is also used by EKS Pod Identity authorization
+  AWS_CONTAINER_AUTHORIZATION_TOKEN = { name = "AWS_CONTAINER_AUTHORIZATION_TOKEN", default = nil },
+  AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE = { name = "AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE", default = nil },
 
   -- HTTP/HTTPs proxy settings
   HTTP_PROXY = { name = "http_proxy", default = nil },

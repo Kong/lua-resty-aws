@@ -185,6 +185,9 @@ Release process:
 - security: remove the documentation entry that contains a sample access key from AWS SDK. This
   avoids false postive vulnerability report.
   [102](https://github.com/Kong/lua-resty-aws/pull/102)
+- feat: container credential provider now supports using auth token defined in
+  AWS_CONTAINER_AUTHORIZATION_TOKEN and AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE.
+  [107](https://github.com/Kong/lua-resty-aws/pull/107)
 
 ### 1.3.6 (25-Dec-2023)
 
