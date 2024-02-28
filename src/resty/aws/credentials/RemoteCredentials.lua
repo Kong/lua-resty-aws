@@ -79,15 +79,9 @@ local function initialize()
                     ({ http = 80, https = 443 })[FullUri.scheme]
   end
 
-  -- get auth token
-  if aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN then
-    AuthToken = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN
-  end
-
-  -- get auth token file path
-  if aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE then
-    AuthTokenFile = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE
-  end
+  -- get auth token/file
+  AuthToken = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN
+  AuthTokenFile = aws_config.global.AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE
 
   initialize = nil
 end
