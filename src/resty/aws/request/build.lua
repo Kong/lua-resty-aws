@@ -157,7 +157,7 @@ local function build_request(operation, config, params)
 
   -- inject parameters in the right places; path/query/header/body
   -- this assumes they all live on the top-level of the structure, is this correct??
-  for name, member_config in pairs(operation.input.members) do
+  for name, member_config in pairs((operation.input or {}).members or {}) do
     local param_value = params[name]
     -- TODO: date-time value should be properly formatted???
     if param_value ~= nil then

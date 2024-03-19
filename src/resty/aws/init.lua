@@ -303,13 +303,16 @@ local function generate_service_methods(service)
                               method_name)
 
     service[method_name] = function(self, params)
+      params = params or {}
 
       --print(require("pl.pretty").write(self.config))
 
-      -- validate parameters
-      local ok, err = validate_input(params, operation.input, "params")
-      if not ok then
-        return nil, operation_prefix .. " validation error: " .. tostring(err)
+      -- validate parameters if we have any; eg. S3 "listBuckets" has none
+      if operation.input then
+        local ok, err = validate_input(params, operation.input, "params")
+        if not ok then
+          return nil, operation_prefix .. " validation error: " .. tostring(err)
+        end
       end
 
       -- implement stsRegionalEndpoints config setting,
