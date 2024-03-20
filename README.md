@@ -176,7 +176,7 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### Unreleased
+### 1.4.0 (20-Mar-2024)
 
 - fix: aws configuration cannot be loaded due to pl.path cannot resolve the path started with ~
   [94](https://github.com/Kong/lua-resty-aws/pull/94)
