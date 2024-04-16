@@ -178,7 +178,13 @@ do
   -- returns an empty table if the section does not exist
   local function load_file(filename, section)
     assert(type(filename) == "string", "expected filename to be a string")
-    if not pl_path.isfile(pl_path.expanduser(filename)) then
+
+    local expanded_path, err = pl_path.expanduser(filename)
+    if not expanded_path then
+      return nil, "failed expanding path '"..filename.."': "..tostring(err)
+    end
+
+    if not pl_path.isfile(expanded_path) then
       return nil, "not a file: '"..filename.."'"
     end
 
@@ -237,7 +243,8 @@ end
 -- table if the config file does not exist.
 -- @return options table as gotten from the configuration file, or nil+err.
 function config.load_config()
-  if not pl_path.isfile(pl_path.expanduser(env_vars.AWS_CONFIG_FILE.value)) then
+  local expanded_path = pl_path.expanduser(env_vars.AWS_CONFIG_FILE.value)
+  if not (expanded_path and pl_path.isfile(expanded_path)) then
     -- file doesn't exist
     return {}
   end
@@ -252,7 +259,8 @@ end
 -- @return credentials table as gotten from the credentials file, or a table
 -- with the key, id, and token from the configuration file, table can be empty.
 function config.load_credentials()
-  if pl_path.isfile(pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)) then
+  local expanded_path = pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  if expanded_path and pl_path.isfile(expanded_path) then
     local creds = config.load_credentials_file(env_vars.AWS_SHARED_CREDENTIALS_FILE.value, env_vars.AWS_PROFILE.value)
     if creds then -- ignore error, already logged
       return creds
@@ -288,7 +296,8 @@ end
 function config.get_config()
   local cfg = config.load_config() or {}   -- ignore error, already logged
 
-  if pl_path.isfile(pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)) then
+  local expanded_path = pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  if expanded_path and pl_path.isfile(expanded_path) then
     -- there is a creds file, so override creds with creds file
     local creds = config.load_credentials_file(
       env_vars.AWS_SHARED_CREDENTIALS_FILE.value, env_vars.AWS_PROFILE.value)  -- ignore error, already logged

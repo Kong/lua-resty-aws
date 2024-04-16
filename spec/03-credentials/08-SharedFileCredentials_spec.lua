@@ -1,6 +1,7 @@
 local pl_path = require "pl.path"
 local pl_config = require "pl.config"
 local tbl_clear = require "table.clear"
+local restore = require "spec.helpers"
 
 local hooked_file = {}
 
@@ -24,12 +25,15 @@ describe("SharedFileCredentials_spec", function()
   local SharedFileCredentials_spec
 
   before_each(function()
+    -- make ci happy
+    restore.setenv("HOME", "/home/ci-test")
     local _ = require("resty.aws.config").global -- load config before anything else
 
     SharedFileCredentials_spec = require "resty.aws.credentials.SharedFileCredentials"
   end)
 
   after_each(function()
+    restore()
     tbl_clear(hooked_file)
   end)
 
