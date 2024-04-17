@@ -63,7 +63,12 @@
 
 local pl_path = require "pl.path"
 local pl_config = require "pl.config"
+local pl_utils = require 'pl.utils'
 
+local sub = string.sub
+local os_getenv = os.getenv
+local assert_string = pl_utils.assert_string
+local is_windows = pl_utils.is_windows
 
 
 -- Convention: variable values are stored in the config table by the name of
@@ -154,6 +159,14 @@ local env_vars = {
   HTTP_PROXY = { name = "http_proxy", default = nil },
   HTTPS_PROXY = { name = "https_proxy", default = nil },
   NO_PROXY = { name = "no_proxy", default = nil },
+
+  -- Environment variables for expanding user home path
+  -- Nix specific
+  HOME = { name = "HOME", default = nil },
+  -- Windows specific
+  USERPROFILE = { name = "USERPROFILE", default = nil },
+  HOMEPATH = { name = "HOMEPATH", default = nil },
+  HOMEDRIVE = { name = "HOMEDRIVE", default = nil },
 }
 
 -- populate the env vars with their values, or defaults
@@ -173,13 +186,61 @@ local config = {
   env_vars = env_vars
 }
 
+
+--- Returns the environment variable value or the cached
+--- environment variable value in the `env_vars` table.
+-- @string var_name The environment variable name
+-- @treturn[1] string The environment variable value or the cached value in `env_vars` table
+-- @treturn[2] nil If the environment variable is not set and the cached value is not available
+local function getenv(var_name)
+  return os_getenv(var_name) or env_vars[var_name].value
+end
+
+
+--- Replace a starting '~' with the user's home directory.
+--- This is a patched version of the original `pl.path.expanduser` function.
+--- In lua-resty-aws the environment variables must be fetched in `init_phase`
+--- So we need to cache those home path related values and fall back to them
+--- if expanduser function failed to fetch the environment variables.
+-- @string P A file path
+-- @treturn[1] string The file path with the `~` prefix substituted, or the input path if it had no prefix.
+-- @treturn[2] nil
+-- @treturn[2] string Error message if the environment variables were unavailable.
+local function expanduser(P)
+  assert_string(1,P)
+  if P:sub(1,1) ~= '~' then
+      return P
+  end
+
+  local home = getenv('HOME')
+  if (not home) and (not is_windows) then
+      -- no more options to try on Nix
+      return nil, "failed to expand '~' (HOME not set)"
+  end
+
+  if (not home) then
+      -- try alternatives on Windows
+      home = getenv 'USERPROFILE'
+      if not home then
+          local hd = getenv 'HOMEDRIVE'
+          local hp = getenv 'HOMEPATH'
+          if not (hd and hp) then
+            return nil, "failed to expand '~' (HOME, USERPROFILE, and HOMEDRIVE and/or HOMEPATH not set)"
+          end
+          home = hd..hp
+      end
+  end
+
+  return home..sub(P,2)
+end
+
 do
   -- load a config file. If section given returns section only, otherwise full file.
   -- returns an empty table if the section does not exist
   local function load_file(filename, section)
     assert(type(filename) == "string", "expected filename to be a string")
 
-    local expanded_path, err = pl_path.expanduser(filename)
+    local expanded_path, err = expanduser(filename)
     if not expanded_path then
       return nil, "failed expanding path '"..filename.."': "..tostring(err)
     end
@@ -243,7 +304,7 @@ end
 -- table if the config file does not exist.
 -- @return options table as gotten from the configuration file, or nil+err.
 function config.load_config()
-  local expanded_path = pl_path.expanduser(env_vars.AWS_CONFIG_FILE.value)
+  local expanded_path = expanduser(env_vars.AWS_CONFIG_FILE.value)
   if not (expanded_path and pl_path.isfile(expanded_path)) then
     -- file doesn't exist
     return {}
@@ -259,7 +320,7 @@ end
 -- @return credentials table as gotten from the credentials file, or a table
 -- with the key, id, and token from the configuration file, table can be empty.
 function config.load_credentials()
-  local expanded_path = pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  local expanded_path = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
   if expanded_path and pl_path.isfile(expanded_path) then
     local creds = config.load_credentials_file(env_vars.AWS_SHARED_CREDENTIALS_FILE.value, env_vars.AWS_PROFILE.value)
     if creds then -- ignore error, already logged
@@ -296,7 +357,7 @@ end
 function config.get_config()
   local cfg = config.load_config() or {}   -- ignore error, already logged
 
-  local expanded_path = pl_path.expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  local expanded_path = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
   if expanded_path and pl_path.isfile(expanded_path) then
     -- there is a creds file, so override creds with creds file
     local creds = config.load_credentials_file(

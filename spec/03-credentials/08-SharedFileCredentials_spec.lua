@@ -9,11 +9,11 @@ local origin_read = pl_config.read
 local origin_isfile = pl_path.isfile
 
 pl_config.read = function(name, ...)
-  return hooked_file[pl_path.expanduser(name)] or origin_read(name, ...)
+  return hooked_file[name] or origin_read(name, ...)
 end
 
 pl_path.isfile = function(name)
-  return hooked_file[pl_path.expanduser(name)] and true or origin_isfile(name)
+  return hooked_file[name] and true or origin_isfile(name)
 end
 
 local function hook_config_file(name, content)
