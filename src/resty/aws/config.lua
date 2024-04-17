@@ -304,8 +304,9 @@ end
 -- table if the config file does not exist.
 -- @return options table as gotten from the configuration file, or nil+err.
 function config.load_config()
-  local expanded_path = expanduser(env_vars.AWS_CONFIG_FILE.value)
+  local expanded_path, err = expanduser(env_vars.AWS_CONFIG_FILE.value)
   if not (expanded_path and pl_path.isfile(expanded_path)) then
+    ngx.log(ngx.DEBUG, "failed to expand config file path or file does not exist: ", err)
     -- file doesn't exist
     return {}
   end
@@ -320,12 +321,15 @@ end
 -- @return credentials table as gotten from the credentials file, or a table
 -- with the key, id, and token from the configuration file, table can be empty.
 function config.load_credentials()
-  local expanded_path = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  local expanded_path, err = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
   if expanded_path and pl_path.isfile(expanded_path) then
     local creds = config.load_credentials_file(env_vars.AWS_SHARED_CREDENTIALS_FILE.value, env_vars.AWS_PROFILE.value)
     if creds then -- ignore error, already logged
       return creds
     end
+
+  else
+    ngx.log(ngx.DEBUG, "failed to expand credential file path or file does not exist: ", err)
   end
 
   -- fall back to config file
@@ -357,7 +361,7 @@ end
 function config.get_config()
   local cfg = config.load_config() or {}   -- ignore error, already logged
 
-  local expanded_path = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
+  local expanded_path, err = expanduser(env_vars.AWS_SHARED_CREDENTIALS_FILE.value)
   if expanded_path and pl_path.isfile(expanded_path) then
     -- there is a creds file, so override creds with creds file
     local creds = config.load_credentials_file(
@@ -367,6 +371,9 @@ function config.get_config()
       cfg.aws_secret_access_key = creds.aws_secret_access_key
       cfg.aws_session_token = creds.aws_session_token
     end
+
+  else
+    ngx.log(ngx.DEBUG, "failed to expand credential file path or file does not exist: ", err)
   end
 
   -- add environment variables
