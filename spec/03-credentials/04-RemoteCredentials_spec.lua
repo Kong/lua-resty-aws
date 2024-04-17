@@ -1,6 +1,7 @@
 local json = require("cjson.safe").new()
 local restore = require "spec.helpers"
 
+local old_pl_utils = require("pl.utils")
 
 -- Mock for HTTP client
 local response = {} -- override in tests
@@ -33,18 +34,17 @@ local http = {
   end,
 }
 
-local pl_utils = {
-  readfile = function()
-    return "testtokenabc123"
-  end
-}
-
 
 describe("RemoteCredentials", function()
 
   local RemoteCredentials
+  local pl_utils_readfile = old_pl_utils.readfile
 
   before_each(function()
+    pl_utils_readfile = old_pl_utils.readfile
+    old_pl_utils.readfile = function()
+      return "testtokenabc123"
+    end
     restore()
     restore.setenv("AWS_CONTAINER_CREDENTIALS_FULL_URI", "https://localhost/test/path")
 
@@ -55,6 +55,7 @@ describe("RemoteCredentials", function()
   end)
 
   after_each(function()
+    old_pl_utils.readfile = pl_utils_readfile
     restore()
   end)
 
@@ -96,6 +97,16 @@ describe("RemoteCredentials with customized full URI", function ()
 end)
 
 describe("RemoteCredentials with full URI and token file", function ()
+  local pl_utils_readfile
+  before_each(function()
+    pl_utils_readfile = old_pl_utils.readfile
+    old_pl_utils.readfile = function()
+      return "testtokenabc123"
+    end
+  end)
+  after_each(function()
+    old_pl_utils.readfile = pl_utils_readfile
+  end)
   it("fetches credentials", function ()
     local RemoteCredentials
 
@@ -105,7 +116,6 @@ describe("RemoteCredentials with full URI and token file", function ()
 
     local _ = require("resty.aws.config").global -- load config before mocking http client
     package.loaded["resty.luasocket.http"] = http
-    package.loaded["pl.utils"] = pl_utils
 
     RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
     finally(function()
@@ -125,6 +135,16 @@ describe("RemoteCredentials with full URI and token file", function ()
 end)
 
 describe("RemoteCredentials with full URI and token and token file, file takes higher precedence", function ()
+  local pl_utils_readfile
+  before_each(function()
+    pl_utils_readfile = old_pl_utils.readfile
+    old_pl_utils.readfile = function()
+      return "testtokenabc123"
+    end
+  end)
+  after_each(function()
+    old_pl_utils.readfile = pl_utils_readfile
+  end)
   it("fetches credentials", function ()
     local RemoteCredentials
 
@@ -135,7 +155,6 @@ describe("RemoteCredentials with full URI and token and token file, file takes h
 
     local _ = require("resty.aws.config").global -- load config before mocking http client
     package.loaded["resty.luasocket.http"] = http
-    package.loaded["pl.utils"] = pl_utils
 
     RemoteCredentials = require "resty.aws.credentials.RemoteCredentials"
     finally(function()

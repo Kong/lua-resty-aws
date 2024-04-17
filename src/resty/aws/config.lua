@@ -220,10 +220,10 @@ local function expanduser(P)
 
   if (not home) then
       -- try alternatives on Windows
-      home = getenv 'USERPROFILE'
+      home = getenv('USERPROFILE')
       if not home then
-          local hd = getenv 'HOMEDRIVE'
-          local hp = getenv 'HOMEPATH'
+          local hd = getenv('HOMEDRIVE')
+          local hp = getenv('HOMEPATH')
           if not (hd and hp) then
             return nil, "failed to expand '~' (HOME, USERPROFILE, and HOMEDRIVE and/or HOMEPATH not set)"
           end
@@ -240,18 +240,18 @@ do
   local function load_file(filename, section)
     assert(type(filename) == "string", "expected filename to be a string")
 
-    local expanded_path, err = expanduser(filename)
-    if not expanded_path then
+    local expanded_filename, err = expanduser(filename)
+    if not expanded_filename then
       return nil, "failed expanding path '"..filename.."': "..tostring(err)
     end
 
-    if not pl_path.isfile(expanded_path) then
+    if not pl_path.isfile(expanded_filename) then
       return nil, "not a file: '"..filename.."'"
     end
 
-    local contents, err = pl_config.read(filename, { variabilize = false })
+    local contents, err = pl_config.read(expanded_filename, { variabilize = false })
     if not contents then
-      return nil, "failed reading file '"..filename.."': "..tostring(err)
+      return nil, "failed reading file '"..filename.."'(expanded: '"..expanded_filename.."'): "..tostring(err)
     end
 
     if not section then
@@ -260,11 +260,11 @@ do
 
     assert(type(section) == "string", "expected section to be a string or falsy")
     if not contents[section] then
-      ngx.log(ngx.DEBUG, "section '",section,"' does not exist in file '",filename,"'")
+      ngx.log(ngx.DEBUG, "section '",section,"' does not exist in file '",filename,"'(expanded: '"..expanded_filename.."')")
       return {}
     end
 
-    ngx.log(ngx.DEBUG, "loaded section '",section,"' from file '",filename,"'")
+    ngx.log(ngx.DEBUG, "loaded section '",section,"' from file '",filename,"'(expanded: '"..expanded_filename.."')")
     return contents[section]
   end
 
