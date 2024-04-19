@@ -150,7 +150,7 @@ or run
 
 ## Copyright and license
 
-Copyright: (c) 2020-2023 Kong, Inc.
+Copyright: (c) 2020-2024 Kong, Inc.
 
 Author: Thijs Schreijer
 
@@ -177,7 +177,7 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### Unreleased
+### 1.4.1 (19-Apr-2024)
 
 - fix: patch expanduser function to be more friendly to OpenResty environment
   [111](https://github.com/Kong/lua-resty-aws/pull/111)
