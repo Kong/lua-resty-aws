@@ -19,6 +19,7 @@ describe("config loader", function()
   local config
   before_each(function()
     restore()
+    restore.setenv("HOME")
     pl_utils.writefile(config_filename, config_info)
   end)
 
