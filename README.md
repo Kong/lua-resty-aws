@@ -182,6 +182,8 @@ Release process:
 - feat: decode AWS api response json body with array metatable
   [114](https://github.com/Kong/lua-resty-aws/pull/114)
 
+- fix: do not inject region info for sts service with VPC endpoint hostname
+  [113](https://github.com/Kong/lua-resty-aws/pull/113)
 
 ### 1.4.1 (19-Apr-2024)
 

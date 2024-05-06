@@ -323,7 +323,10 @@ local function generate_service_methods(service)
         -- https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js#L78-L82
         assert(service.config.region, "region is required when using STS regional endpoints")
 
-        if not service.config._regionalEndpointInjected then
+        -- If the endpoint is a VPC endpoint DNS hostname then we don't need to inject the region
+        -- VPC endpoint DNS hostnames always contain region, see
+        -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
+        if not service.config._regionalEndpointInjected and not service.config.endpoint:match("^(.+)(%.vpce%.amazonaws%.com)$") then
           local pre, post = service.config.endpoint:match("^(.+)(%.amazonaws%.com)$")
           service.config.endpoint = pre .. "." .. service.config.region .. post
           service.config.signingRegion = service.config.region
