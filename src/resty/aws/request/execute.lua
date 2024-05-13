@@ -1,5 +1,8 @@
 local http = require "resty.luasocket.http"
-local json_decode = require("cjson.safe").new().decode
+
+local json_safe = require("cjson.safe").new()
+json_safe.decode_array_with_array_mt(true)
+local json_decode = json_safe.decode
 
 -- TODO: retries and back-off: https://docs.aws.amazon.com/general/latest/gr/api-retries.html
 
