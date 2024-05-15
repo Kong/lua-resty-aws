@@ -94,7 +94,7 @@ To install from the git repo:
 
 ### Troubleshooting
 
-MacOS has a known issue that the libexpat header file 'expat_config.h' is missing. If you run into that issue, install libexpat manually (eg. `brew install libexpat`). And then include the libexpat location when installing;
+MacOS has a known issue that the libexpat header file 'expat_config.h' is missing. If you run into that issue, install libexpat manually (eg. `brew install expat`). And then include the libexpat location when installing;
         luarocks install lua-resty-aws EXPAT_DIR=/path/to/expat
 
 Details: https://github.com/lunarmodules/luaexpat/issues/32
