@@ -1,15 +1,50 @@
 local restore = require "spec.helpers".restore
+local cjson = require "cjson"
 
 describe("request execution", function()
   local AWS, Credentials
 
+  local mock_request_response = {
+    ["s3.amazonaws.com"] = {
+      ["/"] = {
+        GET = {
+          status = 200,
+          headers = {
+            ["x-amz-id-2"] = "test",
+            ["x-amz-request-id"] = "test",
+            ["Date"] = "test",
+            ["Content-Type"] = "application/json",
+            ["Server"] = "AmazonS3",
+          },
+          body = [[{"ListAllMyBucketsResult":{"Buckets":[]}}]]
+        }
+      }
+    }
+  }
+
   setup(function()
     restore()
+    local http = require "resty.luasocket.http"
+    http.connect = function(...) return true end
+    http.request = function(self, req)
+      return { has_body = true,
+               status = mock_request_response[req.headers.Host][req.path][req.method].status,
+               headers = mock_request_response[req.headers.Host][req.path][req.method].headers,
+               read_body = function()
+                 local resp = mock_request_response[req.headers.Host][req.path][req.method].body
+                 return resp
+               end
+              }
+    end
+    http.set_timeout = function(...) return true end
+    http.set_keepalive = function(...) return true end
+    http.close = function(...) return true end
     AWS = require "resty.aws"
     Credentials = require "resty.aws.credentials.Credentials"
   end)
 
   teardown(function()
+    package.loaded["resty.luasocket.http"] = nil
     AWS = nil
     package.loaded["resty.aws"] = nil
   end)
@@ -178,5 +213,26 @@ describe("request execution", function()
     for k, v in pairs(proxy_opts) do
       assert.same(request.proxy_opts[k], v)
     end
+  end)
+
+  it("decoded json body should have array metatable", function ()
+    local config = {
+      region = "us-east-1"
+    }
+
+    config.credentials = Credentials:new({
+      accessKeyId = "teqst_id",
+      secretAccessKey = "test_key",
+    })
+
+    local aws = AWS(config)
+
+    local s3 = aws:S3()
+
+    assert.same(type(s3.listBuckets), "function")
+    local resp = s3:listBuckets()
+
+    assert.is_not_nil(resp.body)
+    assert.same([[{"ListAllMyBucketsResult":{"Buckets":[]}}]], cjson.encode(resp.body))
   end)
 end)
