@@ -92,4 +92,37 @@ describe("AWS main instance", function()
     assert.same("https://sts.eu-central-1.amazonaws.com", sts.config.endpoint)
   end)
 
+  it("do not inject sts region info for sts vpc endpoint url", function()
+    local aws = AWS({
+      region = "eu-central-1",
+      stsRegionalEndpoints = "regional",
+    })
+
+    aws.config.credentials = aws:Credentials {
+      accessKeyId = "test_id",
+      secretAccessKey = "test_key",
+    }
+
+    assert.is.table(aws.config)
+
+    local regional_vpc_endpoint_url = "https://vpce-abcdefg-hijklmn-eu-central-1a.sts.eu-central-1.vpce.amazonaws.com"
+
+    local sts, _ = aws:STS({
+      endpoint = regional_vpc_endpoint_url,
+    })
+    local _, _ = sts:assumeRole {
+      RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
+      RoleSessionName = "aws-test",
+    }
+
+    assert.same(regional_vpc_endpoint_url, sts.config.endpoint)
+
+    local _, _ = sts:assumeRole {
+      RoleArn = "aws:arn::XXXXXXXXXXXXXXXXX:test123",
+      RoleSessionName = "aws-test",
+    }
+    assert.same(regional_vpc_endpoint_url, sts.config.endpoint)
+  end)
+
+
 end)

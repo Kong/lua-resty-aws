@@ -8,6 +8,8 @@ local execute_request = require("resty.aws.request.execute")
 local split = require("pl.utils").split
 local tablex = require("pl.tablex")
 
+local AWS_PUBLIC_DOMAIN_PATTERN = "^(.+)(%.amazonaws%.com)$"
+local AWS_VPC_ENDPOINT_DOMAIN_PATTERN = "^(.+)(%.vpce%.amazonaws%.com)$"
 
 
 -- case-insensitive lookup help.
@@ -323,8 +325,11 @@ local function generate_service_methods(service)
         -- https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js#L78-L82
         assert(service.config.region, "region is required when using STS regional endpoints")
 
-        if not service.config._regionalEndpointInjected then
-          local pre, post = service.config.endpoint:match("^(.+)(%.amazonaws%.com)$")
+        -- If the endpoint is a VPC endpoint DNS hostname then we don't need to inject the region
+        -- VPC endpoint DNS hostnames always contain region, see
+        -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
+        if not service.config._regionalEndpointInjected and not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) then
+          local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
           service.config.endpoint = pre .. "." .. service.config.region .. post
           service.config.signingRegion = service.config.region
           service.config._regionalEndpointInjected = true
