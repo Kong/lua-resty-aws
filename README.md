@@ -177,7 +177,7 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### Unreleased
+### 1.5.0 (20-May-2024)
 
 - feat: decode AWS api response json body with array metatable
   [114](https://github.com/Kong/lua-resty-aws/pull/114)
