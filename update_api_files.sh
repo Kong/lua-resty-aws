@@ -6,7 +6,7 @@
 # It will convert the service descriptions of the specified SDK version
 # (see SDK_VERSION_TAG) into Lua modules and generate a rockspec.
 
-SDK_VERSION_TAG=v2.751.0
+SDK_VERSION_TAG=v2.1353.0
 
 # ----------- nothing to customize below -----------
 TARGET=./src/resty/aws/raw-api
