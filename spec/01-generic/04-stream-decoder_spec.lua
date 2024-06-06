@@ -37,88 +37,43 @@ describe("stream decoder", function()
       {
         body = "{\"role\":\"assistant\"}",
         headers = {
-          {
-            key = ":event-type",
-            value = "messageStart"
-          },
-          {
-            key = ":content-type",
-            value = "application/json"
-          },
-          {
-            key = ":message-type",
-            value = "event"
-          }
-        }
+            [":event-type"] = "messageStart",
+            [":content-type"] = "application/json",
+            [":message-type"] = "event",
+        },
       },
       {
         body = "{\"contentBlockIndex\":0,\"delta\":{\"text\":\"Pi (π) is a mathematical constant that represents the circumference-to-diameter ratio of a circle. It's approximately 3.14159.\"}}",
         headers = {
-          {
-            key = ":event-type",
-            value = "contentBlockDelta"
-          },
-          {
-            key = ":content-type",
-            value = "application/json"
-          },
-          {
-            key = ":message-type",
-            value = "event"
-          }
-        }
+            [":event-type"] = "contentBlockDelta",
+            [":content-type"] = "application/json",
+            [":message-type"] = "event",
+        },
       },
       {
         body = "{\"contentBlockIndex\":0}",
         headers = {
-          {
-            key = ":event-type",
-            value = "contentBlockStop"
-          },
-          {
-            key = ":content-type",
-            value = "application/json"
-          },
-          {
-            key = ":message-type",
-            value = "event"
-          }
-        }
+            [":event-type"] = "contentBlockStop",
+            [":content-type"] = "application/json",
+            [":message-type"] = "event",
+        },
       },
       {
         body = "{\"stopReason\":\"end_turn\"}",
         headers = {
-          {
-            key = ":event-type",
-            value = "messageStop"
-          },
-          {
-            key = ":content-type",
-            value = "application/json"
-          },
-          {
-            key = ":message-type",
-            value = "event"
-          }
-        }
+            [":event-type"] = "messageStop",
+            [":content-type"] = "application/json",
+            [":message-type"] = "event",
+        },
       },
       {
         body = "{\"metrics\":{\"latencyMs\":1506},\"usage\":{\"inputTokens\":8,\"outputTokens\":39,\"totalTokens\":47}}",
         headers = {
-          {
-            key = ":event-type",
-            value = "metadata"
-          },
-          {
-            key = ":content-type",
-            value = "application/json"
-          },
-          {
-            key = ":message-type",
-            value = "event"
-          }
-        }
-      }
+            [":event-type"] = "metadata",
+            [":content-type"] = "application/json",
+            [":message-type"] = "event",
+        },
+      },
     })
   end)
 end)
