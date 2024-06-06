@@ -12,6 +12,7 @@ local json_decode = json_safe.decode
 -- * reason: status description
 -- * headers: table with response headers
 -- * body: string with the raw body
+-- * body_reader: if resposne mimetype is eventstream, returns the stream reader handle
 --
 -- Input parameters:
 -- * signed_request table
