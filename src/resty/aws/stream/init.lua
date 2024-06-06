@@ -24,7 +24,10 @@ local _HEADER_EXTRACTORS = {
   [7] = function(stream)
     local header_value_len = stream:next_int(16)
     return stream:next_utf_8(header_value_len), header_value_len + 2  -- add the 2 bits read for the length
-  end
+  end,
+
+  -- TODO ADD THE REST OF THE DATA TYPES
+  -- EVEN THOUGH THEY'RE NOT REALLY USED
 }
 
 --- Constructor.
