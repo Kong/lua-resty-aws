@@ -177,6 +177,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### 1.x.x unreleased
+
+- fix: when a "blob" type has no location specified, then use it as the body, same as with other types.
+  [120](https://github.com/Kong/lua-resty-aws/pull/120)
+
 ### 1.5.0 (20-May-2024)
 
 - feat: decode AWS api response json body with array metatable
