@@ -12,6 +12,7 @@ local json_decode = json_safe.decode
 -- * reason: status description
 -- * headers: table with response headers
 -- * body: string with the raw body
+-- * body_reader: if resposne mimetype is eventstream, returns the stream reader handle
 --
 -- Input parameters:
 -- * signed_request table
@@ -50,15 +51,22 @@ local function execute_request(signed_request)
                   tostring(err))
   end
 
+  local body, body_reader
 
-  local body do
-    if response.has_body then
-      body, err = response:read_body()
-      if not body then
-        return nil, ("failed reading response body from '%s:%s': %s"):format(
-                      tostring(signed_request.host),
-                      tostring(signed_request.port),
-                      tostring(err))
+  if response.headers["application/vnd.amazon.eventstream"] then
+    body_reader = response.body_reader
+  else
+    local this_body do
+      if response.has_body then
+        this_body, err = response:read_body()
+        if not this_body then
+          return nil, ("failed reading response body from '%s:%s': %s"):format(
+                        tostring(signed_request.host),
+                        tostring(signed_request.port),
+                        tostring(err))
+        end
+
+        body = this_body
       end
     end
   end
@@ -82,7 +90,8 @@ local function execute_request(signed_request)
     status = response.status,
     reason = response.reason,
     headers = response.headers,
-    body = body
+    body = body,
+    body_reader = body_reader,
   }
 end
 
