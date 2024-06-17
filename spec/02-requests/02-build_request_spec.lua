@@ -9,6 +9,7 @@ describe("operations protocol", function()
   local config
   local params
   local snapshot
+  local binary_data
 
   setup(function()
     snapshot = assert:snapshot()
@@ -26,6 +27,8 @@ describe("operations protocol", function()
 
 
   before_each(function()
+    binary_data = "abcd" --"\00\01\02\03"
+
     operation = {
       name = "AssumeRole",
       http = {
@@ -76,6 +79,9 @@ describe("operations protocol", function()
           RoleSessionName = {
             type = "string",
           },
+          BinaryData = {
+            type = "blob",
+          },
           subStructure = {
             locationName = "someSubStructure",
             type = "structure",
@@ -124,7 +130,8 @@ describe("operations protocol", function()
         hello = "the default hello thinghy",
         world = "the default world thinghy"
       },
-      subList = { 1, 2 ,3, }
+      subList = { 1, 2 ,3, },
+      BinaryData = binary_data,
     }
 
   end)
@@ -164,6 +171,7 @@ describe("operations protocol", function()
         Action = "AssumeRole",
         Version = "2011-06-15",
         nice = '',
+        BinaryData = binary_data,
       }
     }, request)
   end)
@@ -182,7 +190,7 @@ describe("operations protocol", function()
     assert.same({
       headers = {
         ["X-Sooper-Secret"] = "towel",
-        ["Content-Length"] = 152,
+        ["Content-Length"] = 172,
         ["Content-Type"] = "application/x-amz-json-1.0",
         ["X-Amz-Target"] = "sts.AssumeRole",
         ["Host"] = "sts.amazonaws.com",
@@ -199,11 +207,12 @@ describe("operations protocol", function()
         subList = { 1,2,3 },
         RoleArn = "hello",
         RoleSessionName = "world",
+        BinaryData = binary_data,
       },
       query = {
         UserId = "Arthur Dent",
         nice = '',
-      }
+      },
     }, request)
   end)
 
@@ -221,7 +230,7 @@ describe("operations protocol", function()
     assert.same({
       headers = {
         ["X-Sooper-Secret"] = "towel",
-        ["Content-Length"] = 152,
+        ["Content-Length"] = 172,
         ["Content-Type"] = "application/x-amz-json-1.0",
         ["X-Amz-Target"] = "sts.AssumeRole",
         ["Host"] = "sts.amazonaws.com",
@@ -238,6 +247,7 @@ describe("operations protocol", function()
         subList = { 1,2,3 },
         RoleArn = "hello",
         RoleSessionName = "world",
+        BinaryData = binary_data,
       },
       query = {
         UserId = "Arthur Dent",
@@ -280,7 +290,7 @@ describe("operations protocol", function()
     assert.same({
       headers = {
         ["X-Sooper-Secret"] = "towel",
-        ["Content-Length"] = 424,
+        ["Content-Length"] = 456,
         ["Content-Type"] = "application/xml",
         ["X-Amz-Target"] = "sts.AssumeRole",
         ["Host"] = "sts.amazonaws.com",
@@ -294,6 +304,8 @@ describe("operations protocol", function()
           [1] = 'hello' },
         RoleSessionName = {
           [1] = 'world' },
+        BinaryData = {
+          [1] = binary_data },
         attr = {
           [1] = 'xmlns',
           xmlns = 'cool-name-space' },
