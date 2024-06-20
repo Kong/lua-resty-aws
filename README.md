@@ -177,7 +177,7 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### 1.x.x unreleased
+### 1.5.1 (20-Jun-2024)
 
 - fix: when a "blob" type has no location specified, then use it as the body, same as with other types.
   [120](https://github.com/Kong/lua-resty-aws/pull/120)
