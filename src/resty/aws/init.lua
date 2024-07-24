@@ -260,7 +260,7 @@ do
 end
 
 
-local isRegionalSTSDomain do
+local is_regional_sts_domain do
   -- from the list described in https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
   -- TODO: not sure if gov cloud also has their own endpoints so leave it for now
   local stsRegionRegexes = {
@@ -268,7 +268,7 @@ local isRegionalSTSDomain do
     [[sts\.cn\-\w+\-\d+\.amazonaws\.com\.cn$]],
   }
 
-  function isRegionalSTSDomain(domain)
+  function is_regional_sts_domain(domain)
     for _, entry in ipairs(stsRegionRegexes) do
       if ngx.re.match(domain, entry, "jo") then
         return true
@@ -352,7 +352,7 @@ local function generate_service_methods(service)
           -- If the endpoint is a VPC endpoint DNS hostname, or a regional STS domain, then we don't need to inject the region
           -- VPC endpoint DNS hostnames always contain region, see
           -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
-          if not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) and not isRegionalSTSDomain(service.config.endpoint) then
+          if not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) and not is_regional_sts_domain(service.config.endpoint) then
             local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
             service.config.endpoint = pre .. "." .. service.config.region .. post
           end
