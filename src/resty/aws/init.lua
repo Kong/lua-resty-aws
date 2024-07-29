@@ -260,6 +260,24 @@ do
 end
 
 
+local is_regional_sts_domain do
+  -- from the list described in https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
+  -- TODO: not sure if gov cloud also has their own endpoints so leave it for now
+  local stsRegionRegexes = {
+    [[sts\.(us|eu|ap|sa|ca|me)\-\w+\-\d+\.amazonaws\.com$]],
+    [[sts\.cn\-\w+\-\d+\.amazonaws\.com\.cn$]],
+  }
+
+  function is_regional_sts_domain(domain)
+    for _, entry in ipairs(stsRegionRegexes) do
+      if ngx.re.match(domain, entry, "jo") then
+        return true
+      end
+    end
+
+    return false
+  end
+end
 
 -- written from scratch
 
@@ -325,14 +343,19 @@ local function generate_service_methods(service)
         -- https://github.com/aws/aws-sdk-js/blob/307e82673b48577fce4389e4ce03f95064e8fe0d/lib/services/sts.js#L78-L82
         assert(service.config.region, "region is required when using STS regional endpoints")
 
-        -- If the endpoint is a VPC endpoint DNS hostname then we don't need to inject the region
-        -- VPC endpoint DNS hostnames always contain region, see
-        -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
-        if not service.config._regionalEndpointInjected and not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) then
-          local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
-          service.config.endpoint = pre .. "." .. service.config.region .. post
-          service.config.signingRegion = service.config.region
+        if not service.config._regionalEndpointInjected then
           service.config._regionalEndpointInjected = true
+          -- stsRegionalEndpoints is set to 'regional', so inject region into the
+          -- signingRegion to override global region_config_data
+          service.config.signingRegion = service.config.region
+
+          -- If the endpoint is a VPC endpoint DNS hostname, or a regional STS domain, then we don't need to inject the region
+          -- VPC endpoint DNS hostnames always contain region, see
+          -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
+          if not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) and not is_regional_sts_domain(service.config.endpoint) then
+            local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
+            service.config.endpoint = pre .. "." .. service.config.region .. post
+          end
         end
       end
 
