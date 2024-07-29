@@ -177,6 +177,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### 1.5.2 (29-Jul-2024)
+
+- fix: fix sts regional endpoint injection under several cases
+  [123](https://github.com/Kong/lua-resty-aws/pull/123)
+
 ### 1.5.1 (20-Jun-2024)
 
 - fix: when a "blob" type has no location specified, then use it as the body, same as with other types.
