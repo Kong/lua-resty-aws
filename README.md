@@ -177,6 +177,12 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### Unreleased
+
+- fix: build the request body based on payload field
+  [126](https://github.com/Kong/lua-resty-aws/pull/126)
+
+
 ### 1.5.2 (29-Jul-2024)
 
 - fix: fix sts regional endpoint injection under several cases

@@ -205,6 +205,21 @@ local function build_request(operation, config, params)
     request.query[k] = v
   end
 
+  local payload_member = operation.input and operation.input.payload
+  if payload_member and body_tbl[payload_member] then
+    local member_config = operation.input.members[payload_member]
+    if member_config.type == "structure" then
+      body_tbl = type(body_tbl[payload_member]) == "table" and body_tbl[payload_member] or body_tbl
+
+    elseif body_tbl[payload_member] then
+      request.body = body_tbl[payload_member]
+      if member_config.type == "binary" and member_config.streaming == true then
+        request.headers["Content-Type"] = "binary/octet-stream"
+      end
+      body_tbl[payload_member] = nil
+    end
+  end
+
   local table_empty = not next(body_tbl)
   -- already has a raw body, or no body at all
   if request.body then
