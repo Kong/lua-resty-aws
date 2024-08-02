@@ -177,7 +177,7 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
-### Unreleased
+### 1.5.3 (02-Aug-2024)
 
 - fix: build the request body based on payload field
   [126](https://github.com/Kong/lua-resty-aws/pull/126)
