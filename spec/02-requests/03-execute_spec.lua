@@ -51,7 +51,8 @@ describe("request execution", function()
 
   it("tls defaults to true", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
@@ -76,7 +77,8 @@ describe("request execution", function()
 
   it("support configuring tls false", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
@@ -103,7 +105,8 @@ describe("request execution", function()
 
   it("support configuring ssl verify false", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json"
     }
 
     config.credentials = Credentials:new({
@@ -129,7 +132,8 @@ describe("request execution", function()
 
   it("support configure timeout", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
@@ -155,7 +159,8 @@ describe("request execution", function()
 
   it("support configure keepalive idle timeout", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
@@ -181,7 +186,8 @@ describe("request execution", function()
 
   it("support set proxy options", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
@@ -217,7 +223,8 @@ describe("request execution", function()
 
   it("decoded json body should have array metatable", function ()
     local config = {
-      region = "us-east-1"
+      region = "us-east-1",
+      protocol = "json",
     }
 
     config.credentials = Credentials:new({
