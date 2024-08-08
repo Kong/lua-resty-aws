@@ -83,7 +83,7 @@ function TokenFileWebIdentityCredentials:refresh()
   if not data then
     return nil, "failed to parse response body: " .. err
   end
-  local credentials = data.AssumeRoleResponse.AssumeRoleResult.Credentials
+  local credentials = data.AssumeRoleWithWebIdentityResponse.AssumeRoleWithWebIdentityResult.Credentials
   self:set(
     credentials.AccessKeyId,
     credentials.SecretAccessKey,
