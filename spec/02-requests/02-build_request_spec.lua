@@ -383,7 +383,7 @@ describe("operations protocol", function()
         BinaryData = {
           [1] = binary_data },
         attr = {
-          [1] = 'xmlns',
+          --[1] = 'xmlns',
           xmlns = 'cool-name-space' },
         someSubStructure = {
           hello = {
