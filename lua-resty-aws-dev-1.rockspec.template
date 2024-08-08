@@ -27,7 +27,6 @@ dependencies = {
   "lua-resty-http >= 0.16",
   "lua-resty-luasocket ~> 1",
   "lua-resty-openssl >= 0.8.17",
-  "luaexpat >= 1.5.1",
 }
 
 build = {

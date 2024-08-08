@@ -139,7 +139,7 @@ local function build_request(operation, config, params)
     path =  uri,
     method = http.method,
     query = {},
-    headers = { ["Host"] = host_header, },
+    headers = { ["Host"] = host_header, ["Accept"] = "application/json" },
     host = host,
     port = port,
   }

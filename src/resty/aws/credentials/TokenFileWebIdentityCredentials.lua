@@ -2,7 +2,7 @@
 -- @classmod TokenFileWebIdentityCredentials
 
 local readfile = require("pl.utils").readfile
-local lom = require("lxp.lom")
+local cjson = require("cjson")
 
 local aws_config = require("resty.aws.config")
 
@@ -79,19 +79,17 @@ function TokenFileWebIdentityCredentials:refresh()
     return nil, "request for token returned invalid body: " .. err
   end
 
-  local resp_body_lom, err = lom.parse(response.body)
-  if not resp_body_lom then
+  local data, err = cjson.decode(response.body)
+  if not data then
     return nil, "failed to parse response body: " .. err
   end
-
-  local cred_lom = lom.find_elem(lom.find_elem(resp_body_lom, "AssumeRoleWithWebIdentityResult"), "Credentials")
-
-  local AccessKeyId = lom.find_elem(cred_lom, "AccessKeyId")[1]
-  local SecretAccessKey = lom.find_elem(cred_lom, "SecretAccessKey")[1]
-  local SessionToken = lom.find_elem(cred_lom, "SessionToken")[1]
-  local Expiration = lom.find_elem(cred_lom, "Expiration")[1]
-
-  self:set(AccessKeyId, SecretAccessKey, SessionToken, Expiration)
+  local credentials = data.AssumeRoleResponse.AssumeRoleResult.Credentials
+  self:set(
+    credentials.AccessKeyId,
+    credentials.SecretAccessKey,
+    credentials.SessionToken,
+    credentials.Expiration
+  )
 
   return true
 end
