@@ -1,5 +1,4 @@
 local cjson = require "cjson"
-local pl_stringx = require "pl.stringx"
 
 describe("operations protocol", function()
 
