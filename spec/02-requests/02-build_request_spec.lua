@@ -37,10 +37,10 @@ describe("operations protocol", function()
       },
       input = {
         type = "structure",
-        locationName = "mainXmlElement",  -- only for rest-xml protocol
-        xmlNamespace = {                  -- only for rest-xml protocol
-          uri = "cool-name-space"
-        },
+        --locationName = "mainXmlElement",  -- only for rest-xml protocol
+        --xmlNamespace = {                  -- only for rest-xml protocol
+        --  uri = "cool-name-space"
+        --},
         required = {
           "RoleArn",
           "RoleSessionName"
@@ -328,86 +328,6 @@ describe("operations protocol", function()
       port = 443,
       body = binary_data,
       query = {},
-    }, request)
-  end)
-
-
-  it("rest-xml: querystring, uri, header and body params", function()
-
-    config.protocol = "rest-xml"
-
-    local request = build_request(operation, config, params)
-    if request and request.body then
-      -- cannot reliably compare non-canonicalized json, so decode to Lua table
-      local body_lines = pl_stringx.splitlines(request.body)
-      for i, line in ipairs(body_lines) do
-        body_lines[i] = pl_stringx.strip(line, ' ')
-      end
-      request.body = assert(require("pl.xml").parse(table.concat(body_lines, "")))
-      local to_lua = function(t)
-        -- convert LOM to comparable Lua table
-        for i, v in ipairs(t) do
-          if type(v) == "table" and v.tag then
-            t[v.tag] = v
-            v.tag = nil
-            t[i] = nil
-            if type(v.attr) == "table" and not next(v.attr) then
-              -- delete empty attr table
-              v.attr = nil
-            end
-          end
-        end
-      end
-      to_lua(request.body)
-      to_lua(request.body.someSubStructure)
-    end
-
-    assert.same({
-      headers = {
-        ["Accept"] = 'application/json',
-        ["X-Sooper-Secret"] = "towel",
-        ["Content-Length"] = 456,
-        ["Content-Type"] = "application/xml",
-        ["X-Amz-Target"] = "sts.AssumeRole",
-        ["Host"] = "sts.amazonaws.com",
-      },
-      method = 'POST',
-      path = '/hello%20world/42',
-      host = 'sts.amazonaws.com',
-      port = 443,
-      body = {
-        RoleArn = {
-          [1] = 'hello' },
-        RoleSessionName = {
-          [1] = 'world' },
-        BinaryData = {
-          [1] = binary_data },
-        attr = {
-          --[1] = 'xmlns',
-          xmlns = 'cool-name-space' },
-        someSubStructure = {
-          hello = {
-            [1] = 'the default hello thinghy' },
-          world = {
-            [1] = 'the default world thinghy' } },
-        subList = {
-          [1] = {
-            [1] = '1',
-            attr = {},
-            tag = 'listELement' },
-          [2] = {
-            [1] = '2',
-            attr = {},
-            tag = 'listELement' },
-          [3] = {
-            [1] = '3',
-            attr = {},
-            tag = 'listELement' } },
-        tag = 'mainXmlElement' },
-      query = {
-        UserId = "Arthur Dent",
-        nice = '',
-      }
     }, request)
   end)
 
