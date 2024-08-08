@@ -206,6 +206,7 @@ describe("operations protocol", function()
     local request = build_request(operation, config, params)
     assert.same({
       headers = {
+        ["Accept"] = 'application/json',
         ["X-Sooper-Secret"] = "towel",
         ["X-Amz-Target"] = "sts.AssumeRole",
         ["Host"] = "sts.amazonaws.com",
@@ -239,6 +240,7 @@ describe("operations protocol", function()
 
     assert.same({
       headers = {
+        ["Accept"] = 'application/json',
         ["X-Sooper-Secret"] = "towel",
         ["Content-Length"] = 172,
         ["Content-Type"] = "application/x-amz-json-1.0",
@@ -279,6 +281,7 @@ describe("operations protocol", function()
 
     assert.same({
       headers = {
+        ["Accept"] = 'application/json',
         ["X-Sooper-Secret"] = "towel",
         ["Content-Length"] = 172,
         ["Content-Type"] = "application/x-amz-json-1.0",
@@ -314,6 +317,7 @@ describe("operations protocol", function()
 
     assert.same({
       headers = {
+        ["Accept"] = 'application/json',
         ["Content-Length"] = 4,
         ["X-Amz-Target"] = "s3.PutObject",
         ["Host"] = "s3.amazonaws.com",
@@ -360,6 +364,7 @@ describe("operations protocol", function()
 
     assert.same({
       headers = {
+        ["Accept"] = 'application/json',
         ["X-Sooper-Secret"] = "towel",
         ["Content-Length"] = 456,
         ["Content-Type"] = "application/xml",
