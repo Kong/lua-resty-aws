@@ -147,8 +147,9 @@ do
       return nil, "not a valid region, only 2 parts; "..region
     end
 
-    parts = tablex.sub(parts, 1, #parts - 1)
-    parts[#parts] = "*"
+    local n_parts = #parts
+    parts[n_parts] = nil
+    parts[n_parts - 1] = "*"
     return table.concat(parts, "-")
   end
 
