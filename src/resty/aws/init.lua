@@ -133,8 +133,10 @@ end
 
 
 do
+  -- https://github.com/aws/aws-sdk-js/blob/c0ec9d31057748cda57eac863273f5ef5a695782/lib/region_config.js#L4
   -- returns the region with the last element replaced by "*"
-  -- "us-east-1" --> "us-east-*"
+  -- "us-east-1" --> "us-*"
+  -- "us-isob-west-1" --> "us-isob-*"
   local function generateRegionPrefix(region)
     if not region then
       return nil, "no region given"
@@ -144,7 +146,10 @@ do
     if #parts < 3 then
       return nil, "not a valid region, only 2 parts; "..region
     end
-    parts[#parts] = "*"
+
+    local n_parts = #parts
+    parts[n_parts] = nil
+    parts[n_parts - 1] = "*"
     return table.concat(parts, "-")
   end
 
@@ -159,9 +164,9 @@ do
   -- 'sts' configured for region 'us-west-2';
   -- {
   --   "us-west-2/sts",
-  --   "us-west-*/sts",
+  --   "us-*/sts",
   --   "us-west-2/*",
-  --   "us-west-*/*",
+  --   "us-*/*",
   --   "*/sts",
   --   "*/*",
   -- }
