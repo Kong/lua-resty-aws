@@ -177,6 +177,11 @@ Release process:
 1. test installing the rock from LuaRocks
 
 
+### 1.5.4 (23-Sep-2024)
+
+- fix: fix configure endpoint bug in getRegionPrefix
+  [129](https://github.com/Kong/lua-resty-aws/pull/129)
+
 ### 1.5.3 (02-Aug-2024)
 
 - fix: build the request body based on payload field
