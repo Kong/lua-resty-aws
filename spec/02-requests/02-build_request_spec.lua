@@ -6,8 +6,10 @@ describe("operations protocol", function()
 
   local build_request
   local operation, operation_with_payload_field
+  local operation_with_requestUri_params_and_query_param_input
   local config, config_with_payload
   local params, params_with_payload
+  local params_with_requestUri_params_and_query_param_input
   local snapshot
   local binary_data
 
