@@ -73,8 +73,8 @@ local function canonicalise_query_string(query)
 
   elseif type(query) == "table" then
     for key, val in pairs(query) do
-      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
-      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
+      key = key:gsub("[^%w%-%._~]", percent_encode)
+      val = val:gsub("[^%w%-%._~]", percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
