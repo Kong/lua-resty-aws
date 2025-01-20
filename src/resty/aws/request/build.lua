@@ -202,7 +202,7 @@ local function build_request(operation, config, params)
   request.path = path
 
   for k,v in pairs(parse_query(query)) do
-    request.query[k] = v
+    request.query[ngx.unescape_uri(k)] = ngx.unescape_uri(v)
   end
 
   local payload_member = operation.input and operation.input.payload
