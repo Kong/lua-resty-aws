@@ -11,7 +11,6 @@ local tablex = require("pl.tablex")
 local AWS_PUBLIC_DOMAIN_PATTERN = "^(.+)(%.amazonaws%.com)$"
 local AWS_VPC_ENDPOINT_DOMAIN_PATTERN = "^(.+)(%.vpce%.amazonaws%.com)$"
 
-
 -- case-insensitive lookup help.
 -- always throws an error!
 local lookup_helper = function(self, key)  -- signature to match __index meta-method
@@ -323,6 +322,11 @@ local function generate_service_methods(service)
     -- decapitalize first character of method names to mimic JS sdk
     local method_name = operation.name:sub(1,1):lower() .. operation.name:sub(2,-1)
 
+    -- add hostPrefix for the methods that needs hostPrefix
+    -- issue: https://github.com/Kong/lua-resty-aws/issues/57
+    local hostPrefix = operation.endpoint and operation.endpoint.hostPrefix or ""
+    service.config.endpoint = hostPrefix .. service.config.endpoint
+    
     local operation_prefix = ("%s:%s()"):format(
                               service.api.metadata.serviceId:gsub(" ",""),
                               method_name)
