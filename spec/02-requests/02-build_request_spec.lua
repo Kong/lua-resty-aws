@@ -6,8 +6,10 @@ describe("operations protocol", function()
 
   local build_request
   local operation, operation_with_payload_field
+  local operation_with_requestUri_params_and_query_param_input
   local config, config_with_payload
   local params, params_with_payload
+  local params_with_requestUri_params_and_query_param_input
   local snapshot
   local binary_data
 
@@ -136,6 +138,36 @@ describe("operations protocol", function()
       },
     }
 
+    operation_with_requestUri_params_and_query_param_input = {
+      name = "PutObject",
+      http = {
+        method = "PUT",
+        requestUri = "/{Bucket}/{Key+}?testparam=testparamvalue"
+      },
+      input = {
+        type = "structure",
+        required = {
+          "Bucket",
+          "Key"
+        },
+        members = {
+          TestMember = {
+            type = "string",
+          },
+          Bucket = {
+            type = "string",
+            location = "uri",
+            locationName = "Bucket"
+          },
+          Key = {
+            type = "string",
+            location = "uri",
+            locationName = "Key"
+          },
+        },
+      },
+    }
+
     config = {
       apiVersion = "2011-06-15",
       --endpointPrefix = "sts",
@@ -184,6 +216,12 @@ describe("operations protocol", function()
       Body = binary_data,
     }
 
+    params_with_requestUri_params_and_query_param_input = {
+      Bucket = "hello",
+      Key = "world",
+      TestMember = "testvalue",
+    }
+
   end)
 
 
@@ -224,6 +262,30 @@ describe("operations protocol", function()
         BinaryData = binary_data,
       }
     }, request)
+  end)
+
+  it("query: undefined location params go into query table, with requestUri query params added", function ()
+    config_with_payload.protocol = "query"
+
+    local request = build_request(operation_with_requestUri_params_and_query_param_input,
+                                  config_with_payload, params_with_requestUri_params_and_query_param_input)
+    assert.same({
+      headers = {
+        ["X-Amz-Target"] = "s3.PutObject",
+        ["Host"] = "s3.amazonaws.com",
+      },
+      method = 'PUT',
+      path = '/hello/world',
+      host = 's3.amazonaws.com',
+      port = 443,
+      query = {
+        Action = "PutObject",
+        Version = "2006-03-01",
+        testparam = "testparamvalue",
+        TestMember = "testvalue",
+      }
+    }, request)
+
   end)
 
 
