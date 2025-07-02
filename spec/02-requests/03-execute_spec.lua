@@ -192,6 +192,8 @@ describe("request execution", function()
     local proxy_opts = {
       http_proxy = 'http://test-http-proxy:1234',
       https_proxy = 'http://test-https-proxy:4321',
+      http_proxy_authorization = 'Basic dGVzdF91c2VyOnRlc3RfcGFzc3c=',
+      https_proxy_authorization = 'Basic dGVzdF91c2VyOnRlc3RfcGFzc3c=',
       no_proxy = '127.0.0.1,localhost'
     }
 
@@ -200,6 +202,8 @@ describe("request execution", function()
     aws.config.http_proxy = proxy_opts.http_proxy
     aws.config.https_proxy = proxy_opts.https_proxy
     aws.config.no_proxy = proxy_opts.no_proxy
+    aws.config.http_proxy_authorization = proxy_opts.http_proxy_authorization
+    aws.config.https_proxy_authorization = proxy_opts.https_proxy_authorization
 
     local s3 = aws:S3()
 

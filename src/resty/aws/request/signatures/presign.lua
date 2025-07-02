@@ -137,6 +137,8 @@ local function presign_awsv4_request(config, request_data, service, region, expi
   local proxy_opts = {
     http_proxy = config.http_proxy,
     https_proxy = config.https_proxy,
+    http_proxy_authorization = config.http_proxy_authorization,
+    https_proxy_authorization = config.https_proxy_authorization,
     no_proxy = config.no_proxy,
   }
 
