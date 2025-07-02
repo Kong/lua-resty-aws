@@ -176,6 +176,10 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.6.0 (02-Jul-2025)
+
+- feat: support http_proxy_authorization and https_proxy_authorization options
+  [136](https://github.com/Kong/lua-resty-aws/pull/136)
 
 ### 1.5.4 (23-Sep-2024)
 
