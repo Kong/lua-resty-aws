@@ -158,6 +158,9 @@ local env_vars = {
   -- HTTP/HTTPs proxy settings
   HTTP_PROXY = { name = "http_proxy", default = nil },
   HTTPS_PROXY = { name = "https_proxy", default = nil },
+  -- Authorization headers for HTTP/HTTPs proxy
+  HTTP_PROXY_AUTHORIZATION = { name = "http_proxy_authorization", default = nil },
+  HTTPS_PROXY_AUTHORIZATION = { name = "https_proxy_authorization", default = nil },
   NO_PROXY = { name = "no_proxy", default = nil },
 
   -- Environment variables for expanding user home path
