@@ -498,12 +498,19 @@ function AWS:new(config)
         service_config[k] = service_config[k] or v
       end
 
+      local signer
+      if service_id == "RDS" then
+        signer = require("resty.aws.service.rds.signer")
+      elseif service_id == "ElastiCache" then
+        signer = require("resty.aws.service.elasticache.signer")
+      end
+
       local service_instance = {
         aws = aws_instance,
         config = service_config,
         api = api,
         -- Add service specific methods:
-        Signer = (service_id == "RDS") and require("resty.aws.service.rds.signer") or nil
+        Signer = signer
       }
 
       AWS.configureEndpoint(service_instance)
