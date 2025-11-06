@@ -305,7 +305,7 @@ describe("operations protocol", function()
         ["Host"] = "s3.amazonaws.com",
       },
       method = 'PUT',
-      path = '/hello%20world/test/abc',
+      path = '/hello%20world/test%2Fabc',
       host = 's3.amazonaws.com',
       port = 443,
       query = {
