@@ -46,7 +46,7 @@ local function canonicalise_path(path)
       -- intentionally discards components at top level
       segments[#segments] = nil
     else
-      segments[#segments+1] = ngx.unescape_uri(segment):gsub(URI_UNRESERVED_CHARS_PATTERN,
+      segments[#segments+1] = segment:gsub(URI_UNRESERVED_CHARS_PATTERN,
                                                              percent_encode)
     end
   end

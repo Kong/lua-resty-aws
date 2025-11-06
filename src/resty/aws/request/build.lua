@@ -50,7 +50,7 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
   end
 end
 
-local ESCAPE_PATTERN = "[^!#$&'()*+,/:;=?@[\\]A-Z\\d-_.~%]"
+local ESCAPE_PATTERN = "[^!#$&'()*+,/:;=?@[\\]a-zA-Z\\d_.~%-]"
 
 local function percent_escape(m)
   return string.format("%%%02X", string.byte(m[0]))
