@@ -11,6 +11,9 @@ for i = 0, 255 do
   CHAR_TO_HEX[char] = hex
 end
 
+local URI_UNRESERVED_CHARS_PATTERN = "[^%w%-%._~]"
+local QUERY_STRING_KV_PATTERN = "([^&=]+)=?([^&]*)"
+
 
 local function hmac(secret, data)
   return openssl_hmac.new(secret, "sha256"):final(data)
@@ -43,7 +46,7 @@ local function canonicalise_path(path)
       -- intentionally discards components at top level
       segments[#segments] = nil
     else
-      segments[#segments+1] = segment:gsub("[^%w%-%._~]",
+      segments[#segments+1] = segment:gsub(URI_UNRESERVED_CHARS_PATTERN,
                                             percent_encode)
     end
   end
@@ -65,16 +68,16 @@ end
 local function canonicalise_query_string(query)
   local q = {}
   if type(query) == "string" then
-    for key, val in query:gmatch("([^&=]+)=?([^&]*)") do
-      key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
-      val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
+    for key, val in query:gmatch(QUERY_STRING_KV_PATTERN) do
+      key = ngx.unescape_uri(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      val = ngx.unescape_uri(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
   elseif type(query) == "table" then
     for key, val in pairs(query) do
-      key = key:gsub("[^%w%-%._~]", percent_encode)
-      val = val:gsub("[^%w%-%._~]", percent_encode)
+      key = ngx.unescape_uri(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      val = ngx.unescape_uri(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
@@ -90,16 +93,16 @@ end
 local function add_args_to_query_string(query_args, query_string, sort)
   local q = {}
   if type(query_args) == "string" then
-    for key, val in query_args:gmatch("([^&=]+)=?([^&]*)") do
-      key = tostring(key):gsub("[^%w%-%._~]", percent_encode)
-      val = tostring(val):gsub("[^%w%-%._~]", percent_encode)
+    for key, val in query_args:gmatch(QUERY_STRING_KV_PATTERN) do
+      key = tostring(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      val = tostring(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
   elseif type(query_args) == "table" then
     for key, val in pairs(query_args) do
-      key = tostring(key):gsub("[^%w%-%._~]", percent_encode)
-      val = tostring(val):gsub("[^%w%-%._~]", percent_encode)
+      key = tostring(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      val = tostring(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
@@ -107,9 +110,9 @@ local function add_args_to_query_string(query_args, query_string, sort)
     error("bad query type, expected string or table, got: ".. type(query_args))
   end
 
-  for key, val in query_string:gmatch("([^&=]+)=?([^&]*)") do
-    key = ngx.unescape_uri(key):gsub("[^%w%-%._~]", percent_encode)
-    val = ngx.unescape_uri(val):gsub("[^%w%-%._~]", percent_encode)
+  for key, val in query_string:gmatch(QUERY_STRING_KV_PATTERN) do
+    key = ngx.unescape_uri(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+    val = ngx.unescape_uri(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
     q[#q+1] = key .. "=" .. val
   end
 
