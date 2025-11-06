@@ -10,6 +10,7 @@ describe("operations protocol", function()
   local config, config_with_payload
   local params, params_with_payload
   local params_with_requestUri_params_and_query_param_input
+  local params_with_uri_params
   local snapshot
   local binary_data
 
@@ -222,6 +223,12 @@ describe("operations protocol", function()
       TestMember = "testvalue",
     }
 
+    params_with_uri_params = {
+      Bucket = "hello world",
+      Key = "test/abc",
+      TestMember = "testvalue",
+    }
+
   end)
 
 
@@ -285,7 +292,29 @@ describe("operations protocol", function()
         TestMember = "testvalue",
       }
     }, request)
+  end)
 
+  it("query: correctly escape URI location params", function ()
+    config_with_payload.protocol = "query"
+
+    local request = build_request(operation_with_requestUri_params_and_query_param_input,
+                                  config_with_payload, params_with_uri_params)
+    assert.same({
+      headers = {
+        ["X-Amz-Target"] = "s3.PutObject",
+        ["Host"] = "s3.amazonaws.com",
+      },
+      method = 'PUT',
+      path = '/hello%20world/test/abc',
+      host = 's3.amazonaws.com',
+      port = 443,
+      query = {
+        Action = "PutObject",
+        Version = "2006-03-01",
+        testparam = "testparamvalue",
+        TestMember = "testvalue",
+      }
+    }, request)
   end)
 
 
