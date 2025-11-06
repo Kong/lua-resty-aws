@@ -180,6 +180,8 @@ Release process:
 
 - fix: fix an issue when publish sns message with urlencode reserved character(+/%)
   [132](https://github.com/Kong/lua-resty-aws/pull/132)
+- fix: fix an issue for building and signing request with URI location params.
+  [139](https://github.com/Kong/lua-resty-aws/pull/139)
 
 ### 1.6.0 (02-Jul-2025)
 
