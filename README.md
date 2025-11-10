@@ -176,10 +176,16 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
-### Unreleased
+### 1.7.0
+
+- feat: add a signer for ElastiCache
+  [140](https://github.com/Kong/lua-resty-aws/pull/140)
 
 - fix: fix an issue when publish sns message with urlencode reserved character(+/%)
   [132](https://github.com/Kong/lua-resty-aws/pull/132)
+
+- fix: fix an issue with building and signing request with URI location parameter
+  [141](https://github.com/Kong/lua-resty-aws/pull/141)
 
 ### 1.6.0 (02-Jul-2025)
 
