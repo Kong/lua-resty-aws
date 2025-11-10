@@ -76,8 +76,8 @@ local function canonicalise_query_string(query)
 
   elseif type(query) == "table" then
     for key, val in pairs(query) do
-      key = key:gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
-      val = val:gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      key = tostring(key):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
+      val = tostring(val):gsub(URI_UNRESERVED_CHARS_PATTERN, percent_encode)
       q[#q+1] = key .. "=" .. val
     end
 
