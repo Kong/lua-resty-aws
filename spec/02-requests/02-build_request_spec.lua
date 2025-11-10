@@ -7,6 +7,7 @@ describe("operations protocol", function()
   local build_request
   local operation, operation_with_payload_field
   local operation_with_requestUri_params_and_query_param_input
+  local operation_with_requestUri_params_without_plus_and_query_param_input
   local config, config_with_payload
   local params, params_with_payload
   local params_with_requestUri_params_and_query_param_input
@@ -169,6 +170,36 @@ describe("operations protocol", function()
       },
     }
 
+    operation_with_requestUri_params_without_plus_and_query_param_input = {
+      name = "PutObject",
+      http = {
+        method = "PUT",
+        requestUri = "/{Bucket}/{Key}?testparam=testparamvalue"
+      },
+      input = {
+        type = "structure",
+        required = {
+          "Bucket",
+          "Key"
+        },
+        members = {
+          TestMember = {
+            type = "string",
+          },
+          Bucket = {
+            type = "string",
+            location = "uri",
+            locationName = "Bucket"
+          },
+          Key = {
+            type = "string",
+            location = "uri",
+            locationName = "Key"
+          },
+        },
+      },
+    }
+
     config = {
       apiVersion = "2011-06-15",
       --endpointPrefix = "sts",
@@ -294,10 +325,33 @@ describe("operations protocol", function()
     }, request)
   end)
 
-  it("query: correctly escape URI location params", function ()
+  it("query: correctly escape URI location params with plus sign", function ()
     config_with_payload.protocol = "query"
 
     local request = build_request(operation_with_requestUri_params_and_query_param_input,
+                                  config_with_payload, params_with_uri_params)
+    assert.same({
+      headers = {
+        ["X-Amz-Target"] = "s3.PutObject",
+        ["Host"] = "s3.amazonaws.com",
+      },
+      method = 'PUT',
+      path = '/hello%20world/test/abc',
+      host = 's3.amazonaws.com',
+      port = 443,
+      query = {
+        Action = "PutObject",
+        Version = "2006-03-01",
+        testparam = "testparamvalue",
+        TestMember = "testvalue",
+      }
+    }, request)
+  end)
+
+  it("query: correctly escape URI location params without plus sign", function ()
+    config_with_payload.protocol = "query"
+
+    local request = build_request(operation_with_requestUri_params_without_plus_and_query_param_input,
                                   config_with_payload, params_with_uri_params)
     assert.same({
       headers = {
