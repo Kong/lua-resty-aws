@@ -176,6 +176,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.7.1
+
+- fix: fix an issue with building request with URI location parameter and plus sign.
+  [143](https://github.com/Kong/lua-resty-aws/pull/143)
+
 ### 1.7.0
 
 - feat: add a signer for ElastiCache
