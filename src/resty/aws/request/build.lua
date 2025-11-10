@@ -51,14 +51,16 @@ local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
 end
 
 local ESCAPE_PATTERN = "[^!#$&'()*+,:;=?@[\\]A-Z\\d_.~%-]"
+local ESCAPE_PATTERN_WITH_PATH = "[^!#$&'()*+,:;=?@[\\]A-Z\\d_.~%/-]"
 
 local function percent_escape(m)
   return string.format("%%%02X", string.byte(m[0]))
 end
 
-local function escape_uri(uri)
-  if ngx.re.find(uri, ESCAPE_PATTERN, "joi") then
-    return (ngx.re.gsub(uri, ESCAPE_PATTERN, percent_escape, "joi"))
+local function escape_uri(uri, preserve_path)
+  local pattern = preserve_path and ESCAPE_PATTERN_WITH_PATH or ESCAPE_PATTERN
+  if ngx.re.find(uri, pattern, "joi") then
+    return (ngx.re.gsub(uri, pattern, percent_escape, "joi"))
   end
 
   return uri
@@ -168,8 +170,10 @@ local function build_request(operation, config, params)
       -- print(name," = ", param_value, ": ",location, " (", locationName,")")
 
       if location == "uri" then
-        local place_holder = "{" .. locationName .. "%+?}"
-        local replacement = escape_uri(param_value):gsub("%%", "%%%%")
+        local place_holder = "{" .. locationName .. "(%+?)}"
+        local _, _, has_plus = request.path:find(place_holder)
+        local preserve_path = has_plus == "+"
+        local replacement = escape_uri(param_value, preserve_path):gsub("%%", "%%%%")
         request.path = request.path:gsub(place_holder, replacement)
 
       elseif location == "querystring" then
