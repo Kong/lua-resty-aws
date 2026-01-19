@@ -84,6 +84,10 @@
 	<td class="name" nowrap><a href="#Utils.getIDMSMetadata">Utils.getIDMSMetadata (subpath, version)</a></td>
 	<td class="summary">Fetches IDMS Metadata (EC2 and EKS).</td>
 	</tr>
+    <tr>
+    <td class="name" nowrap><a href="#Utils.getInstanceSignature">Utils.getInstanceSignature ()</a></td>
+    <td class="summary">Fetches the instance identity document and signature from IDMS.</td>
+    </tr>
 </table>
 
 <br/>
@@ -190,6 +194,22 @@
 
 
 </dd>
+
+<!-- generate doc for Utils.getInstanceSignature -->
+    <dt>
+    <a name = "Utils.getInstanceSignature"></a>
+    <strong>Utils.getInstanceSignature ()</strong>
+    </dt>
+    <dd>
+    Fetches the instance identity document and signature from IDMS.
+ Will make a call to the AWS identity endpoint and hence might timeout if ran on anything
+ else than an EC2-instance.
+    <h3>Returns:</h3>
+    <ol>
+        body &amp; content-type (if json, the body will be decoded to a Lua table), or nil+err
+    </ol>
+</dd>
+
 </dl>
 
 
