@@ -294,6 +294,26 @@ do  -- getCurrentRegion
 
     return detected_region, detected_error
   end
+
+
+  --- Retrieves the RSA2048 signature from EC2 instance metadata.
+  -- @return signature string, or nil+err
+  function Utils.getInstanceSignature()
+    local headers = { ["X-aws-ec2-metadata-token-ttl-seconds"] = "21600" }
+    local token, err = make_request(IDMS_URI .. "/latest/api/token", "PUT", headers)
+    if not token then
+      return nil, "failed getting IDMSToken: " .. tostring(err)
+    end
+
+    headers = { ["X-aws-ec2-metadata-token"] = token }
+    local signature, err = make_request(IDMS_URI .. "/latest/dynamic/instance-identity/rsa2048", "GET", headers)
+    if not signature then
+      return nil, "failed getting instance signature: " .. tostring(err)
+    end
+
+    signature = signature:gsub("\n", "")
+    return signature
+  end
 end
 
 return Utils
