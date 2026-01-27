@@ -176,6 +176,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.7.2
+
+- feat(aws): add Utils.getInstanceSignature to support get signature.
+  [145](https://github.com/Kong/lua-resty-aws/pull/145)
+
 ### 1.7.1
 
 - fix: fix an issue with building request with URI location parameter and plus sign.
