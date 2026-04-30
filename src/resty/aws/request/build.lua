@@ -10,6 +10,51 @@ local protocols = {
 
 
 
+-- emit (key, raw_value) pairs into `out` for a shape+data pair.
+-- Used by the "ec2" and "query" wire protocols. flatten_lists=true forces
+-- the flattened form (ec2 always flattens); query passes false and respects
+-- shape.flattened on each list shape.
+local function form_encode_recurse(out, shape, name, data, flatten_lists)
+  if shape.type == "structure" then
+    for member_name, member_shape in pairs(shape.members or {}) do
+      if data[member_name] ~= nil then
+        local seg = member_shape.locationName or member_name
+        local sub = name and (name .. "." .. seg) or seg
+        form_encode_recurse(out, member_shape, sub, data[member_name], flatten_lists)
+      end
+    end
+  elseif shape.type == "list" then
+    local member = shape.member or {}
+    local flat = flatten_lists or shape.flattened
+    local list_name
+    if flat then
+      if member.locationName then
+        local prefix = name:match("(.+)%.[^.]+$")
+        list_name = prefix and (prefix .. "." .. member.locationName) or member.locationName
+      else
+        list_name = name
+      end
+    else
+      list_name = name .. "." .. (member.locationName or "member")
+    end
+    for i, item in ipairs(data) do
+      form_encode_recurse(out, member, list_name .. "." .. i, item, flatten_lists)
+    end
+  elseif shape.type == "map" then
+    local key_name = (shape.key   or {}).locationName or "key"
+    local val_name = (shape.value or {}).locationName or "value"
+    local i = 1
+    for k, v in pairs(data) do
+      out[#out+1] = { name .. ".entry." .. i .. "." .. key_name, tostring(k) }
+      out[#out+1] = { name .. ".entry." .. i .. "." .. val_name, tostring(v) }
+      i = i + 1
+    end
+  else
+    out[#out+1] = { name, tostring(data) }
+  end
+end
+
+
 local function poor_mans_xml_encoding(output, shape, shape_name, data, indent)
   local indent = indent or 0
   local prefix = string.rep("  ", indent)
@@ -189,8 +234,16 @@ local function build_request(operation, config, params)
 
       elseif location == nil then
         if config.protocol == "query" then
-          -- no location specified, but protocol is query, so it goes into query
-          request.query[name] = param_value
+          -- no location specified, but protocol is query, so it goes into query.
+          -- Lists/structs/maps are recursively expanded into AWS query wire form
+          -- (e.g. InstanceIds.member.1=...) so the HTTP client receives flat scalars.
+          local out = {}
+          form_encode_recurse(out, member_config,
+                              member_config.locationName or name,
+                              param_value, false)
+          for _, kv in ipairs(out) do
+            request.query[kv[1]] = kv[2]
+          end
         else
           -- nowhere else to go, so put it in the body (for json and xml)
           body_tbl[name] = param_value
@@ -238,7 +291,24 @@ local function build_request(operation, config, params)
 
   -- format the body
   if config.protocol == "ec2" then
-    error("protocol 'ec2' not implemented yet")
+    -- EC2 wire protocol: POST body is application/x-www-form-urlencoded with
+    -- Action+Version and all params (including nested structs and lists) folded
+    -- in via the AWS flattened-list form: <member.locationName>.N=value.
+    local out = {
+      { "Action",  operation.name },
+      { "Version", config.apiVersion },
+    }
+    for n, v in pairs(body_tbl) do
+      local mc = operation.input.members[n]
+      assert(mc, "no shape for body parameter '" .. n .. "'")
+      form_encode_recurse(out, mc, mc.locationName or n, v, true)
+    end
+    local parts = {}
+    for _, kv in ipairs(out) do
+      parts[#parts+1] = escape_uri(kv[1]) .. "=" .. escape_uri(kv[2])
+    end
+    request.headers["Content-Type"] = request.headers["Content-Type"] or "application/x-www-form-urlencoded"
+    request.body = table.concat(parts, "&")
 
   elseif config.protocol == "rest-xml" then
     local xml_data = {

@@ -276,8 +276,6 @@ describe("operations protocol", function()
   it("query: params go into query table, target action+version added", function()
 
     config.protocol = "query"
-    params.subList = nil
-    params.subStructure = nil
 
     local request = build_request(operation, config, params)
     assert.same({
@@ -298,6 +296,11 @@ describe("operations protocol", function()
         Version = "2011-06-15",
         nice = '',
         BinaryData = binary_data,
+        ["someSubStructure.hello"] = "the default hello thinghy",
+        ["someSubStructure.world"] = "the default world thinghy",
+        ["subList.listELement.1"] = "1",
+        ["subList.listELement.2"] = "2",
+        ["subList.listELement.3"] = "3",
       }
     }, request)
   end)
@@ -552,13 +555,254 @@ describe("operations protocol", function()
   end)
 
 
-  pending("ec2: querystring, uri, header and body params", function()
+  it("ec2: querystring, uri, header and body params", function()
 
     config.protocol = "ec2"
 
-    assert.has.error(function()
-      build_request(operation, config, params)
-    end, "protocol 'ec2' not implemented yet")
+    local request = build_request(operation, config, params)
+
+    -- body is order-insensitive (pairs() ordering); parse and compare as table
+    local body_len = #request.body
+    local function parse_body(s)
+      local t = {}
+      for kv in s:gmatch("[^&]+") do
+        local k, v = kv:match("^([^=]*)=(.*)$")
+        t[ngx.unescape_uri(k)] = ngx.unescape_uri(v)
+      end
+      return t
+    end
+    local parsed_body = parse_body(request.body)
+    request.body = nil
+    assert.equal(body_len, request.headers["Content-Length"])
+    request.headers["Content-Length"] = nil
+
+    assert.same({
+      Action = "AssumeRole",
+      Version = "2011-06-15",
+      RoleArn = "hello",
+      RoleSessionName = "world",
+      BinaryData = binary_data,
+      ["someSubStructure.hello"] = "the default hello thinghy",
+      ["someSubStructure.world"] = "the default world thinghy",
+      ["listELement.1"] = "1",
+      ["listELement.2"] = "2",
+      ["listELement.3"] = "3",
+    }, parsed_body)
+
+    assert.same({
+      headers = {
+        ["X-Sooper-Secret"] = "towel",
+        ["Content-Type"] = "application/x-www-form-urlencoded",
+        ["X-Amz-Target"] = "sts.AssumeRole",
+        ["Host"] = "sts.amazonaws.com",
+      },
+      method = 'POST',
+      path = '/hello%20world/42',
+      host = 'sts.amazonaws.com',
+      port = 443,
+      query = {
+        UserId = "Arthur Dent",
+        nice = '',
+      },
+    }, request)
+  end)
+
+
+  it("ec2: nested struct-list with nested list (Filters-style)", function()
+    local op = {
+      name = "DescribeInstances",
+      http = { method = "POST", requestUri = "/" },
+      input = {
+        type = "structure",
+        members = {
+          Filters = {
+            type = "list",
+            member = {
+              locationName = "Filter",
+              type = "structure",
+              members = {
+                Name = { type = "string" },
+                Values = {
+                  type = "list",
+                  member = {
+                    locationName = "Value",
+                    type = "string",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }
+    local cfg = {
+      apiVersion = "2016-11-15",
+      globalEndpoint = "ec2.amazonaws.com",
+      protocol = "ec2",
+      signatureVersion = "v4",
+    }
+    local p = {
+      Filters = {
+        { Name = "instance-state-name", Values = { "running", "stopped" } },
+        { Name = "tag:Env",              Values = { "prod" } },
+      },
+    }
+
+    local request = build_request(op, cfg, p)
+    local parsed = {}
+    for kv in request.body:gmatch("[^&]+") do
+      local k, v = kv:match("^([^=]*)=(.*)$")
+      parsed[ngx.unescape_uri(k)] = ngx.unescape_uri(v)
+    end
+
+    assert.same({
+      Action = "DescribeInstances",
+      Version = "2016-11-15",
+      ["Filter.1.Name"]    = "instance-state-name",
+      ["Filter.1.Value.1"] = "running",
+      ["Filter.1.Value.2"] = "stopped",
+      ["Filter.2.Name"]    = "tag:Env",
+      ["Filter.2.Value.1"] = "prod",
+    }, parsed)
+    assert.equal("application/x-www-form-urlencoded", request.headers["Content-Type"])
+  end)
+
+
+  it("ec2: empty list emits no entries", function()
+    config.protocol = "ec2"
+    params.subList = {}
+
+    local request = build_request(operation, config, params)
+    for kv in request.body:gmatch("[^&]+") do
+      assert.is_nil(kv:find("listELement", 1, true), "did not expect listELement in body, got: " .. kv)
+    end
+  end)
+
+
+  it("ec2: map honors key/value locationName", function()
+    local op = {
+      name = "CreateTags",
+      http = { method = "POST", requestUri = "/" },
+      input = {
+        type = "structure",
+        members = {
+          Tags = {
+            type = "map",
+            key   = { type = "string", locationName = "Key" },
+            value = { type = "string", locationName = "Value" },
+          },
+        },
+      },
+    }
+    local cfg = {
+      apiVersion = "2016-11-15",
+      globalEndpoint = "ec2.amazonaws.com",
+      protocol = "ec2",
+      signatureVersion = "v4",
+    }
+    local p = { Tags = { Env = "prod", Owner = "team" } }
+
+    local request = build_request(op, cfg, p)
+    local parsed = {}
+    for kv in request.body:gmatch("[^&]+") do
+      local k, v = kv:match("^([^=]*)=(.*)$")
+      parsed[ngx.unescape_uri(k)] = ngx.unescape_uri(v)
+    end
+
+    -- pairs() ordering means we don't know which entry is .1 vs .2; collect pairs
+    local pairs_seen = {}
+    for i = 1, 2 do
+      local k = parsed["Tags.entry." .. i .. ".Key"]
+      local v = parsed["Tags.entry." .. i .. ".Value"]
+      assert.is_not_nil(k, "missing Tags.entry." .. i .. ".Key")
+      assert.is_not_nil(v, "missing Tags.entry." .. i .. ".Value")
+      pairs_seen[k] = v
+    end
+    assert.same({ Env = "prod", Owner = "team" }, pairs_seen)
+
+    -- and the literal .key/.value form must NOT be present
+    for k in pairs(parsed) do
+      assert.is_nil(k:find(".entry.%d+%.key$"), "unexpected literal .key segment: " .. k)
+      assert.is_nil(k:find(".entry.%d+%.value$"), "unexpected literal .value segment: " .. k)
+    end
+  end)
+
+
+  it("ec2: map without locationName falls back to literal key/value", function()
+    local op = {
+      name = "Whatever",
+      http = { method = "POST", requestUri = "/" },
+      input = {
+        type = "structure",
+        members = {
+          Attrs = {
+            type = "map",
+            key   = { type = "string" },
+            value = { type = "string" },
+          },
+        },
+      },
+    }
+    local cfg = {
+      apiVersion = "2016-11-15",
+      globalEndpoint = "ec2.amazonaws.com",
+      protocol = "ec2",
+      signatureVersion = "v4",
+    }
+    local p = { Attrs = { foo = "bar" } }
+
+    local request = build_request(op, cfg, p)
+    local parsed = {}
+    for kv in request.body:gmatch("[^&]+") do
+      local k, v = kv:match("^([^=]*)=(.*)$")
+      parsed[ngx.unescape_uri(k)] = ngx.unescape_uri(v)
+    end
+
+    assert.equal("foo", parsed["Attrs.entry.1.key"])
+    assert.equal("bar", parsed["Attrs.entry.1.value"])
+  end)
+
+
+  it("query: nested list of structs uses .member. infix", function()
+    local op = {
+      name = "DescribeAlarms",
+      http = { method = "POST", requestUri = "/" },
+      input = {
+        type = "structure",
+        members = {
+          Filters = {
+            type = "list",
+            member = {
+              type = "structure",
+              members = {
+                Name = { type = "string" },
+                Values = {
+                  type = "list",
+                  member = { type = "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    }
+    local cfg = {
+      apiVersion = "2010-08-01",
+      globalEndpoint = "monitoring.amazonaws.com",
+      protocol = "query",
+      signatureVersion = "v4",
+    }
+    local p = {
+      Filters = {
+        { Name = "Alarm", Values = { "a", "b" } },
+      },
+    }
+
+    local request = build_request(op, cfg, p)
+
+    assert.equal("Alarm", request.query["Filters.member.1.Name"])
+    assert.equal("a",     request.query["Filters.member.1.Values.member.1"])
+    assert.equal("b",     request.query["Filters.member.1.Values.member.2"])
   end)
 
 
