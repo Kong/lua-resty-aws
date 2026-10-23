@@ -358,8 +358,11 @@ local function generate_service_methods(service)
           -- VPC endpoint DNS hostnames always contain region, see
           -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
           if not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) and not is_regional_sts_domain(service.config.endpoint) then
+            -- custom endpoints (eg. a proxy) don't match the public AWS domain, leave them untouched
             local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
-            service.config.endpoint = pre .. "." .. service.config.region .. post
+            if pre and post then
+              service.config.endpoint = pre .. "." .. service.config.region .. post
+            end
           end
         end
       end

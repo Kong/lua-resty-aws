@@ -117,6 +117,30 @@ describe("STS service", function()
           assert.not_nil(request.headers.Authorization:find(region, 1, true))
         end)
 
+        it("and endpoint is a custom non-AWS domain", function ()
+          local config = {
+            region = region,
+            stsRegionalEndpoints = "regional",
+            endpoint = "https://sts-proxy.example.com",
+            dry_run = true,
+          }
+
+          local sts = aws:STS(config)
+          for _ = 1, 2 do
+            local request = sts:assumeRole({
+              RoleArn = test_assume_role_arn,
+              RoleSessionName = test_role_session_name,
+            })
+
+            assert.same(sts.config.stsRegionalEndpoints, "regional")
+            assert.same(region, sts.config.signingRegion)
+            assert.truthy(sts.config._regionalEndpointInjected)
+            -- Check the custom endpoint is left untouched
+            assert.same(config.endpoint, sts.config.endpoint)
+            assert.not_nil(request.headers.Authorization:find(region, 1, true))
+          end
+        end)
+
         it("and endpoint is region VPC endpoint", function ()
           local config = {
             region = region,
