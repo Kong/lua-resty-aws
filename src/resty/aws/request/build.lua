@@ -1,4 +1,5 @@
 local json_encode = require("cjson.safe").new().encode
+local http = require("resty.luasocket.http")
 
 local protocols = {
   ec2 = true,
@@ -94,7 +95,9 @@ local function get_host_port(config)
   end
 
   local tls = config.tls
-  local port = config.port or (tls and 443 or 80)
+  local parsed = http:parse_uri((tls and "https://" or "http://") .. endpoint, false)
+  local host = parsed and parsed[2] or endpoint
+  local port = config.port or (parsed and parsed[3]) or (tls and 443 or 80)
 
   local host_header do -- If the "standard" port is not in use, the port should be added to the Host header
     local with_port
@@ -104,13 +107,13 @@ local function get_host_port(config)
       with_port = port ~= 80
     end
     if with_port then
-      host_header = string.format("%s:%d", endpoint, port)
+      host_header = string.format("%s:%d", host, port)
     else
-      host_header = endpoint
+      host_header = host
     end
   end
 
-  return endpoint, port, host_header
+  return host, port, host_header
 end
 
 -- implement AWS api protocols.
