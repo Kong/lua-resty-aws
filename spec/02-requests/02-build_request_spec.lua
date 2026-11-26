@@ -562,4 +562,52 @@ describe("operations protocol", function()
   end)
 
 
+  describe("endpoint host and port parsing", function()
+    before_each(function()
+      config.protocol = "query"
+      params.subList = nil
+      params.subStructure = nil
+    end)
+
+    it("parses custom port and strips trailing slash from HTTP endpoint", function()
+      config.endpoint = "http://127.0.0.1:18080/"
+
+      local request = build_request(operation, config, params)
+      assert.same("127.0.0.1", request.host)
+      assert.same(18080, request.port)
+      assert.same("127.0.0.1:18080", request.headers["Host"])
+      assert.is_false(config.tls)
+    end)
+
+    it("strips trailing slash from HTTPS endpoint with standard port", function()
+      config.endpoint = "https://sts.ap-southeast-1.amazonaws.com/"
+
+      local request = build_request(operation, config, params)
+      assert.same("sts.ap-southeast-1.amazonaws.com", request.host)
+      assert.same(443, request.port)
+      assert.same("sts.ap-southeast-1.amazonaws.com", request.headers["Host"])
+      assert.is_true(config.tls)
+    end)
+
+    it("parses IPv6 host with custom port", function()
+      config.endpoint = "http://[::1]:18080/"
+
+      local request = build_request(operation, config, params)
+      assert.same("[::1]", request.host)
+      assert.same(18080, request.port)
+      assert.same("[::1]:18080", request.headers["Host"])
+    end)
+
+    it("prefers explicit config.port over port in endpoint URL", function()
+      config.endpoint = "https://sts.example.com:8443/"
+      config.port = 9443
+
+      local request = build_request(operation, config, params)
+      assert.same("sts.example.com", request.host)
+      assert.same(9443, request.port)
+      assert.same("sts.example.com:9443", request.headers["Host"])
+    end)
+  end)
+
+
 end)

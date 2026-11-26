@@ -7,9 +7,7 @@ local sign_request = require("resty.aws.request.sign")
 local execute_request = require("resty.aws.request.execute")
 local split = require("pl.utils").split
 local tablex = require("pl.tablex")
-
-local AWS_PUBLIC_DOMAIN_PATTERN = "^(.+)(%.amazonaws%.com)$"
-local AWS_VPC_ENDPOINT_DOMAIN_PATTERN = "^(.+)(%.vpce%.amazonaws%.com)$"
+local http = require("resty.luasocket.http")
 
 
 -- case-insensitive lookup help.
@@ -265,23 +263,31 @@ do
 end
 
 
-local is_regional_sts_domain do
-  -- from the list described in https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_enable-regions.html
-  -- TODO: not sure if gov cloud also has their own endpoints so leave it for now
-  local stsRegionRegexes = {
-    [[sts\.(us|eu|ap|sa|ca|me)\-\w+\-\d+\.amazonaws\.com$]],
-    [[sts\.cn\-\w+\-\d+\.amazonaws\.com\.cn$]],
-  }
-
-  function is_regional_sts_domain(domain)
-    for _, entry in ipairs(stsRegionRegexes) do
-      if ngx.re.match(domain, entry, "jo") then
-        return true
-      end
-    end
-
-    return false
+-- Parse an endpoint URL (with or without scheme) into its components.
+-- @param endpoint (string) endpoint URL or hostname, e.g. "https://sts.amazonaws.com:8443/"
+-- @return scheme (string|nil) lowercase URI scheme ("http" or "https"), or nil on failure
+-- @return host (string|nil) lowercase hostname without port or path
+-- @return port (number|nil) numeric port (defaults to 80 for http, 443 for https)
+local function parse_endpoint(endpoint)
+  if type(endpoint) ~= "string" then
+    return nil
   end
+
+  local sep = endpoint:find("://", 1, true)
+  if sep then
+    -- resty.http:parse_uri only accepts lowercase "http(s)" scheme
+    endpoint = endpoint:sub(1, sep - 1):lower() .. endpoint:sub(sep)
+  else
+    endpoint = "https://" .. endpoint
+  end
+
+  local parsed = http:parse_uri(endpoint, false)
+  if not parsed then
+    return nil
+  end
+
+  -- parsed = { scheme, host, port, path, query }
+  return parsed[1], parsed[2]:lower(), parsed[3]
 end
 
 -- written from scratch
@@ -354,12 +360,17 @@ local function generate_service_methods(service)
           -- signingRegion to override global region_config_data
           service.config.signingRegion = service.config.region
 
-          -- If the endpoint is a VPC endpoint DNS hostname, or a regional STS domain, then we don't need to inject the region
-          -- VPC endpoint DNS hostnames always contain region, see
-          -- https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html#interface-endpoint-dns-hostnames
-          if not service.config.endpoint:match(AWS_VPC_ENDPOINT_DOMAIN_PATTERN) and not is_regional_sts_domain(service.config.endpoint) then
-            local pre, post = service.config.endpoint:match(AWS_PUBLIC_DOMAIN_PATTERN)
-            service.config.endpoint = pre .. "." .. service.config.region .. post
+          local scheme, host, port = parse_endpoint(service.config.endpoint)
+          if host == "sts.amazonaws.com" then
+            local default_port = (scheme == "http") and 80 or 443
+            local port_suffix = (port and port ~= default_port) and (":" .. port) or ""
+            service.config.endpoint = string.format(
+              "%s://sts.%s.%s%s",
+              scheme,
+              service.config.region,
+              AWS.getEndpointSuffix(service.config.region),
+              port_suffix
+            )
           end
         end
       end
