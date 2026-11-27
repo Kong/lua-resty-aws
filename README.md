@@ -176,6 +176,11 @@ Release process:
 1. upload using: `VERSION=x.y.z APIKEY=abc... make upload`
 1. test installing the rock from LuaRocks
 
+### 1.7.3
+
+- fix(sts): preserve custom STS endpoints and parse endpoint port.
+  [150](https://github.com/Kong/lua-resty-aws/pull/150)
+
 ### 1.7.2
 
 - feat(aws): add Utils.getInstanceSignature to support get signature.
